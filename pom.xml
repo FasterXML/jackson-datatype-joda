@@ -5,10 +5,10 @@
     <artifactId>oss-parent</artifactId>
     <version>5</version>
   </parent>
-  <groupId>com.fasterxml</groupId>
+  <groupId>com.fasterxml.jackson.datatype</groupId>
   <artifactId>jackson-datatype-joda</artifactId>
   <name>Jackson-datatype-JODA</name>
-  <version>0.5.0-SNAPSHOT</version>
+  <version>2.0.0-RC2-SNAPSHOT</version>
   <packaging>bundle</packaging>
   <description>Add-on module for Jackson (http://jackson.codehaus.org) to support
 Joda (http://joda-time.sourceforge.net/) data types.
@@ -48,17 +48,20 @@ Joda (http://joda-time.sourceforge.net/) data types.
   </organization>
 
   <dependencies>
-    <dependency><!-- add core, not just mapper, to try to enforce compatible versions-->
-      <groupId>org.codehaus.jackson</groupId>
-      <artifactId>jackson-core-asl</artifactId>
-      <version>1.8.1</version>
+    <!-- Extends Jackson mapper, 2.x
+      -->
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-core</artifactId>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.codehaus.jackson</groupId>
-      <artifactId>jackson-mapper-asl</artifactId>
-      <version>1.8.1</version>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-databind</artifactId>
+      <version>${project.version}</version>
     </dependency>
-    <!-- And obviously also depend on Joda lib -->
+
+    <!-- And obviously also depends on Joda lib -->
     <dependency>
         <groupId>joda-time</groupId>
         <artifactId>joda-time</artifactId>
@@ -70,16 +73,23 @@ Joda (http://joda-time.sourceforge.net/) data types.
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>4.8.1</version>
+      <version>4.8.2</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
 
   <build>
+    <resources>
+      <resource>
+        <directory>src/main/resources</directory>
+        <filtering>true</filtering>
+      </resource>  
+    </resources>
     <plugins>
       <plugin>
         <!-- Let's require JDK 1.6 -->
         <artifactId>maven-compiler-plugin</artifactId>
+        <version>2.3.2</version>
         <configuration>
           <source>1.6</source>
           <target>1.6</target>
@@ -88,7 +98,7 @@ Joda (http://joda-time.sourceforge.net/) data types.
         <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-release-plugin</artifactId>
-            <version>2.0</version>
+            <version>2.1</version>
             <configuration>
                 <mavenExecutorId>forked-path</mavenExecutorId>
             </configuration>
@@ -96,6 +106,7 @@ Joda (http://joda-time.sourceforge.net/) data types.
         <plugin><!-- plug-in to attach source bundle in repo -->
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-source-plugin</artifactId>
+          <version>2.1.2</version>
           <executions>
             <execution>
               <id>attach-sources</id>
@@ -108,7 +119,7 @@ Joda (http://joda-time.sourceforge.net/) data types.
         <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <version>2.6</version>
+                <version>2.6.1</version>
                 <configuration>
                     <source>1.6</source>
                     <target>1.6</target>
@@ -133,18 +144,17 @@ Joda (http://joda-time.sourceforge.net/) data types.
         <plugin>
           <groupId>org.apache.felix</groupId>
           <artifactId>maven-bundle-plugin</artifactId>
+          <version>2.3.6</version>
           <extensions>true</extensions>
           <configuration>
             <instructions>
-              <Bundle-SymbolicName>${pom.artifactId}</Bundle-SymbolicName>
+              <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
               <Bundle-Vendor>fasterml.com</Bundle-Vendor>
               <Import-Package>
-,org.codehaus.jackson, org.codehaus.jackson.annotate, org.codehaus.jackson.format, org.codehaus.jackson.impl
-,org.codehaus.jackson.io ,org.codehaus.jackson.type, org.codehaus.jackson.util
-,org.codehaus.jackson.map, org.codehaus.jackson.map.introspect, org.codehaus.jackson.map.module
-,org.codehaus.jackson.map.jsontype, org.codehaus.jackson.map.jsontype.impl
-,org.codehaus.jackson.map.ser, org.codehaus.jackson.map.ser.impl
-,org.codehaus.jackson.map.type, org.codehaus.jackson.map.util
+com.fasterxml.jackson.core
+,com.fasterxml.jackson.databind
+,org.joda.time
+,org.joda.time.format
 </Import-Package>
               <Private-Package>
 </Private-Package>
