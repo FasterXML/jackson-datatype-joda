@@ -13,7 +13,7 @@ import com.fasterxml.jackson.databind.*;
  * Basic support is added for handling {@link DateTime}; more can be
  * added over time if and when requested.
  */
-public class TestJodaTime extends JodaTestBase
+public class JodaDeserializationTest extends JodaTestBase
 {
     /*
     /**********************************************************
@@ -21,23 +21,7 @@ public class TestJodaTime extends JodaTestBase
     /**********************************************************
      */
 
-    /**
-     * First: let's ensure that serialization does not fail
-     * with an error (see [JACKSON-157]).
-     */
-    public void testSerialization() throws IOException
-    {
-        ObjectMapper m = new ObjectMapper();
-        // let's use epoch time (Jan 1, 1970, UTC)
-        DateTime dt = new DateTime(0L, DateTimeZone.UTC);
-        // by default, dates use timestamp, so:
-        assertEquals("0", m.writeValueAsString(dt));
-
-        // but if re-configured, as regular ISO-8601 string
-        m = new ObjectMapper();
-        m.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
-        assertEquals(quote("1970-01-01T00:00:00.000Z"), m.writeValueAsString(dt));
-    }
+    private final ObjectMapper MAPPER = jodaMapper();
 
     /**
      * Ok, then: should be able to convert from JSON String or Number,
@@ -50,36 +34,33 @@ public class TestJodaTime extends JodaTestBase
         cal.set(Calendar.YEAR, 1972);
         long timepoint = cal.getTime().getTime();
 
-        ObjectMapper mapper = new ObjectMapper();
         // Ok, first: using JSON number (milliseconds since epoch)
-        DateTime dt = mapper.readValue(String.valueOf(timepoint), DateTime.class);
+        DateTime dt = MAPPER.readValue(String.valueOf(timepoint), DateTime.class);
         assertEquals(timepoint, dt.getMillis());
 
         // And then ISO-8601 String
-        dt = mapper.readValue(quote("1972-12-28T12:00:01.000+0000"), DateTime.class);
+        dt = MAPPER.readValue(quote("1972-12-28T12:00:01.000+0000"), DateTime.class);
         assertEquals("1972-12-28T12:00:01.000Z", dt.toString());
     }
 
     public void testDeserReadableDateTime() throws IOException
     {
-        ObjectMapper mapper = new ObjectMapper();
-        ReadableDateTime date = mapper.readValue(quote("1972-12-28T12:00:01.000+0000"), ReadableDateTime.class);
+        ReadableDateTime date = MAPPER.readValue(quote("1972-12-28T12:00:01.000+0000"), ReadableDateTime.class);
         assertNotNull(date);
         assertEquals("1972-12-28T12:00:01.000Z", date.toString());
 
         // since 1.6.1, for [JACKSON-360]
-        assertNull(mapper.readValue(quote(""), ReadableDateTime.class));
+        assertNull(MAPPER.readValue(quote(""), ReadableDateTime.class));
     }
 
     public void testDeserReadableInstant() throws IOException
     {
-        ObjectMapper mapper = new ObjectMapper();
-        ReadableInstant date = mapper.readValue(quote("1972-12-28T12:00:01.000+0000"), ReadableInstant.class);
+        ReadableInstant date = MAPPER.readValue(quote("1972-12-28T12:00:01.000+0000"), ReadableInstant.class);
         assertNotNull(date);
         assertEquals("1972-12-28T12:00:01.000Z", date.toString());
 
         // since 1.6.1, for [JACKSON-360]
-        assertNull(mapper.readValue(quote(""), ReadableInstant.class));
+        assertNull(MAPPER.readValue(quote(""), ReadableInstant.class));
     }
     
     /*
@@ -87,35 +68,22 @@ public class TestJodaTime extends JodaTestBase
     /* Tests for DateMidnight type
     /**********************************************************
      */
-    
-    public void testDateMidnightSer() throws IOException
-    {
-        DateMidnight date = new DateMidnight(2001, 5, 25);
-        ObjectMapper mapper = new ObjectMapper();
-        // default format is that of JSON array...
-        assertEquals("[2001,5,25]", mapper.writeValueAsString(date));
-        // but we can force it to be a String as well (note: here we assume this is
-        // dynamically changeable)
-        mapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);        
-        assertEquals(quote("2001-05-25"), mapper.writeValueAsString(date));
-    }
 
     public void testDateMidnightDeser() throws IOException
     {
-        ObjectMapper mapper = new ObjectMapper();
         // couple of acceptable formats, so:
-        DateMidnight date = mapper.readValue("[2001,5,25]", DateMidnight.class);
+        DateMidnight date = MAPPER.readValue("[2001,5,25]", DateMidnight.class);
         assertEquals(2001, date.getYear());
         assertEquals(5, date.getMonthOfYear());
         assertEquals(25, date.getDayOfMonth());
 
-        DateMidnight date2 = mapper.readValue(quote("2005-07-13"), DateMidnight.class);
+        DateMidnight date2 = MAPPER.readValue(quote("2005-07-13"), DateMidnight.class);
         assertEquals(2005, date2.getYear());
         assertEquals(7, date2.getMonthOfYear());
         assertEquals(13, date2.getDayOfMonth());
 
         // since 1.6.1, for [JACKSON-360]
-        assertNull(mapper.readValue(quote(""), DateMidnight.class));
+        assertNull(MAPPER.readValue(quote(""), DateMidnight.class));
     }
     
     /*
@@ -123,18 +91,6 @@ public class TestJodaTime extends JodaTestBase
     /* Tests for LocalDate type
     /**********************************************************
      */
-    
-    public void testLocalDateSer() throws IOException
-    {
-        LocalDate date = new LocalDate(2001, 5, 25);
-        ObjectMapper mapper = new ObjectMapper();
-        // default format is that of JSON array...
-        assertEquals("[2001,5,25]", mapper.writeValueAsString(date));
-        // but we can force it to be a String as well (note: here we assume this is
-        // dynamically changeable)
-        mapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);        
-        assertEquals(quote("2001-05-25"), mapper.writeValueAsString(date));
-    }
 
     public void testLocalDateDeser() throws IOException
     {
@@ -160,24 +116,10 @@ public class TestJodaTime extends JodaTestBase
     /**********************************************************
      */
     
-    public void testLocalDateTimeSer() throws IOException
-    {
-        LocalDateTime date = new LocalDateTime(2001, 5, 25,
-                10, 15, 30, 37);
-        ObjectMapper mapper = new ObjectMapper();
-        // default format is that of JSON array...
-        assertEquals("[2001,5,25,10,15,30,37]", mapper.writeValueAsString(date));
-        // but we can force it to be a String as well (note: here we assume this is
-        // dynamically changeable)
-        mapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);        
-        assertEquals(quote("2001-05-25T10:15:30.037"), mapper.writeValueAsString(date));
-    }
-
     public void testLocalDateTimeDeser() throws IOException
     {
-        ObjectMapper mapper = new ObjectMapper();
         // couple of acceptable formats again:
-        LocalDateTime date = mapper.readValue("[2001,5,25,10,15,30,37]", LocalDateTime.class);
+        LocalDateTime date = MAPPER.readValue("[2001,5,25,10,15,30,37]", LocalDateTime.class);
         assertEquals(2001, date.getYear());
         assertEquals(5, date.getMonthOfYear());
         assertEquals(25, date.getDayOfMonth());
@@ -187,7 +129,7 @@ public class TestJodaTime extends JodaTestBase
         assertEquals(30, date.getSecondOfMinute());
         assertEquals(37, date.getMillisOfSecond());
 
-        LocalDateTime date2 = mapper.readValue(quote("2007-06-30T08:34:09.001"), LocalDateTime.class);
+        LocalDateTime date2 = MAPPER.readValue(quote("2007-06-30T08:34:09.001"), LocalDateTime.class);
         assertEquals(2007, date2.getYear());
         assertEquals(6, date2.getMonthOfYear());
         assertEquals(30, date2.getDayOfMonth());
@@ -198,7 +140,7 @@ public class TestJodaTime extends JodaTestBase
         assertEquals(1, date2.getMillisOfSecond());
 
         // since 1.6.1, for [JACKSON-360]
-        assertNull(mapper.readValue(quote(""), LocalDateTime.class));
+        assertNull(MAPPER.readValue(quote(""), LocalDateTime.class));
     }
 
     /*
@@ -207,16 +149,9 @@ public class TestJodaTime extends JodaTestBase
     /**********************************************************
      */
 
-    public void testPeriodSer() throws IOException
-    {
-        Period in = new Period(1, 2, 3, 4);
-        String json = new ObjectMapper().writeValueAsString(in);
-        assertEquals(quote("PT1H2M3.004S"), json);
-    }
-
     public void testPeriodDeser() throws IOException
     {
-        Period out = new ObjectMapper().readValue(quote("PT1H2M3.004S"), Period.class);
+        Period out = MAPPER.readValue(quote("PT1H2M3.004S"), Period.class);
         assertEquals(1, out.getHours());
         assertEquals(2, out.getMinutes());
         assertEquals(3, out.getSeconds());
@@ -224,7 +159,7 @@ public class TestJodaTime extends JodaTestBase
 
         // also, should work as number:
         String json = String.valueOf(1000 * out.toStandardSeconds().getSeconds());
-        out = new ObjectMapper().readValue(json, Period.class);
+        out = MAPPER.readValue(json, Period.class);
         assertEquals(1, out.getHours());
         assertEquals(2, out.getMinutes());
         assertEquals(3, out.getSeconds());

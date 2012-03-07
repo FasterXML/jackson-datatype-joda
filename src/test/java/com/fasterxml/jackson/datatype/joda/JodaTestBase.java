@@ -12,6 +12,19 @@ public abstract class JodaTestBase extends TestCase
 {
     /*
     /**********************************************************
+    /* Initialization
+    /**********************************************************
+     */
+
+    protected ObjectMapper jodaMapper()
+    {
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule(new JodaModule());
+        return mapper;
+    }
+    
+    /*
+    /**********************************************************
     /* Additional assert methods
     /**********************************************************
      */
