@@ -94,20 +94,19 @@ public class JodaDeserializationTest extends JodaTestBase
 
     public void testLocalDateDeser() throws IOException
     {
-        ObjectMapper mapper = new ObjectMapper();
         // couple of acceptable formats, so:
-        LocalDate date = mapper.readValue("[2001,5,25]", LocalDate.class);
+        LocalDate date = MAPPER.readValue("[2001,5,25]", LocalDate.class);
         assertEquals(2001, date.getYear());
         assertEquals(5, date.getMonthOfYear());
         assertEquals(25, date.getDayOfMonth());
-
-        LocalDate date2 = mapper.readValue(quote("2005-07-13"), LocalDate.class);
+        
+        LocalDate date2 = MAPPER.readValue(quote("2005-07-13"), LocalDate.class);
         assertEquals(2005, date2.getYear());
         assertEquals(7, date2.getMonthOfYear());
         assertEquals(13, date2.getDayOfMonth());
 
         // since 1.6.1, for [JACKSON-360]
-        assertNull(mapper.readValue(quote(""), LocalDate.class));
+        assertNull(MAPPER.readValue(quote(""), LocalDate.class));
     }
 
     /*

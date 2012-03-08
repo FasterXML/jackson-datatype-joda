@@ -24,16 +24,8 @@ public class JodaModule extends SimpleModule
         super(ModuleVersion.instance.version());
         
         // First: add deserializers
-        addDeserializer(DateMidnight.class, new DateMidnightDeserializer());
-        addDeserializer(ReadableDateTime.class,
-                new DateTimeDeserializer<ReadableDateTime>(ReadableDateTime.class));
-        addDeserializer(ReadableInstant.class,
-                new DateTimeDeserializer<ReadableInstant>(ReadableInstant.class));
-        addDeserializer(LocalDate.class, new LocalDateDeserializer());
-        addDeserializer(LocalDateTime.class, new LocalDateTimeDeserializer());
-        addDeserializer(DateMidnight.class, new DateMidnightDeserializer());
-        addDeserializer(ReadablePeriod.class, new PeriodDeserializer());
-
+        setDeserializers(new JodaDeserializers());
+        
         // then serializers:
         addSerializer(DateTime.class, new DateTimeSerializer());
         addSerializer(LocalDateTime.class, new LocalDateTimeSerializer());
