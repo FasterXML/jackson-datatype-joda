@@ -22,9 +22,13 @@ public class JodaModule extends SimpleModule
     public JodaModule()
     {
         super(ModuleVersion.instance.version());
-        
-        // First: add deserializers
-        setDeserializers(new JodaDeserializers());
+        addDeserializer(DateMidnight.class, new DateMidnightDeserializer());
+        addDeserializer(LocalDateTime.class, new LocalDateTimeDeserializer());
+        addDeserializer(LocalDate.class, new LocalDateDeserializer());
+        addDeserializer(Period.class, new PeriodDeserializer());
+        addDeserializer(DateTime.class, DateTimeDeserializer.forType(DateTime.class));
+        addDeserializer(ReadableDateTime.class, DateTimeDeserializer.forType(ReadableDateTime.class));
+        addDeserializer(ReadableInstant.class, DateTimeDeserializer.forType(ReadableInstant.class));
         
         // then serializers:
         addSerializer(DateTime.class, new DateTimeSerializer());

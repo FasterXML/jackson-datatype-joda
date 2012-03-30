@@ -4,27 +4,37 @@ import java.io.IOException;
 
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
+import org.joda.time.ReadableDateTime;
+import org.joda.time.ReadableInstant;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.JsonDeserializer;
 
 /**
- * Basic deserializer for {@link DateTime}. Accepts JSON String and Number
- * values and passes those to single-argument constructor.
+ * Basic deserializer for {@link ReadableDateTime} and its subtypes.
+ * Accepts JSON String and Number values and passes those to single-argument constructor.
  * Does not (yet?) support JSON object; support can be added if desired.
- *<p>
- * Since 1.6 this has been generic, to handle multiple related types,
- * including super types of {@link DateTime}
  */
 public class DateTimeDeserializer
-    extends JodaDeserializerBase<DateTime>
+    extends JodaDeserializerBase<ReadableInstant>
 {
-    public DateTimeDeserializer() { super(DateTime.class); }
+    @SuppressWarnings("unchecked")
+    public DateTimeDeserializer(Class<? extends ReadableInstant> cls) {
+        super((Class<ReadableInstant>)cls);
+    }
 
+    @SuppressWarnings("unchecked")
+    public static <T extends ReadableInstant> JsonDeserializer<T> forType(Class<T> cls)
+    {
+        return (JsonDeserializer<T>) new DateTimeDeserializer(cls);
+    }
+    
+    
     @Override
-    public DateTime deserialize(JsonParser jp, DeserializationContext ctxt)
+    public ReadableDateTime deserialize(JsonParser jp, DeserializationContext ctxt)
         throws IOException, JsonProcessingException
     {
         JsonToken t = jp.getCurrentToken();

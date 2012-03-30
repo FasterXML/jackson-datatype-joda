@@ -1,11 +1,21 @@
-Version: 2.0.0
+Version: 2.0.1
 
 Release date:
-  25-Mar-2012
+  29-Mar-2012
 
 Description:
-  The official 2.0 release.
+  A patch release for 2.0
+
+Fixes:
+
+* Issue-1: Deserializers registered so they would handle Object type,
+  messing up 'untyped' Lists, Maps
+ (reported by Pierre-Alexander M)
 
 ------------------------------------------------------------------------
 === History: ===
 ------------------------------------------------------------------------
+
+2.0.0 [25-Mar-2012]
+
+The first official release
