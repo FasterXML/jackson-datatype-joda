@@ -165,4 +165,39 @@ public class JodaDeserializationTest extends JodaTestBase
         // but millis are actually truncated...
         assertEquals(0, out.getMillis());
     }
+
+    /*
+    /**********************************************************
+    /* Tests for Duration type
+    /**********************************************************
+     */
+
+    public void testDurationDeserFromInt() throws IOException
+    {
+        Duration d = MAPPER.readValue("1234", Duration.class);
+        assertEquals(1234, d.getMillis());
+    }
+
+    public void testDurationDeserFromString() throws IOException
+    {
+        Duration d = MAPPER.readValue(quote("PT1.234S"), Duration.class);
+        assertEquals(1234, d.getMillis());
+    }
+
+    public void testDurationRoundtrip() throws IOException
+    {
+        Duration d = new Duration(5513);
+        assertEquals(d, MAPPER.readValue(MAPPER.writeValueAsString(d), Duration.class));
+    }
+
+    public void testDurationFailsDeserializingUnexpectedType() throws IOException
+    {
+        try {
+            MAPPER.readValue("{\"foo\":1234}", Duration.class);
+            fail();
+        } catch (JsonMappingException e) {
+            // there's location info involving a string object id on the second line, so just use the first line
+            assertEquals("expected JSON Number or String", e.getMessage().split("\n")[0]);
+        }
+    }
 }
