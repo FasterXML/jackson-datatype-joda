@@ -102,4 +102,17 @@ public class JodaSerializationTest extends JodaTestBase
         String json = MAPPER.writeValueAsString(in);
         assertEquals(quote("PT1H2M3.004S"), json);
     }
+
+    /*
+    /**********************************************************
+    /* Tests for Duration type
+    /**********************************************************
+     */
+
+    public void testDurationSer() throws IOException
+    {
+        Duration d = new Duration(3123422);
+        String json = MAPPER.writeValueAsString(d);
+        assertEquals("3123422", json);
+    }
 }
