@@ -1,18 +1,23 @@
-Version: 2.0.2
+Version: 2.0.3
 
 Release date:
-  18-May-2012
+  xx-Jun-2012
 
 Description:
   A patch release for 2.0
 
 Fixes:
 
- No fixes, just syncing up with core releases.
+- [Issue-3] Add support for Duration serialization, deserialization
+ (reported by Marshall Pierce)
 
 ------------------------------------------------------------------------
 === History: ===
 ------------------------------------------------------------------------
+
+2.0.2 [18-May-2012]
+
+No fixes, just syncing up with core releases.
 
 2.0.1 [29-Mar-2012]
 
