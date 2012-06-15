@@ -1,5 +1,6 @@
 package com.fasterxml.jackson.datatype.joda;
 
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import java.io.IOException;
 
 import org.joda.time.*;
@@ -34,6 +35,20 @@ public class JodaSerializationTest extends JodaTestBase
         assertEquals(quote("1970-01-01T00:00:00.000Z"), m.writeValueAsString(dt));
     }
     
+    public void testSerializationWithTypeInfo() throws IOException
+    {
+        // let's use epoch time (Jan 1, 1970, UTC)
+        DateTime dt = new DateTime(0L, DateTimeZone.UTC);
+        // by default, dates use timestamp, so:
+        assertEquals("0", MAPPER.writeValueAsString(dt));
+
+        // but if re-configured, as regular ISO-8601 string
+        ObjectMapper m = jodaMapper();
+        m.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+        m.addMixInAnnotations(DateTime.class, ObjectConfiguration.class);
+        assertEquals("[\"org.joda.time.DateTime\",\"1970-01-01T00:00:00.000Z\"]", m.writeValueAsString(dt));
+    }
+    
     /*
     /**********************************************************
     /* Tests for DateMidnight type
@@ -50,6 +65,19 @@ public class JodaSerializationTest extends JodaTestBase
         ObjectMapper mapper = jodaMapper();
         mapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);        
         assertEquals(quote("2001-05-25"), mapper.writeValueAsString(date));
+    }
+    
+    public void testDateMidnightSerWithTypeInfo() throws IOException
+    {
+        DateMidnight date = new DateMidnight(2001, 5, 25);
+        // default format is that of JSON array...
+        assertEquals("[2001,5,25]", MAPPER.writeValueAsString(date));
+        // but we can force it to be a String as well (note: here we assume this is
+        // dynamically changeable)
+        ObjectMapper mapper = jodaMapper();
+        mapper.addMixInAnnotations(DateMidnight.class, ObjectConfiguration.class);
+        mapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);        
+        assertEquals("[\"org.joda.time.DateMidnight\",\"2001-05-25\"]", mapper.writeValueAsString(date));
     }
     
     /*
@@ -70,6 +98,20 @@ public class JodaSerializationTest extends JodaTestBase
         mapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);        
         assertEquals(quote("2001-05-25"), mapper.writeValueAsString(date));
     }
+    
+    public void testLocalDateSerWithTypeInfo() throws IOException
+    {
+        LocalDate date = new LocalDate(2001, 5, 25);
+        // default format is that of JSON array...
+        assertEquals("[2001,5,25]", MAPPER.writeValueAsString(date));
+
+        // but we can force it to be a String as well (note: here we assume this is
+        // dynamically changeable)
+        ObjectMapper mapper = jodaMapper();
+        mapper.addMixInAnnotations(LocalDate.class, ObjectConfiguration.class);
+        mapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);        
+        assertEquals("[\"org.joda.time.LocalDate\",\"2001-05-25\"]", mapper.writeValueAsString(date));
+    }
 
     /*
     /**********************************************************
@@ -89,6 +131,20 @@ public class JodaSerializationTest extends JodaTestBase
         mapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);        
         assertEquals(quote("2001-05-25T10:15:30.037"), mapper.writeValueAsString(date));
     }
+    
+    public void testLocalDateTimeSerWithTypeInfo() throws IOException
+    {
+        LocalDateTime date = new LocalDateTime(2001, 5, 25,
+                10, 15, 30, 37);
+        // default format is that of JSON array...
+        assertEquals("[2001,5,25,10,15,30,37]", MAPPER.writeValueAsString(date));
+        // but we can force it to be a String as well (note: here we assume this is
+        // dynamically changeable)
+        ObjectMapper mapper = jodaMapper();
+        mapper.addMixInAnnotations(LocalDateTime.class, ObjectConfiguration.class);
+        mapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);        
+        assertEquals("[\"org.joda.time.LocalDateTime\",\"2001-05-25T10:15:30.037\"]", mapper.writeValueAsString(date));
+    }
 
     /*
     /**********************************************************
@@ -102,6 +158,15 @@ public class JodaSerializationTest extends JodaTestBase
         String json = MAPPER.writeValueAsString(in);
         assertEquals(quote("PT1H2M3.004S"), json);
     }
+    
+    public void testPeriodSerWithTypeInfo() throws IOException
+    {
+        Period in = new Period(1, 2, 3, 4);
+        ObjectMapper mapper = jodaMapper();
+        mapper.addMixInAnnotations(Period.class, ObjectConfiguration.class);
+        String json = mapper.writeValueAsString(in);
+        assertEquals("[\"org.joda.time.Period\",\"PT1H2M3.004S\"]", json);
+    }
 
     /*
     /**********************************************************
@@ -114,5 +179,18 @@ public class JodaSerializationTest extends JodaTestBase
         Duration d = new Duration(3123422);
         String json = MAPPER.writeValueAsString(d);
         assertEquals("3123422", json);
+    }
+    
+    public void testDurationSerWithTypeInfo() throws IOException
+    {
+        Duration d = new Duration(3123422);
+        ObjectMapper mapper = jodaMapper();
+        mapper.addMixInAnnotations(Duration.class, ObjectConfiguration.class);
+        String json = mapper.writeValueAsString(d);
+        assertEquals("[\"org.joda.time.Duration\",3123422]", json);
+    }
+    
+    @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.WRAPPER_ARRAY, property = "@class")
+    private static interface ObjectConfiguration {
     }
 }

@@ -9,7 +9,7 @@
   <artifactId>jackson-datatype-joda</artifactId>
   <name>Jackson-datatype-JODA</name>
   <version>2.0.3-SNAPSHOT</version>
-  <packaging>bundle</packaging>
+  <packaging>jar</packaging>
   <description>Add-on module for Jackson (http://jackson.codehaus.org) to support
 Joda (http://joda-time.sourceforge.net/) data types.
   </description>
@@ -103,19 +103,7 @@ Joda (http://joda-time.sourceforge.net/) data types.
                 <mavenExecutorId>forked-path</mavenExecutorId>
             </configuration>
         </plugin>
-        <plugin><!-- plug-in to attach source bundle in repo -->
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-source-plugin</artifactId>
-          <version>2.1.2</version>
-          <executions>
-            <execution>
-              <id>attach-sources</id>
-              <goals>
-                <goal>jar</goal>
-              </goals>
-            </execution>
-          </executions>
-        </plugin>
+        
         <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
@@ -141,7 +129,7 @@ Joda (http://joda-time.sourceforge.net/) data types.
         </plugin>
 
         <!-- Plus, let's make jars OSGi bundles as well  -->
-        <plugin>
+        <!--plugin>
           <groupId>org.apache.felix</groupId>
           <artifactId>maven-bundle-plugin</artifactId>
           <version>2.3.7</version>
@@ -170,7 +158,7 @@ com.fasterxml.jackson.datatype.joda
 </Export-Package>
             </instructions>
           </configuration>
-        </plugin>
+        </plugin-->
     </plugins>
   </build>
   <profiles>
