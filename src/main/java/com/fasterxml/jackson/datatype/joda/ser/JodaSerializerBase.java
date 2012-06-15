@@ -1,5 +1,6 @@
 package com.fasterxml.jackson.datatype.joda.ser;
 
+import com.fasterxml.jackson.core.JsonGenerator;
 import java.io.IOException;
 
 import org.joda.time.ReadableInstant;
@@ -8,6 +9,8 @@ import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.SerializerProvider;
+import com.fasterxml.jackson.databind.jsontype.TypeSerializer;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 
 abstract class JodaSerializerBase<T> extends StdSerializer<T>
@@ -34,4 +37,12 @@ abstract class JodaSerializerBase<T> extends StdSerializer<T>
     {
         return _localDateFormat.print(dateValue);
     }
+
+    @Override
+    public void serializeWithType(T value, JsonGenerator jgen, SerializerProvider provider, TypeSerializer typeSer) throws IOException, JsonProcessingException {
+        typeSer.writeTypePrefixForScalar(value, jgen);
+        serialize(value, jgen, provider);
+        typeSer.writeTypeSuffixForScalar(value, jgen);
+    }
+    
 }
