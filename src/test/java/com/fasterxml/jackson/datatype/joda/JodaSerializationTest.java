@@ -113,6 +113,40 @@ public class JodaSerializationTest extends JodaTestBase
         assertEquals("[\"org.joda.time.LocalDate\",\"2001-05-25\"]", mapper.writeValueAsString(date));
     }
 
+    
+    /*
+    /**********************************************************
+    /* Tests for LocalTime type
+    /**********************************************************
+     */
+    
+    public void testLocalTimeSer() throws IOException
+    {
+        LocalTime date = new LocalTime(13,20,54);
+        // default format is that of JSON array...
+        assertEquals("[13,20,54,0]", MAPPER.writeValueAsString(date));
+
+        // but we can force it to be a String as well (note: here we assume this is
+        // dynamically changeable)
+        ObjectMapper mapper = jodaMapper();
+        mapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);        
+        assertEquals(quote("13:20:54.000"), mapper.writeValueAsString(date));
+    }
+    
+    public void testLocalTimeSerWithTypeInfo() throws IOException
+    {
+        LocalTime date = new LocalTime(13,20,54);
+        // default format is that of JSON array...
+        assertEquals("[13,20,54,0]", MAPPER.writeValueAsString(date));
+
+        // but we can force it to be a String as well (note: here we assume this is
+        // dynamically changeable)
+        ObjectMapper mapper = jodaMapper();
+        mapper.addMixInAnnotations(LocalTime.class, ObjectConfiguration.class);
+        mapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);        
+        assertEquals("[\"org.joda.time.LocalTime\",\"13:20:54.000\"]", mapper.writeValueAsString(date));
+    }
+
     /*
     /**********************************************************
     /* Tests for LocalDateTime type

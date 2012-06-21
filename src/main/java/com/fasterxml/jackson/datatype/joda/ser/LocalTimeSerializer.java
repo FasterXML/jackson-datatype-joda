@@ -2,7 +2,7 @@ package com.fasterxml.jackson.datatype.joda.ser;
 
 import java.io.IOException;
 
-import org.joda.time.LocalDateTime;
+import org.joda.time.LocalTime;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
 
@@ -12,30 +12,27 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.SerializerProvider;
 
-public final class LocalDateTimeSerializer
-    extends JodaSerializerBase<LocalDateTime>
+public final class LocalTimeSerializer
+    extends JodaSerializerBase<LocalTime>
 {
-    final static DateTimeFormatter format = ISODateTimeFormat.dateTime();
-    
-    public LocalDateTimeSerializer() { super(LocalDateTime.class); }
+    final static DateTimeFormatter format = ISODateTimeFormat.time();
+
+    public LocalTimeSerializer() { super(LocalTime.class); }
 
     @Override
-    public void serialize(LocalDateTime dt, JsonGenerator jgen, SerializerProvider provider)
+    public void serialize(LocalTime tm, JsonGenerator jgen, SerializerProvider provider)
         throws IOException, JsonGenerationException
     {
         if (provider.isEnabled(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)) {
             // Timestamp here actually means an array of values
             jgen.writeStartArray();
-            jgen.writeNumber(dt.year().get());
-            jgen.writeNumber(dt.monthOfYear().get());
-            jgen.writeNumber(dt.dayOfMonth().get());
-            jgen.writeNumber(dt.hourOfDay().get());
-            jgen.writeNumber(dt.minuteOfHour().get());
-            jgen.writeNumber(dt.secondOfMinute().get());
-            jgen.writeNumber(dt.millisOfSecond().get());
+            jgen.writeNumber(tm.hourOfDay().get());
+            jgen.writeNumber(tm.minuteOfHour().get());
+            jgen.writeNumber(tm.secondOfMinute().get());
+            jgen.writeNumber(tm.millisOfSecond().get());
             jgen.writeEndArray();
         } else {
-            jgen.writeString(format.print(dt));
+            jgen.writeString(format.print(tm));
         }
     }
 

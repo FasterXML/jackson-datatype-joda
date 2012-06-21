@@ -3,7 +3,9 @@ package com.fasterxml.jackson.datatype.joda.deser;
 import java.io.IOException;
 
 import org.joda.time.DateMidnight;
-import org.joda.time.DateTime;
+import org.joda.time.LocalDate;
+import org.joda.time.format.DateTimeFormatter;
+import org.joda.time.format.ISODateTimeFormat;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -13,6 +15,8 @@ import com.fasterxml.jackson.databind.DeserializationContext;
 public class DateMidnightDeserializer
     extends JodaDeserializerBase<DateMidnight>
 {
+    final static DateTimeFormatter parser = ISODateTimeFormat.localDateParser();
+
     public DateMidnightDeserializer() { super(DateMidnight.class); }
 
     @Override
@@ -36,7 +40,11 @@ public class DateMidnightDeserializer
         case VALUE_NUMBER_INT:
             return new DateMidnight(jp.getLongValue());            
         case VALUE_STRING:
-            DateTime local = parseLocal(jp);
+            String str = jp.getText().trim();
+            if (str.length() == 0) { // [JACKSON-360]
+                return null;
+            }
+            LocalDate local = parser.parseLocalDate(str);
             if (local == null) {
                 return null;
             }
