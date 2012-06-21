@@ -3,6 +3,8 @@ package com.fasterxml.jackson.datatype.joda.ser;
 import java.io.IOException;
 
 import org.joda.time.DateMidnight;
+import org.joda.time.format.DateTimeFormatter;
+import org.joda.time.format.ISODateTimeFormat;
 
 import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.core.JsonGenerator;
@@ -13,6 +15,8 @@ import com.fasterxml.jackson.databind.SerializerProvider;
 public final class DateMidnightSerializer
     extends JodaSerializerBase<DateMidnight>
 {
+    final static DateTimeFormatter format = ISODateTimeFormat.date();
+    
     public DateMidnightSerializer() { super(DateMidnight.class); }
 
     @Override
@@ -27,7 +31,7 @@ public final class DateMidnightSerializer
             jgen.writeNumber(dt.dayOfMonth().get());
             jgen.writeEndArray();
         } else {
-            jgen.writeString(printLocalDate(dt));
+            jgen.writeString(format.print(dt));
         }
     }
 
