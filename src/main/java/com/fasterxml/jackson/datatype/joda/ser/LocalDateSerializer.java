@@ -3,6 +3,8 @@ package com.fasterxml.jackson.datatype.joda.ser;
 import java.io.IOException;
 
 import org.joda.time.LocalDate;
+import org.joda.time.format.DateTimeFormatter;
+import org.joda.time.format.ISODateTimeFormat;
 
 import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.core.JsonGenerator;
@@ -13,6 +15,8 @@ import com.fasterxml.jackson.databind.SerializerProvider;
 public final class LocalDateSerializer
     extends JodaSerializerBase<LocalDate>
 {
+    final static DateTimeFormatter format = ISODateTimeFormat.date();
+
     public LocalDateSerializer() { super(LocalDate.class); }
 
     @Override
@@ -27,7 +31,7 @@ public final class LocalDateSerializer
             jgen.writeNumber(dt.dayOfMonth().get());
             jgen.writeEndArray();
         } else {
-            jgen.writeString(printLocalDate(dt));
+            jgen.writeString(format.print(dt));
         }
     }
 
