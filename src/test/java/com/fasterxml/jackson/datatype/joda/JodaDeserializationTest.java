@@ -349,4 +349,28 @@ public class JodaDeserializationTest extends JodaTestBase
     @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.WRAPPER_ARRAY, property = "@class")
     private static interface ObjectConfiguration {
     }
+
+
+
+    public void testDeserInstantFromNumber() throws IOException
+    {
+        Calendar cal = new GregorianCalendar(TimeZone.getTimeZone("UTC"));
+        cal.set(Calendar.YEAR, 1972);
+        long timepoint = cal.getTime().getTime();
+
+        // Ok, first: using JSON number (milliseconds since epoch)
+        Instant instant = MAPPER.readValue(String.valueOf(timepoint), Instant.class);
+        assertEquals(timepoint, instant.getMillis());
+    }
+
+    public void testDeserInstant() throws IOException
+    {
+        Instant date = MAPPER.readValue(quote("1972-12-28T12:00:01.000Z"), Instant.class);
+        assertNotNull(date);
+        assertEquals("1972-12-28T12:00:01.000Z", date.toString());
+
+        // since 1.6.1, for [JACKSON-360]
+        assertNull(MAPPER.readValue(quote(""), Instant.class));
+    }
+
 }

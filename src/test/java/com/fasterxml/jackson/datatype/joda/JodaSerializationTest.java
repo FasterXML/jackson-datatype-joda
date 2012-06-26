@@ -1,10 +1,10 @@
 package com.fasterxml.jackson.datatype.joda;
 
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import java.io.IOException;
 
 import org.joda.time.*;
 
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
@@ -226,5 +226,17 @@ public class JodaSerializationTest extends JodaTestBase
     
     @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.WRAPPER_ARRAY, property = "@class")
     private static interface ObjectConfiguration {
+    }
+
+    public void testInstantSer() throws IOException {
+        Instant instant = new Instant(0L);
+
+        // by default, dates use timestamp, so:
+        assertEquals("0", MAPPER.writeValueAsString(instant));
+
+        // but if re-configured, as regular ISO-8601 string
+        ObjectMapper m = jodaMapper();
+        m.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+        assertEquals(quote("1970-01-01T00:00:00.000Z"), m.writeValueAsString(instant));
     }
 }
