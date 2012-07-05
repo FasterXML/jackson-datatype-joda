@@ -7,7 +7,7 @@ Joda (http://joda-time.sourceforge.net/) data types.
 Modules are registered through ObjectMapper, like so:
 
     ObjectMapper mapper = new ObjectMapper();
-    mapper.register(new JodaModule());
+    mapper.registerModule(new JodaModule());
 
 after which you can read JSON as Joda types, as well as write Joda values as JSON.
 It's really that simple; convenient and efficient.
