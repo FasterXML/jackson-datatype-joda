@@ -33,6 +33,7 @@ Joda (http://joda-time.sourceforge.net/) data types.
     <connection>scm:git:git@github.com:FasterXML/jackson-datatype-joda.git</connection>
     <developerConnection>scm:git:git@github.com:FasterXML/jackson-datatype-joda.git</developerConnection>
     <url>http://github.com/FasterXML/jackson-datatype-joda</url>    
+    <tag>jackson-datatype-joda-2.0.6</tag>
   </scm>
   <properties>
     <!-- Configuration properties for the OSGi maven-bundle-plugin -->
