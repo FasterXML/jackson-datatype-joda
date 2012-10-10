@@ -1,10 +1,10 @@
-Version: 2.0.5
+Version: 2.1.0
 
 Release date:
-  05-Oct-2012
+  08-Oct-2012
 
 Description:
-  Another patch release for 2.0
+  New minor version, based on Jackson core 2.1.
 
 Improvements:
 
