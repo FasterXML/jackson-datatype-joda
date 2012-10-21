@@ -2,6 +2,8 @@ Project to build Jackson (http://jackson.codehaus.org) module (jar)
 to support JSON serialization and deserialization of
 Joda (http://joda-time.sourceforge.net/) data types.
 
+[![Build Status](https://fasterxml.ci.cloudbees.com/job/jackson-datatype-joda-master/badge/icon)](https://fasterxml.ci.cloudbees.com/job/jackson-datatype-joda-master/)
+
 # Usage
 
 Modules are registered through ObjectMapper, like so:
