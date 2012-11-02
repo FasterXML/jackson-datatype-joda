@@ -4,7 +4,9 @@ Joda (http://joda-time.sourceforge.net/) data types.
 
 ## Status
 
-As of version 2.0 module is usable and relatively extensive (more so than in-built support 1.9 had).
+[![Build Status](https://fasterxml.ci.cloudbees.com/job/jackson-datatype-joda-master/badge/icon)](https://fasterxml.ci.cloudbees.com/job/jackson-datatype-joda-master/)
+
+As of version 2.0 module is usable and relatively extensive (more so than in-built support 1.9 had). Contributions are welcome!
 
 ## Usage
 
