@@ -1,19 +1,19 @@
-Version: 2.1.0
+Version: 2.1.1 (13-Nov-2012)
 
-Release date:
-  08-Oct-2012
+A patch release with no functional changes.
 
-Description:
-  New minor version, based on Jackson core 2.1.
+------------------------------------------------------------------------
+=== History: ===
+------------------------------------------------------------------------
+
+2.1.0 (08-Oct-2012)
+
+New minor version, based on Jackson core 2.1.
 
 Improvements:
 
 - [Issue#9]: Add support for (de)serialiazing Interval
  (submitted by jkolobok@github)
-
-------------------------------------------------------------------------
-=== History: ===
-------------------------------------------------------------------------
 
 2.0.4 (26-Jun-2012)
 
