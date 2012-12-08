@@ -1,10 +1,15 @@
-Version: 2.1.1 (13-Nov-2012)
+Project: jackson-datatype-joda
+Version: 2.1.2 (08-Dec-2012)
 
-A patch release with no functional changes.
+No functional changes.
 
 ------------------------------------------------------------------------
 === History: ===
 ------------------------------------------------------------------------
+
+2.1.1 (13-Nov-2012)
+
+No functional changes.
 
 2.1.0 (08-Oct-2012)
 

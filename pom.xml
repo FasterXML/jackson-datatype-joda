@@ -36,6 +36,8 @@ Joda (http://joda-time.sourceforge.net/) data types.
     <tag>HEAD</tag>
   </scm>
   <properties>
+    <version.jackson>2.1.2</version.jackson>
+
     <!-- Configuration properties for the OSGi maven-bundle-plugin -->
     <osgi.import>com.fasterxml.jackson.core
 ,com.fasterxml.jackson.core.util
@@ -57,12 +59,12 @@ Joda (http://joda-time.sourceforge.net/) data types.
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-core</artifactId>
-      <version>2.1.1</version>
+      <version>${version.jackson}</version>
     </dependency>
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-databind</artifactId>
-      <version>2.1.1</version>
+      <version>${version.jackson}</version>
     </dependency>
 
     <!-- And obviously also depends on Joda lib -->
