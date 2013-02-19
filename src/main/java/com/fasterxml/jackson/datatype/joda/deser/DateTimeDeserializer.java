@@ -1,17 +1,16 @@
 package com.fasterxml.jackson.datatype.joda.deser;
 
-import java.io.IOException;
-
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
-import org.joda.time.ReadableDateTime;
-import org.joda.time.ReadableInstant;
-
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
+import org.joda.time.ReadableDateTime;
+import org.joda.time.ReadableInstant;
+
+import java.io.IOException;
 
 /**
  * Basic deserializer for {@link ReadableDateTime} and its subtypes.
@@ -39,14 +38,14 @@ public class DateTimeDeserializer
     {
         JsonToken t = jp.getCurrentToken();
         if (t == JsonToken.VALUE_NUMBER_INT) {
-            return new DateTime(jp.getLongValue(), DateTimeZone.UTC);
+            return new DateTime(jp.getLongValue(), DateTimeZone.forTimeZone(ctxt.getTimeZone()));
         }
         if (t == JsonToken.VALUE_STRING) {
             String str = jp.getText().trim();
             if (str.length() == 0) { // [JACKSON-360]
                 return null;
             }
-            return new DateTime(str, DateTimeZone.UTC);
+            return new DateTime(str, DateTimeZone.forTimeZone(ctxt.getTimeZone()));
         }
         throw ctxt.mappingException(getValueClass());
     }
