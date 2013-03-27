@@ -3,8 +3,8 @@ package com.fasterxml.jackson.datatype.joda.ser;
 import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
+
 import org.joda.time.Interval;
-import org.joda.time.LocalDate;
 
 import java.io.IOException;
 

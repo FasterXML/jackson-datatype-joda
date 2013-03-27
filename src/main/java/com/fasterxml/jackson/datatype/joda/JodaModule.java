@@ -10,9 +10,11 @@ import com.fasterxml.jackson.datatype.joda.ser.*;
 
 public class JodaModule extends SimpleModule
 {
+    private static final long serialVersionUID = 1L;
+
     public JodaModule()
     {
-        super(ModuleVersion.instance.version());
+        super(PackageVersion.VERSION);
         // first deserializers
         addDeserializer(DateMidnight.class, new DateMidnightDeserializer());
         addDeserializer(DateTime.class, DateTimeDeserializer.forType(DateTime.class));
