@@ -1,6 +1,7 @@
 Project: jackson-datatype-joda
 Version: 2.2.0 (xx-Mar-2013)
 
+#8: Make DateTimeDeserializer abide by configured TimeZone
 - Upgraded version detection not to use VERSION.txt file
 
 ------------------------------------------------------------------------
