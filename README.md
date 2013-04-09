@@ -1,6 +1,6 @@
-Project to build Jackson (http://jackson.codehaus.org) module (jar)
+Project to build [Jackson](http://jackson.codehaus.org) module (jar)
 to support JSON serialization and deserialization of
-Joda (http://joda-time.sourceforge.net/) data types.
+[Joda](http://joda-time.sourceforge.net/) data types.
 
 ## Status
 
