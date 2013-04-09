@@ -1,13 +1,14 @@
 package com.fasterxml.jackson.datatype.joda;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import java.io.*;
-import java.util.*;
-
-
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.joda.time.*;
 
-import com.fasterxml.jackson.databind.*;
+import java.io.IOException;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+import java.util.TimeZone;
 
 /**
  * Unit tests for verifying limited interoperability for Joda time.
@@ -49,6 +50,18 @@ public class JodaDeserializationTest extends JodaTestBase
         ReadableDateTime date = MAPPER.readValue(quote("1972-12-28T12:00:01.000+0000"), ReadableDateTime.class);
         assertNotNull(date);
         assertEquals("1972-12-28T12:00:01.000Z", date.toString());
+
+        // since 1.6.1, for [JACKSON-360]
+        assertNull(MAPPER.readValue(quote(""), ReadableDateTime.class));
+    }
+
+    // since 2.1.3, for github issue #8
+    public void testDeserReadableDateTimeWithTimeZoneInfo() throws IOException
+    {
+        MAPPER.setTimeZone(TimeZone.getTimeZone("GMT-6"));
+        ReadableDateTime date = MAPPER.readValue(quote("1972-12-28T12:00:01.000-0600"), ReadableDateTime.class);
+        assertNotNull(date);
+        assertEquals("1972-12-28T12:00:01.000-06:00", date.toString());
 
         // since 1.6.1, for [JACKSON-360]
         assertNull(MAPPER.readValue(quote(""), ReadableDateTime.class));
