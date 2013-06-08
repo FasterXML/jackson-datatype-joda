@@ -1,7 +1,6 @@
-com / fasterxml / jackson / datatype / joda;
+package com.fasterxml.jackson.datatype.joda;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.joda.JodaModule;
 
 public class JodaMapper extends ObjectMapper {
   public JodaMapper() {
