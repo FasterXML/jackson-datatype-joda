@@ -38,5 +38,8 @@ public class JodaModule extends SimpleModule
         addSerializer(LocalTime.class, new LocalTimeSerializer());
         addSerializer(Period.class, ToStringSerializer.instance);
         addSerializer(Interval.class, new IntervalSerializer());
+
+        // then key deserializers - only one included for DateTime here.
+        addKeyDeserializer(DateTime.class, new DateTimeKeyDeserializer());
     }
 }
