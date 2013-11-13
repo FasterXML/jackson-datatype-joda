@@ -39,4 +39,16 @@ public class JodaModule extends SimpleModule
         addSerializer(Period.class, ToStringSerializer.instance);
         addSerializer(Interval.class, new IntervalSerializer());
     }
+
+    @Override
+    public int hashCode()
+    {
+        return JodaModule.class.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object o)
+    {
+        return this == o;
+    }
 }
