@@ -10,6 +10,7 @@
   <artifactId>jackson-datatype-joda</artifactId>
   <name>Jackson-datatype-JODA</name>
   <version>2.3.1-SNAPSHOT</version>
+  <packaging>bundle</packaging>
   <description>Add-on module for Jackson (http://jackson.codehaus.org) to support
 Joda (http://joda-time.sourceforge.net/) data types.
   </description>
