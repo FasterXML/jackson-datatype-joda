@@ -1,14 +1,17 @@
 Project: jackson-datatype-joda
-Version: 2.3.0 (14-Nov-2013)
+Version: 2.3.1 (xx-Dec-2013)
 
-New minor version
-
-#18: Add `JodaMapper`, sub-class of basic `ObjectMapper` that auto-registers
-  Joda module
+#26: Implement `equals()` and `hashCode()` for JodaModule
+ (suggested by Henning S)
 
 ------------------------------------------------------------------------
 === History: ===
 ------------------------------------------------------------------------
+
+2.3.0 (14-Nov-2013)
+
+#18: Add `JodaMapper`, sub-class of basic `ObjectMapper` that auto-registers
+  Joda module
 
 2.2.2 (27-May-2013)
 2.2.1 (04-May-2013)
