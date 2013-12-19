@@ -1,6 +1,7 @@
 package com.fasterxml.jackson.datatype.joda;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.joda.time.*;
@@ -8,6 +9,7 @@ import org.joda.time.*;
 import java.io.IOException;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.Map;
 import java.util.TimeZone;
 
 /**
@@ -384,6 +386,15 @@ public class JodaDeserializationTest extends JodaTestBase
 
         // since 1.6.1, for [JACKSON-360]
         assertNull(MAPPER.readValue(quote(""), Instant.class));
+    }
+
+    public void testDateTimeKeyDeserialize() throws IOException {
+
+        final String json = "{" + quote("1970-01-01T00:00:00.000Z") + ":0}";
+        final Map<DateTime, Long> map = MAPPER.readValue(json, new TypeReference<Map<DateTime, String>>() { });
+
+        assertNotNull(map);
+        assertTrue(map.containsKey(DateTime.parse("1970-01-01T00:00:00.000Z")));
     }
 
 }
