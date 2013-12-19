@@ -3,6 +3,8 @@ Version: 2.3.1 (xx-Dec-2013)
 
 #23: Package as a bundle (was accidentally not, just bare jar)
  (suggested by Łukasz D)
+#25: Add `KeyDeserializer` for `DateTime`
+ (contributed by Lorcan C)
 #26: Implement `equals()` and `hashCode()` for JodaModule
  (suggested by Henning S)
 
