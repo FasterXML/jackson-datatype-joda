@@ -3,6 +3,8 @@ Version: 2.3.1 (xx-Dec-2013)
 
 #19: Add serializers and deserializers for MonthDay and YearMonth
  (contributed by ncjones@github)
+#21: Make `DateTimeSerializer` use configured timezone
+ (contributed by pavax@github)
 #23: Package as a bundle (was accidentally not, just bare jar)
  (suggested by Łukasz D)
 #25: Add `KeyDeserializer` for `DateTime`

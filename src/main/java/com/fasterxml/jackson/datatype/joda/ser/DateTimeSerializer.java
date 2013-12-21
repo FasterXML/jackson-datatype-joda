@@ -1,6 +1,7 @@
 package com.fasterxml.jackson.datatype.joda.ser;
 
 import java.io.IOException;
+import java.util.TimeZone;
 
 import org.joda.time.DateTime;
 
@@ -9,6 +10,7 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.SerializerProvider;
+
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
@@ -16,9 +18,10 @@ import org.joda.time.format.ISODateTimeFormat;
 public final class DateTimeSerializer
     extends JodaSerializerBase<DateTime>
 {
-    public DateTimeSerializer() { super(DateTime.class); }
+    private final DateTimeFormatter defaultFormat = ISODateTimeFormat.dateTime()
+            .withZoneUTC();
 
-    private DateTimeFormatter format = null;
+    public DateTimeSerializer() { super(DateTime.class); }
 
     @Override
     public void serialize(DateTime value, JsonGenerator jgen, SerializerProvider provider)
@@ -38,10 +41,13 @@ public final class DateTimeSerializer
                 ? "number" : "string", true);
     }
 
-    private DateTimeFormatter getDateTimeFormatter(SerializerProvider provider) {
-        if (format == null) {
-            format = ISODateTimeFormat.dateTime().withZone(DateTimeZone.forTimeZone(provider.getTimeZone()));
+    private DateTimeFormatter getDateTimeFormatter(SerializerProvider provider)
+    {
+        DateTimeFormatter formatter = defaultFormat;
+        TimeZone ts = provider.getTimeZone();
+        if (ts != null) {
+            formatter = formatter.withZone(DateTimeZone.forTimeZone(ts));
         }
-        return format;
+        return formatter;
     }
 }
