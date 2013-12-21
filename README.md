@@ -18,7 +18,7 @@ To use module on Maven-based projects, use following dependency:
 <dependency>
   <groupId>com.fasterxml.jackson.datatype</groupId>
   <artifactId>jackson-datatype-joda</artifactId>
-  <version>2.1.1</version>
+  <version>2.3.0</version>
 </dependency>    
 ```
 
@@ -35,8 +35,13 @@ mapper.registerModule(new JodaModule());
 ```
 
 after which functionality is available for all normal Jackson operations:
-you can read JSON as Joda types, as well as write Joda values as JSON.
+you can read JSON as Joda types, as well as write Joda values as JSON, so that for example:
+
+```java
+DateTime now = new DateTime();
+String json = mapper.writeValueAsString(now);
+```
 
 ## More
 
-See [Wiki](../wiki) for more information (javadocs, downloads).
+See [Wiki](../../wiki) for more information (javadocs, downloads).
