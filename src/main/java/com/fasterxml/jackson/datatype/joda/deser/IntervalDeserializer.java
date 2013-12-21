@@ -8,10 +8,7 @@ import org.joda.time.Interval;
 
 import java.io.IOException;
 
-/**
- * @author jkolobok
- */
-public class IntervalDeserializer  extends JodaDeserializerBase<Interval>
+public class IntervalDeserializer extends JodaDeserializerBase<Interval>
 {
     private static final long serialVersionUID = 5196071166239332742L;
 

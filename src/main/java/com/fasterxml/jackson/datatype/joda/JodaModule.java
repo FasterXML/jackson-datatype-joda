@@ -18,6 +18,8 @@ public class JodaModule extends SimpleModule
         // first deserializers
         addDeserializer(DateMidnight.class, new DateMidnightDeserializer());
         addDeserializer(DateTime.class, DateTimeDeserializer.forType(DateTime.class));
+        addDeserializer(DateTimeZone.class, new DateTimeZoneDeserializer());
+                
         addDeserializer(Duration.class, new DurationDeserializer());
         addDeserializer(Instant.class, new InstantDeserializer());
         addDeserializer(LocalDateTime.class, new LocalDateTimeDeserializer());
@@ -34,6 +36,7 @@ public class JodaModule extends SimpleModule
         final JsonSerializer<Object> stringSer = ToStringSerializer.instance;
         addSerializer(DateMidnight.class, new DateMidnightSerializer());
         addSerializer(DateTime.class, new DateTimeSerializer());
+        addSerializer(DateTimeZone.class, new DateTimeZoneSerializer());
         addSerializer(Duration.class, new DurationSerializer());
         addSerializer(Instant.class, new InstantSerializer());
         addSerializer(LocalDateTime.class, new LocalDateTimeSerializer());

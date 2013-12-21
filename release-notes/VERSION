@@ -11,6 +11,8 @@ Version: 2.3.1 (xx-Dec-2013)
  (contributed by Lorcan C)
 #26: Implement `equals()` and `hashCode()` for JodaModule
  (suggested by Henning S)
+#27: Add support for `DateTimeZone`
+ (requested by Hendy Irawan)
 
 ------------------------------------------------------------------------
 === History: ===
