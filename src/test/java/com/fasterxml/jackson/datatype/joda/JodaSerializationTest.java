@@ -239,4 +239,21 @@ public class JodaSerializationTest extends JodaTestBase
         m.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
         assertEquals(quote("1970-01-01T00:00:00.000Z"), m.writeValueAsString(instant));
     }
+
+    public void testMonthDaySer() throws Exception
+    {
+        MonthDay monthDay = new MonthDay(7, 23);
+        ObjectMapper mapper = jodaMapper();
+        String json = mapper.writeValueAsString(monthDay);
+        assertEquals(quote("--07-23"), json);
+    }
+
+    public void testYearMonthSer() throws Exception
+    {
+        YearMonth yearMonth = new YearMonth(2013, 8);
+        ObjectMapper mapper = jodaMapper();
+        String json = mapper.writeValueAsString(yearMonth);
+        assertEquals(quote("2013-08"), json);
+    }
+
 }

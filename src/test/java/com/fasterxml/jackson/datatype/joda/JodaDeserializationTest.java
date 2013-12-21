@@ -397,4 +397,54 @@ public class JodaDeserializationTest extends JodaTestBase
         assertTrue(map.containsKey(DateTime.parse("1970-01-01T00:00:00.000Z")));
     }
 
+    public void testDeserMonthDay() throws Exception
+    {
+        String monthDayString = new MonthDay(7, 23).toString();
+        MonthDay monthDay = MAPPER.readValue(quote(monthDayString), MonthDay.class);
+        assertEquals(new MonthDay(7, 23), monthDay);
+    }
+
+    public void testDeserMonthDayFromEmptyString() throws Exception
+    {
+        MonthDay monthDay = MAPPER.readValue(quote(""), MonthDay.class);
+        assertNull(monthDay);
+    }
+
+    public void testDeserMonthDayFailsForUnexpectedType() throws IOException
+    {
+        try
+        {
+            MAPPER.readValue("{\"month\":8}", MonthDay.class);
+            fail();
+        } catch (JsonMappingException e)
+        {
+            assertTrue(e.getMessage().contains("expected JSON String"));
+        }
+    }
+
+    public void testDeserYearMonth() throws Exception
+    {
+        String yearMonthString = new YearMonth(2013, 8).toString();
+        YearMonth yearMonth = MAPPER.readValue(quote(yearMonthString), YearMonth.class);
+        assertEquals(new YearMonth(2013, 8), yearMonth);
+    }
+
+    public void testDeserYearMonthFromEmptyString() throws Exception
+    {
+        YearMonth yearMonth = MAPPER.readValue(quote(""), YearMonth.class);
+        assertNull(yearMonth);
+    }
+
+    public void testDeserYearMonthFailsForUnexpectedType() throws IOException
+    {
+        try
+        {
+            MAPPER.readValue("{\"year\":2013}", YearMonth.class);
+            fail();
+        } catch (JsonMappingException e)
+        {
+            assertTrue(e.getMessage().contains("expected JSON String"));
+        }
+    }
+
 }

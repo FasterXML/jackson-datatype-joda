@@ -2,9 +2,9 @@ package com.fasterxml.jackson.datatype.joda;
 
 import org.joda.time.*;
 
+import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
-
 import com.fasterxml.jackson.datatype.joda.deser.*;
 import com.fasterxml.jackson.datatype.joda.ser.*;
 
@@ -27,8 +27,11 @@ public class JodaModule extends SimpleModule
         addDeserializer(ReadableDateTime.class, DateTimeDeserializer.forType(ReadableDateTime.class));
         addDeserializer(ReadableInstant.class, DateTimeDeserializer.forType(ReadableInstant.class));
         addDeserializer(Interval.class, new IntervalDeserializer());
+        addDeserializer(MonthDay.class, new MonthDayDeserializer());
+        addDeserializer(YearMonth.class, new YearMonthDeserializer());
 
         // then serializers:
+        final JsonSerializer<Object> stringSer = ToStringSerializer.instance;
         addSerializer(DateMidnight.class, new DateMidnightSerializer());
         addSerializer(DateTime.class, new DateTimeSerializer());
         addSerializer(Duration.class, new DurationSerializer());
@@ -36,8 +39,10 @@ public class JodaModule extends SimpleModule
         addSerializer(LocalDateTime.class, new LocalDateTimeSerializer());
         addSerializer(LocalDate.class, new LocalDateSerializer());
         addSerializer(LocalTime.class, new LocalTimeSerializer());
-        addSerializer(Period.class, ToStringSerializer.instance);
+        addSerializer(Period.class, stringSer);
         addSerializer(Interval.class, new IntervalSerializer());
+        addSerializer(MonthDay.class, stringSer);
+        addSerializer(YearMonth.class, stringSer);
 
         // then key deserializers - only one included for DateTime here.
         addKeyDeserializer(DateTime.class, new DateTimeKeyDeserializer());
@@ -46,7 +51,7 @@ public class JodaModule extends SimpleModule
     @Override
     public int hashCode()
     {
-        return JodaModule.class.hashCode();
+        return getClass().hashCode();
     }
 
     @Override
