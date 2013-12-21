@@ -17,6 +17,7 @@ Version: 2.3.1 (xx-Dec-2013)
 #18: Add `JodaMapper`, sub-class of basic `ObjectMapper` that auto-registers
   Joda module
 
+2.2.3 (25-Aug-2013)
 2.2.2 (27-May-2013)
 2.2.1 (04-May-2013)
 
