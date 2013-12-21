@@ -7,6 +7,8 @@ Version: 2.3.1 (xx-Dec-2013)
  (contributed by pavax@github)
 #23: Package as a bundle (was accidentally not, just bare jar)
  (suggested by Łukasz D)
+#24: Allow serializing `Duration` using ISO-8601 notation
+ (requested by cowwoc@github)
 #25: Add `KeyDeserializer` for `DateTime`
  (contributed by Lorcan C)
 #26: Implement `equals()` and `hashCode()` for JodaModule

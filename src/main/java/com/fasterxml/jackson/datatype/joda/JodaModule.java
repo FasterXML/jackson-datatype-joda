@@ -42,7 +42,7 @@ public class JodaModule extends SimpleModule
         addSerializer(LocalDateTime.class, new LocalDateTimeSerializer());
         addSerializer(LocalDate.class, new LocalDateSerializer());
         addSerializer(LocalTime.class, new LocalTimeSerializer());
-        addSerializer(Period.class, stringSer);
+        addSerializer(Period.class, new PeriodSerializer());
         addSerializer(Interval.class, new IntervalSerializer());
         addSerializer(MonthDay.class, stringSer);
         addSerializer(YearMonth.class, stringSer);

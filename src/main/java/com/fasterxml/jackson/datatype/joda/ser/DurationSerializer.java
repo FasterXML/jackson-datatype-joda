@@ -6,21 +6,25 @@ import org.joda.time.Duration;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.SerializerProvider;
-import com.fasterxml.jackson.databind.ser.std.StdScalarSerializer;
 
 /**
- * Serializes a Duration as its number of millis.
+ * Serializes a Duration; either as number of millis, or, if textual output
+ * requested, using ISO-8601 format.
  */
-public final class DurationSerializer extends StdScalarSerializer<Duration>
+public final class DurationSerializer extends JodaSerializerBase<Duration>
 {
-
     public DurationSerializer() { super(Duration.class); }
 
     @Override
     public void serialize(Duration value, JsonGenerator jgen, SerializerProvider provider) throws IOException,
         JsonProcessingException
     {
-        jgen.writeNumber(value.getMillis());
+        if (provider.isEnabled(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)) {
+            jgen.writeNumber(value.getMillis());
+        } else {
+            jgen.writeString(value.toString());
+        }
     }
 }
