@@ -39,4 +39,4 @@ you can read JSON as Joda types, as well as write Joda values as JSON.
 
 ## More
 
-See [Wiki](https://github.com/FasterXML/jackson-datatype-joda/wiki) for more information (javadocs, downloads).
+See [Wiki](../wiki) for more information (javadocs, downloads).
