@@ -12,6 +12,8 @@ import com.fasterxml.jackson.databind.DeserializationContext;
 public class LocalTimeDeserializer
     extends JodaDeserializerBase<LocalTime>
 {
+    private static final long serialVersionUID = 1L;
+
     final static DateTimeFormatter parser = ISODateTimeFormat.localTimeParser();
 
     public LocalTimeDeserializer() { super(LocalTime.class); }
@@ -50,6 +52,7 @@ public class LocalTimeDeserializer
                 return null;
             }
             return parser.parseLocalTime(str);
+        default:
         }
         throw ctxt.wrongTokenException(jp, JsonToken.START_ARRAY, "expected JSON Array, String or Number");
     }

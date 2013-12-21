@@ -7,8 +7,9 @@ import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.deser.std.StdScalarDeserializer;
 import com.fasterxml.jackson.databind.jsontype.TypeDeserializer;
 
-abstract class JodaDeserializerBase<T> extends StdScalarDeserializer<T> {
-
+@SuppressWarnings("serial")
+abstract class JodaDeserializerBase<T> extends StdScalarDeserializer<T>
+{
     protected JodaDeserializerBase(Class<T> cls) {
         super(cls);
     }

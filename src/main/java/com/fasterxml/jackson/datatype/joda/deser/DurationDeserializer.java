@@ -16,6 +16,7 @@ import com.fasterxml.jackson.databind.deser.std.StdScalarDeserializer;
  */
 public final class DurationDeserializer extends StdScalarDeserializer<Duration>
 {
+    private static final long serialVersionUID = 1L;
 
     public DurationDeserializer() { super(Duration.class); }
 
@@ -28,6 +29,7 @@ public final class DurationDeserializer extends StdScalarDeserializer<Duration>
             return new Duration(jsonParser.getLongValue());
         case VALUE_STRING:
             return new Duration(jsonParser.getText());
+        default:
         }
         throw deserializationContext.mappingException("expected JSON Number or String");
     }

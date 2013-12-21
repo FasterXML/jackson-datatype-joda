@@ -17,6 +17,8 @@ import com.fasterxml.jackson.databind.DeserializationContext;
 public class InstantDeserializer
     extends JodaDeserializerBase<Instant>
 {
+    private static final long serialVersionUID = 1L;
+
     public InstantDeserializer() {
         super(Instant.class);
     }

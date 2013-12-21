@@ -12,6 +12,8 @@ import com.fasterxml.jackson.databind.DeserializationContext;
 public class PeriodDeserializer
     extends JodaDeserializerBase<Period>
 {
+    private static final long serialVersionUID = 1L;
+
     public PeriodDeserializer() { super(Period.class); }
    
     @Override
@@ -25,6 +27,7 @@ public class PeriodDeserializer
             return new Period(jp.getLongValue());            
         case VALUE_STRING:
             return new Period(jp.getText());
+        default:
         }
         throw ctxt.wrongTokenException(jp, JsonToken.START_ARRAY, "expected JSON Number or String");
    }

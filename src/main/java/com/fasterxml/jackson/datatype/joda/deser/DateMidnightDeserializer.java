@@ -15,6 +15,8 @@ import com.fasterxml.jackson.databind.DeserializationContext;
 public class DateMidnightDeserializer
     extends JodaDeserializerBase<DateMidnight>
 {
+    private static final long serialVersionUID = 1L;
+
     final static DateTimeFormatter parser = ISODateTimeFormat.localDateParser();
 
     public DateMidnightDeserializer() { super(DateMidnight.class); }
@@ -49,6 +51,7 @@ public class DateMidnightDeserializer
                 return null;
             }
             return local.toDateMidnight();
+        default:
         }
         throw ctxt.wrongTokenException(jp, JsonToken.START_ARRAY, "expected JSON Array, Number or String");
     }
