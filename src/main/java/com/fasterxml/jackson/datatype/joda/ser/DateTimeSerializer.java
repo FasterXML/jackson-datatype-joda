@@ -9,11 +9,16 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.SerializerProvider;
+import org.joda.time.DateTimeZone;
+import org.joda.time.format.DateTimeFormatter;
+import org.joda.time.format.ISODateTimeFormat;
 
 public final class DateTimeSerializer
     extends JodaSerializerBase<DateTime>
 {
     public DateTimeSerializer() { super(DateTime.class); }
+
+    private DateTimeFormatter format = null;
 
     @Override
     public void serialize(DateTime value, JsonGenerator jgen, SerializerProvider provider)
@@ -22,7 +27,7 @@ public final class DateTimeSerializer
         if (provider.isEnabled(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)) {
             jgen.writeNumber(value.getMillis());
         } else {
-            jgen.writeString(value.toString());
+            jgen.writeString(getDateTimeFormatter(provider).print(value));
         }
     }
 
@@ -31,5 +36,12 @@ public final class DateTimeSerializer
     {
         return createSchemaNode(provider.isEnabled(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
                 ? "number" : "string", true);
+    }
+
+    private DateTimeFormatter getDateTimeFormatter(SerializerProvider provider) {
+        if (format == null) {
+            format = ISODateTimeFormat.dateTime().withZone(DateTimeZone.forTimeZone(provider.getTimeZone()));
+        }
+        return format;
     }
 }
