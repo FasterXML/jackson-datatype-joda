@@ -1,0 +1,22 @@
+Here are people who have contributed to the development of Jackson JSON processor
+Joda datatype module.
+(version numbers in brackets indicate release in which the problem was fixed)
+
+Tatu Saloranta, tatu.saloranta@iki.fi: author
+
+ncjones@github.com:
+ * Contributed #19:  Add support for `MonthDay` and `YearMonth`
+  (2.3.1)
+
+Łukasz D:
+ * Suggested #23: package as a bundle
+  (2.3.1)
+
+Lorcan C:
+ * Contributed #25: Add `KeyDeserializer` for `DateTime`
+  (2.3.1)
+
+Hendy Irawan: (ceefour@github)
+ * Contributed #27: Allow support for `DateTimeZone`
+  (2.3.1)
+
