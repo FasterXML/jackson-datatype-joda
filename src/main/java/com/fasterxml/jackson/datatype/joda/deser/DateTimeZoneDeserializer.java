@@ -32,6 +32,6 @@ public class DateTimeZoneDeserializer extends JodaDeserializerBase<DateTimeZone>
         if (t == JsonToken.VALUE_STRING) {
             return DateTimeZone.forID(jp.getText().trim());
         }
-        throw ctxt.mappingException(getValueClass(), JsonToken.VALUE_STRING);
+        throw ctxt.mappingException(DateTimeZone.class, JsonToken.VALUE_STRING);
     }
 }

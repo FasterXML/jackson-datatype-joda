@@ -35,6 +35,7 @@ public class DateTimeDeserializer
         return (JsonDeserializer<T>) new DateTimeDeserializer(cls);
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public ReadableDateTime deserialize(JsonParser jp, DeserializationContext ctxt)
         throws IOException, JsonProcessingException

@@ -39,6 +39,6 @@ public class InstantDeserializer
             return new Instant(str);
         }
         // TODO: in 2.4, use 'handledType()'
-        throw ctxt.mappingException(getValueClass());
+        throw ctxt.mappingException(Instant.class);
     }
 }
