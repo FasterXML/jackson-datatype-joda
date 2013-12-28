@@ -1,5 +1,5 @@
 Project: jackson-datatype-joda
-Version: 2.3.1 (xx-Dec-2013)
+Version: 2.3.1 (28-Dec-2013)
 
 #19: Add serializers and deserializers for MonthDay and YearMonth
  (contributed by ncjones@github)
