@@ -8,7 +8,7 @@
   </parent>
   <groupId>com.fasterxml.jackson.datatype</groupId>
   <artifactId>jackson-datatype-joda</artifactId>
-  <name>Jackson-datatype-JODA</name>
+  <name>Jackson-datatype-Joda</name>
   <version>2.3.2-SNAPSHOT</version>
   <packaging>bundle</packaging>
   <description>Add-on module for Jackson (http://jackson.codehaus.org) to support
