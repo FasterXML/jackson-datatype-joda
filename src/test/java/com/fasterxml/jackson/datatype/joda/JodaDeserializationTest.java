@@ -2,6 +2,7 @@ package com.fasterxml.jackson.datatype.joda;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.joda.time.*;
@@ -58,19 +59,32 @@ public class JodaDeserializationTest extends JodaTestBase
     }
 
     // since 2.1.3, for github issue #8
-    public void testDeserReadableDateTimeWithTimeZoneInfo() throws IOException
-    {
-        MAPPER.setTimeZone(TimeZone.getTimeZone("GMT-6"));
+    public void testDeserReadableDateTimeWithTimeZoneInfo() throws IOException {
+        TimeZone timeZone = TimeZone.getTimeZone("GMT-6");
+        DateTimeZone dateTimeZone = DateTimeZone.forTimeZone(timeZone);
+        MAPPER.setTimeZone(timeZone);
         ReadableDateTime date = MAPPER.readValue(quote("1972-12-28T12:00:01.000-0600"), ReadableDateTime.class);
         assertNotNull(date);
         assertEquals("1972-12-28T12:00:01.000-06:00", date.toString());
+        assertEquals(dateTimeZone, date.getZone());
+
+        // default behavior is to ignore the timezone in serialized data
+        ReadableDateTime otherTzDate = MAPPER.readValue(quote("1972-12-28T12:00:01.000-0700"), ReadableDateTime.class);
+        assertEquals(dateTimeZone, otherTzDate.getZone());
 
         // since 1.6.1, for [JACKSON-360]
         assertNull(MAPPER.readValue(quote(""), ReadableDateTime.class));
     }
 
-    public void testDeserReadableInstant() throws IOException
-    {
+    public void testDeserReadableDateTimeWithTimeZoneFromData() throws IOException {
+        ObjectMapper mapper = jodaMapper();
+        mapper.disable(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE);
+        mapper.setTimeZone(TimeZone.getTimeZone("GMT-6"));
+        ReadableDateTime date = mapper.readValue(quote("2014-01-20T08:59:01.000-0500"), ReadableDateTime.class);
+        assertEquals(DateTimeZone.forOffsetHours(-5), date.getZone());
+    }
+
+    public void testDeserReadableInstant() throws IOException {
         ReadableInstant date = MAPPER.readValue(quote("1972-12-28T12:00:01.000+0000"), ReadableInstant.class);
         assertNotNull(date);
         assertEquals("1972-12-28T12:00:01.000Z", date.toString());
@@ -78,7 +92,7 @@ public class JodaDeserializationTest extends JodaTestBase
         // since 1.6.1, for [JACKSON-360]
         assertNull(MAPPER.readValue(quote(""), ReadableInstant.class));
     }
-    
+
     public void testDeserDateTimeWithTypeInfo() throws IOException
     {
         ObjectMapper mapper = jodaMapper();
@@ -87,7 +101,7 @@ public class JodaDeserializationTest extends JodaTestBase
         assertNotNull(date);
         assertEquals("1972-12-28T12:00:01.000Z", date.toString());
     }
-    
+
     /*
     /**********************************************************
     /* Tests for DateMidnight type
@@ -110,12 +124,12 @@ public class JodaDeserializationTest extends JodaTestBase
         // since 1.6.1, for [JACKSON-360]
         assertNull(MAPPER.readValue(quote(""), DateMidnight.class));
     }
-    
+
     public void testDateMidnightDeserWithTypeInfo() throws IOException
     {
         ObjectMapper mapper = jodaMapper();
         mapper.addMixInAnnotations(DateMidnight.class, ObjectConfiguration.class);
-        
+
         // couple of acceptable formats, so:
         DateMidnight date = mapper.readValue("[\"org.joda.time.DateMidnight\",[2001,5,25]]", DateMidnight.class);
         assertEquals(2001, date.getYear());
@@ -141,7 +155,7 @@ public class JodaDeserializationTest extends JodaTestBase
         assertEquals(2001, date.getYear());
         assertEquals(5, date.getMonthOfYear());
         assertEquals(25, date.getDayOfMonth());
-        
+
         LocalDate date2 = MAPPER.readValue(quote("2005-07-13"), LocalDate.class);
         assertEquals(2005, date2.getYear());
         assertEquals(7, date2.getMonthOfYear());
@@ -150,18 +164,18 @@ public class JodaDeserializationTest extends JodaTestBase
         // since 1.6.1, for [JACKSON-360]
         assertNull(MAPPER.readValue(quote(""), LocalDate.class));
     }
-    
+
     public void testLocalDateDeserWithTypeInfo() throws IOException
     {
         ObjectMapper mapper = jodaMapper();
         mapper.addMixInAnnotations(LocalDate.class, ObjectConfiguration.class);
-        
+
         // couple of acceptable formats, so:
         LocalDate date = mapper.readValue("[\"org.joda.time.LocalDate\",[2001,5,25]]", LocalDate.class);
         assertEquals(2001, date.getYear());
         assertEquals(5, date.getMonthOfYear());
         assertEquals(25, date.getDayOfMonth());
-        
+
         LocalDate date2 = mapper.readValue("[\"org.joda.time.LocalDate\",\"2005-07-13\"]", LocalDate.class);
         assertEquals(2005, date2.getYear());
         assertEquals(7, date2.getMonthOfYear());
@@ -182,7 +196,7 @@ public class JodaDeserializationTest extends JodaTestBase
         assertEquals(59, time.getMinuteOfHour());
         assertEquals(1, time.getSecondOfMinute());
         assertEquals(222, time.getMillisOfSecond());
-        
+
         LocalTime time2 = MAPPER.readValue(quote("13:45:22"), LocalTime.class);
         assertEquals(13, time2.getHourOfDay());
         assertEquals(45, time2.getMinuteOfHour());
@@ -192,19 +206,19 @@ public class JodaDeserializationTest extends JodaTestBase
         // since 1.6.1, for [JACKSON-360]
         assertNull(MAPPER.readValue(quote(""), LocalTime.class));
     }
-    
+
     public void testLocalTimeDeserWithTypeInfo() throws IOException
     {
         ObjectMapper mapper = jodaMapper();
         mapper.addMixInAnnotations(LocalTime.class, ObjectConfiguration.class);
-        
+
         // couple of acceptable formats, so:
         LocalTime time = mapper.readValue("[\"org.joda.time.LocalTime\",[23,59,1,10]]", LocalTime.class);
         assertEquals(23, time.getHourOfDay());
         assertEquals(59, time.getMinuteOfHour());
         assertEquals(1, time.getSecondOfMinute());
         assertEquals(10, time.getMillisOfSecond());
-        
+
         LocalTime time2 = mapper.readValue("[\"org.joda.time.LocalTime\",\"13:45:22\"]", LocalTime.class);
         assertEquals(13, time2.getHourOfDay());
         assertEquals(45, time2.getMinuteOfHour());
@@ -217,7 +231,7 @@ public class JodaDeserializationTest extends JodaTestBase
     /* Tests for LocalDateTime type
     /**********************************************************
      */
-    
+
     public void testLocalDateTimeDeser() throws IOException
     {
         // couple of acceptable formats again:
@@ -244,12 +258,12 @@ public class JodaDeserializationTest extends JodaTestBase
         // since 1.6.1, for [JACKSON-360]
         assertNull(MAPPER.readValue(quote(""), LocalDateTime.class));
     }
-    
+
     public void testLocalDateTimeDeserWithTypeInfo() throws IOException
     {
         ObjectMapper mapper = jodaMapper();
         mapper.addMixInAnnotations(LocalDateTime.class, ObjectConfiguration.class);
-        
+
         // couple of acceptable formats again:
         LocalDateTime date = mapper.readValue("[\"org.joda.time.LocalDateTime\",[2001,5,25,10,15,30,37]]", LocalDateTime.class);
         assertEquals(2001, date.getYear());
@@ -295,12 +309,12 @@ public class JodaDeserializationTest extends JodaTestBase
         // but millis are actually truncated...
         assertEquals(0, out.getMillis());
     }
-    
+
     public void testPeriodDeserWithTypeInfo() throws IOException
     {
         ObjectMapper mapper = jodaMapper();
         mapper.addMixInAnnotations(Period.class, ObjectConfiguration.class);
-        
+
         Period out = mapper.readValue("[\"org.joda.time.Period\",\"PT1H2M3.004S\"]", Period.class);
         assertEquals(1, out.getHours());
         assertEquals(2, out.getMinutes());
@@ -351,16 +365,16 @@ public class JodaDeserializationTest extends JodaTestBase
             assertEquals("expected JSON Number or String", e.getMessage().split("\n")[0]);
         }
     }
-    
+
     public void testDurationDeserFromIntWithTypeInfo() throws IOException
     {
         ObjectMapper mapper = jodaMapper();
         mapper.addMixInAnnotations(Duration.class, ObjectConfiguration.class);
-        
+
         Duration d = mapper.readValue("[\"org.joda.time.Duration\",1234]", Duration.class);
         assertEquals(1234, d.getMillis());
     }
-    
+
     @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.WRAPPER_ARRAY, property = "@class")
     private static interface ObjectConfiguration {
     }
