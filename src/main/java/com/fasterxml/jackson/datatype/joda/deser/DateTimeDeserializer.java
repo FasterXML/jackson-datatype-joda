@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 
 import org.joda.time.DateTime;
@@ -52,7 +53,10 @@ public class DateTimeDeserializer
             if (str.length() == 0) { // [JACKSON-360]
                 return null;
             }
-            return new DateTime(str, dtz);
+            if (ctxt.isEnabled(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE))
+                return new DateTime(str, dtz);
+            else
+                return DateTime.parse(str);
         }
         // TODO: in 2.4, use 'handledType()'
         throw ctxt.mappingException(getValueClass());
