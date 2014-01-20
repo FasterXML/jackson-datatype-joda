@@ -1,5 +1,14 @@
 Project: jackson-datatype-joda
-Version: 2.3.1 (28-Dec-2013)
+Version: 2.3.2 (xx-xxx-2013)
+
+#16: Adjust existing Date/Time deserializers to support `DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE`
+ (contributed by lukelukeluke@github)
+
+------------------------------------------------------------------------
+=== History: ===
+------------------------------------------------------------------------
+
+2.3.1 (28-Dec-2013)
 
 #19: Add serializers and deserializers for MonthDay and YearMonth
  (contributed by ncjones@github)
@@ -15,10 +24,6 @@ Version: 2.3.1 (28-Dec-2013)
  (suggested by Henning S)
 #27: Add support for `DateTimeZone`
  (requested by Hendy Irawan)
-
-------------------------------------------------------------------------
-=== History: ===
-------------------------------------------------------------------------
 
 2.3.0 (14-Nov-2013)
 
