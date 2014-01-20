@@ -12,8 +12,8 @@ formats on input side.
 
 ## Usage
 
-Since this module extends basic [Jackson databind](../jackson-databind) functionality, you may want to check out
-documentation at [Jackson-docs](../jackson-docs) first.
+Since this module extends basic [Jackson databind](../../../jackson-databind) functionality, you may want to check out
+documentation at [Jackson-docs](../../../jackson-docs) first.
 
 ### Maven dependency
 
@@ -41,7 +41,7 @@ mapper.registerModule(new JodaModule());
 
 ### Reading and Writing Joda types
 
-After registering Joda module, [Jackson Databind](../jackson-databind) will be able to write values
+After registering Joda module, [Jackson Databind](../../../jackson-databind) will be able to write values
 of supported Joda types as JSON (and other formats Jackson supports), and read Joda values
 from same formats.
 
