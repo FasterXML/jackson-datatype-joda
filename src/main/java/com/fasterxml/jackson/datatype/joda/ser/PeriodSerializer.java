@@ -8,11 +8,14 @@ import org.joda.time.format.PeriodFormatter;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.SerializerProvider;
 
 /**
- * Serializes a Duration; either as number of millis, or, if textual output
- * requested, using ISO-8601 format.
+ * Serializes a {@link ReadablePeriod} using Joda default formatting.
+ *<p>
+ * TODO: allow serialization as an array of numbers, for numeric ("timestamp")
+ * notation?
  */
 public final class PeriodSerializer extends JodaSerializerBase<ReadablePeriod>
 {
@@ -25,5 +28,10 @@ public final class PeriodSerializer extends JodaSerializerBase<ReadablePeriod>
         JsonProcessingException
     {
         jgen.writeString(defaultFormat.print(value));
+    }
+
+    @Override
+    public JsonNode getSchema(SerializerProvider provider, java.lang.reflect.Type typeHint) {
+        return createSchemaNode("string", true);
     }
 }

@@ -8,7 +8,6 @@ import org.joda.time.DateTime;
 import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.SerializerProvider;
 
 import org.joda.time.DateTimeZone;
@@ -16,18 +15,37 @@ import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
 
 public final class DateTimeSerializer
-    extends JodaSerializerBase<DateTime>
+    extends JodaDateSerializerBase<DateTime>
 {
-    private final DateTimeFormatter defaultFormat = ISODateTimeFormat.dateTime()
-            .withZoneUTC();
+    protected final static DateTimeFormatter DEFAULT_FORMAT
+        = ISODateTimeFormat.dateTime().withZoneUTC();
+    
+    protected final DateTimeFormatter _formatter;
 
-    public DateTimeSerializer() { super(DateTime.class); }
+    protected final TimeZone _jdkTimezone;
+    
+    public DateTimeSerializer() { this(null, null); }
+    public DateTimeSerializer(Boolean useNumeric, TimeZone jdkTimezone) {
+        super(DateTime.class, useNumeric);
+        _jdkTimezone = jdkTimezone;
+        if (jdkTimezone == null) {
+            _formatter = DEFAULT_FORMAT;
+        } else {
+            _formatter = DEFAULT_FORMAT.withZone(DateTimeZone.forTimeZone(jdkTimezone));
+        }
+    }
+
+    @Override
+    public DateTimeSerializer withFormat(Boolean useTimestamp,
+            TimeZone jdkTimezone) {
+        return new DateTimeSerializer(useTimestamp, jdkTimezone);
+    }
 
     @Override
     public void serialize(DateTime value, JsonGenerator jgen, SerializerProvider provider)
         throws IOException, JsonGenerationException
     {
-        if (provider.isEnabled(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)) {
+        if (_useTimestamp(provider)) {
             jgen.writeNumber(value.getMillis());
         } else {
             jgen.writeString(getDateTimeFormatter(provider).print(value));
@@ -35,18 +53,19 @@ public final class DateTimeSerializer
     }
 
     @Override
-    public JsonNode getSchema(SerializerProvider provider, java.lang.reflect.Type typeHint)
-    {
-        return createSchemaNode(provider.isEnabled(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
-                ? "number" : "string", true);
+    public JsonNode getSchema(SerializerProvider provider, java.lang.reflect.Type typeHint) {
+        return createSchemaNode(_useTimestamp(provider) ? "number" : "string", true);
     }
 
     private DateTimeFormatter getDateTimeFormatter(SerializerProvider provider)
     {
-        DateTimeFormatter formatter = defaultFormat;
-        TimeZone ts = provider.getTimeZone();
-        if (ts != null) {
-            formatter = formatter.withZone(DateTimeZone.forTimeZone(ts));
+        DateTimeFormatter formatter = _formatter;
+        TimeZone tz = _jdkTimezone;
+        if (tz == null) {
+            TimeZone defTz = provider.getTimeZone();
+            if (defTz != null && !defTz.equals(tz)) {
+                formatter = formatter.withZone(DateTimeZone.forTimeZone(defTz));
+            }
         }
         return formatter;
     }

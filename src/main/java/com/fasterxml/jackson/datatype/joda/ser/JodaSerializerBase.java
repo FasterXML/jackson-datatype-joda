@@ -18,5 +18,4 @@ abstract class JodaSerializerBase<T> extends StdSerializer<T>
         serialize(value, jgen, provider);
         typeSer.writeTypeSuffixForScalar(value, jgen);
     }
-    
 }

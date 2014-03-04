@@ -29,8 +29,7 @@ public abstract class JodaTestBase extends TestCase
     /**********************************************************
      */
 
-    protected void assertEquals(int[] exp, int[] act)
-    {
+    protected void assertEquals(int[] exp, int[] act) {
         assertArrayEquals(exp, act);
     }
     
@@ -42,6 +41,10 @@ public abstract class JodaTestBase extends TestCase
 
     public String quote(String str) {
         return '"'+str+'"';
+    }
+
+    protected String aposToQuotes(String json) {
+        return json.replace("'", "\"");
     }
 
     protected <T> T readAndMapFromString(ObjectMapper m, String input, Class<T> cls)

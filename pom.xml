@@ -22,19 +22,23 @@ Joda (http://joda-time.sourceforge.net/) data types.
     <tag>HEAD</tag>
   </scm>
   <properties>
+    <version.jackson.annotations>2.3.0</version.jackson.annotations>
     <version.jackson.core>2.3.2</version.jackson.core>
     <!-- Generate PackageVersion.java into this directory. -->
     <packageVersion.dir>com/fasterxml/jackson/datatype/joda</packageVersion.dir>
     <packageVersion.package>${project.groupId}.joda</packageVersion.package>
 
     <!-- Configuration properties for the OSGi maven-bundle-plugin -->
-    <osgi.import>com.fasterxml.jackson.core
+    <osgi.import>com.fasterxml.jackson.annotation
+,com.fasterxml.jackson.core
 ,com.fasterxml.jackson.core.util
 ,com.fasterxml.jackson.databind
 ,com.fasterxml.jackson.databind.deser.std
+,com.fasterxml.jackson.databind.introspect
 ,com.fasterxml.jackson.databind.jsontype
 ,com.fasterxml.jackson.databind.module
 ,com.fasterxml.jackson.databind.node
+,com.fasterxml.jackson.databind.ser
 ,com.fasterxml.jackson.databind.ser.std
 ,org.joda.time
 ,org.joda.time.format
@@ -44,7 +48,14 @@ Joda (http://joda-time.sourceforge.net/) data types.
   </properties>
 
   <dependencies>
-    <!-- Extends Jackson mapper, 2.x -->
+    <!-- Extends Jackson mapper, 2.x; but also needs annotations slightly,
+         to support JsonFormat
+      -->
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-annotations</artifactId>
+      <version>${version.jackson.annotations}</version>
+    </dependency>
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-core</artifactId>

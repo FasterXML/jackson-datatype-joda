@@ -1,12 +1,16 @@
 Project: jackson-datatype-joda
-Version: 2.3.2 (01-Mar-2013)
+Version: 2.3.3 (xx-xxx-2014)
 
-#16: Adjust existing Date/Time deserializers to support `DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE`
- (contributed by lukelukeluke@github)
+#32: Support use of `@JsonFormat(shape=...)` for timestamp/string choice
 
 ------------------------------------------------------------------------
 === History: ===
 ------------------------------------------------------------------------
+
+2.3.2 (01-Mar-2014)
+
+#16: Adjust existing Date/Time deserializers to support `DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE`
+ (contributed by lukelukeluke@github)
 
 2.3.1 (28-Dec-2013)
 
