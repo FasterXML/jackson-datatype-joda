@@ -1,10 +1,8 @@
 package com.fasterxml.jackson.datatype.joda.ser;
 
 import java.io.IOException;
-import java.util.TimeZone;
 
 import org.joda.time.DateMidnight;
-import org.joda.time.format.DateTimeFormatter;
 
 import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.core.JsonGenerator;
@@ -14,33 +12,32 @@ import com.fasterxml.jackson.databind.SerializerProvider;
 public final class DateMidnightSerializer
     extends JodaDateSerializerBase<DateMidnight>
 {
-    protected final static DateTimeFormatter DEFAULT_FORMAT = DEFAULT_DATEONLY_FORMAT;
-
-    public DateMidnightSerializer() { this(null); }
-    public DateMidnightSerializer(Boolean useTimestamp) {
-        super(DateMidnight.class, useTimestamp);
-    }
+    protected final static JacksonJodaFormat DEFAULT_FORMAT
+        = new JacksonJodaFormat(DEFAULT_DATEONLY_FORMAT);
     
-    @Override
-    public DateMidnightSerializer withFormat(Boolean useTimestamp,
-            TimeZone jdkTimezone) {
-        return (useTimestamp == _useTimestamp) ? this
-                : new DateMidnightSerializer(useTimestamp);
+    public DateMidnightSerializer() { this(DEFAULT_FORMAT); }
+    public DateMidnightSerializer(JacksonJodaFormat format) {
+        super(DateMidnight.class, format);
     }
 
     @Override
-    public void serialize(DateMidnight dt, JsonGenerator jgen, SerializerProvider provider)
+    public DateMidnightSerializer withFormat(JacksonJodaFormat formatter) {
+        return (_format == formatter) ? this : new DateMidnightSerializer(_format);
+    }
+
+    @Override
+    public void serialize(DateMidnight value, JsonGenerator jgen, SerializerProvider provider)
         throws IOException, JsonGenerationException
     {
         if (_useTimestamp(provider)) {
             // same as with other date-only values
             jgen.writeStartArray();
-            jgen.writeNumber(dt.year().get());
-            jgen.writeNumber(dt.monthOfYear().get());
-            jgen.writeNumber(dt.dayOfMonth().get());
+            jgen.writeNumber(value.year().get());
+            jgen.writeNumber(value.monthOfYear().get());
+            jgen.writeNumber(value.dayOfMonth().get());
             jgen.writeEndArray();
         } else {
-            jgen.writeString(DEFAULT_FORMAT.print(dt));
+            jgen.writeString(_format.createFormatter(provider).print(value));
         }
     }
 

@@ -1,17 +1,10 @@
 package com.fasterxml.jackson.datatype.joda.ser;
 
-import java.util.TimeZone;
-
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-
-import com.fasterxml.jackson.databind.BeanProperty;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.JsonSerializer;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.databind.SerializerProvider;
+import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.introspect.Annotated;
 import com.fasterxml.jackson.databind.ser.ContextualSerializer;
 
@@ -20,67 +13,54 @@ public abstract class JodaDateSerializerBase<T> extends JodaSerializerBase<T>
     implements ContextualSerializer
 {
     protected final static DateTimeFormatter DEFAULT_DATEONLY_FORMAT
-        = ISODateTimeFormat.date();
+        = ISODateTimeFormat.date().withZoneUTC();
 
     protected final static DateTimeFormatter DEFAULT_TIMEONLY_FORMAT
-        = ISODateTimeFormat.time();
+        = ISODateTimeFormat.time().withZoneUTC();
 
     protected final static DateTimeFormatter DEFAULT_LOCAL_DATETIME_FORMAT
-        = ISODateTimeFormat.dateTime();
+        = ISODateTimeFormat.dateTime().withZoneUTC();
+
+    protected final JacksonJodaFormat _format;
     
-    /**
-     * Flag that indicates that serialization must be done as the
-     * Java timestamp, regardless of other settings.
-     */
-    protected final Boolean _useTimestamp;
-    
-    protected JodaDateSerializerBase(Class<T> type,
-            Boolean useTimestamp)
+    protected JodaDateSerializerBase(Class<T> type, JacksonJodaFormat format)
     {
         super(type);
-        _useTimestamp = useTimestamp;
+        _format = format;
     }
 
-    public abstract JodaDateSerializerBase<T> withFormat(Boolean useTimestamp,
-            TimeZone jdkTimezone);
+    public abstract JodaDateSerializerBase<T> withFormat(JacksonJodaFormat format);
 
     @Override
     public JsonSerializer<?> createContextual(SerializerProvider prov,
             BeanProperty property) throws JsonMappingException
     {
         if (property != null) {
-            JsonFormat.Value format = prov.getAnnotationIntrospector().findFormat((Annotated)property.getMember());
-            if (format != null) {
+            JsonFormat.Value ann = prov.getAnnotationIntrospector().findFormat((Annotated)property.getMember());
+            if (ann != null) {
+                JacksonJodaFormat format = _format;
+
                 Boolean useTimestamp;
-                
+
                 // Simple case first: serialize as numeric timestamp?
-                if (format.getShape().isNumeric()) {
+                if (ann.getShape().isNumeric()) {
                     useTimestamp = Boolean.TRUE;
-                } else if (format.getShape() == JsonFormat.Shape.STRING) {
+                } else if (ann.getShape() == JsonFormat.Shape.STRING) {
                     useTimestamp = Boolean.FALSE;
                 } else  {
                     useTimestamp = null;
                 }
-                // If not, do we have timezone?
-                TimeZone tz = format.getTimeZone();
-
-                if ((useTimestamp != _useTimestamp) || (tz != null)) {
-                    return withFormat(useTimestamp, tz);
+                // must not call if flag defined, to rely on defaults:
+                if (useTimestamp != null) {
+                    format = format.withUseTimestamp(useTimestamp);
                 }
-                    
-                    // !!! TODO
-                    /*
-                    DateFormat df = prov.getConfig().getDateFormat();
-                    // one shortcut: with our custom format, can simplify handling a bit
-                    if (df.getClass() == StdDateFormat.class) {
-                        df = StdDateFormat.getISO8601Format(tz);
-                    } else {
-                        // otherwise need to clone, re-set timezone:
-                        df = (DateFormat) df.clone();
-                        df.setTimeZone(tz);
-                    }
-                    return withFormat(false, df);
-                    */
+                // for others, safe to call, null/empty just ignored
+                format = format.withFormat(ann.getPattern().trim());
+                format = format.withLocale(ann.getLocale());
+                format = format.withTimeZone(ann.getTimeZone());
+                if (format != _format) {
+                    return withFormat(format);
+                }
             }
         }
         return this;
@@ -93,9 +73,6 @@ public abstract class JodaDateSerializerBase<T> extends JodaSerializerBase<T>
      */
 
     protected boolean _useTimestamp(SerializerProvider provider) {
-        if (_useTimestamp != null) {
-            return _useTimestamp.booleanValue();
-        }
-        return provider.isEnabled(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+        return _format.useTimestamp(provider);
     }
 }

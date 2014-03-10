@@ -1,10 +1,8 @@
 package com.fasterxml.jackson.datatype.joda.ser;
 
 import java.io.IOException;
-import java.util.TimeZone;
 
 import org.joda.time.LocalDateTime;
-import org.joda.time.format.DateTimeFormatter;
 
 import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.core.JsonGenerator;
@@ -14,37 +12,36 @@ import com.fasterxml.jackson.databind.SerializerProvider;
 public final class LocalDateTimeSerializer
     extends JodaDateSerializerBase<LocalDateTime>
 {
-    protected final static DateTimeFormatter DEFAULT_FORMAT = DEFAULT_LOCAL_DATETIME_FORMAT;
+    protected final static JacksonJodaFormat DEFAULT_FORMAT
+        = new JacksonJodaFormat(DEFAULT_LOCAL_DATETIME_FORMAT);
 
-    public LocalDateTimeSerializer() { this(null); }
-    public LocalDateTimeSerializer(Boolean useTimestamp) {
-        super(LocalDateTime.class, useTimestamp);
+    public LocalDateTimeSerializer() { this(DEFAULT_FORMAT); }
+    public LocalDateTimeSerializer(JacksonJodaFormat format) {
+        super(LocalDateTime.class, format);
     }
 
     @Override
-    public LocalDateTimeSerializer withFormat(Boolean useTimestamp,
-            TimeZone jdkTimezone) {
-        return (useTimestamp == _useTimestamp) ? this
-                : new LocalDateTimeSerializer(useTimestamp);
+    public LocalDateTimeSerializer withFormat(JacksonJodaFormat formatter) {
+        return (_format == formatter) ? this : new LocalDateTimeSerializer(formatter);
     }
 
     @Override
-    public void serialize(LocalDateTime dt, JsonGenerator jgen, SerializerProvider provider)
+    public void serialize(LocalDateTime value, JsonGenerator jgen, SerializerProvider provider)
         throws IOException, JsonGenerationException
     {
         if (_useTimestamp(provider)) {
             // Timestamp here actually means an array of values
             jgen.writeStartArray();
-            jgen.writeNumber(dt.year().get());
-            jgen.writeNumber(dt.monthOfYear().get());
-            jgen.writeNumber(dt.dayOfMonth().get());
-            jgen.writeNumber(dt.hourOfDay().get());
-            jgen.writeNumber(dt.minuteOfHour().get());
-            jgen.writeNumber(dt.secondOfMinute().get());
-            jgen.writeNumber(dt.millisOfSecond().get());
+            jgen.writeNumber(value.year().get());
+            jgen.writeNumber(value.monthOfYear().get());
+            jgen.writeNumber(value.dayOfMonth().get());
+            jgen.writeNumber(value.hourOfDay().get());
+            jgen.writeNumber(value.minuteOfHour().get());
+            jgen.writeNumber(value.secondOfMinute().get());
+            jgen.writeNumber(value.millisOfSecond().get());
             jgen.writeEndArray();
         } else {
-            jgen.writeString(DEFAULT_FORMAT.print(dt));
+            jgen.writeString(_format.createFormatter(provider).print(value));
         }
     }
 

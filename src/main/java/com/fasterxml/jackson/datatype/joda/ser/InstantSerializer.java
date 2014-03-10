@@ -1,7 +1,6 @@
 package com.fasterxml.jackson.datatype.joda.ser;
 
 import java.io.IOException;
-import java.util.TimeZone;
 
 import org.joda.time.Instant;
 
@@ -13,16 +12,16 @@ import com.fasterxml.jackson.databind.SerializerProvider;
 public final class InstantSerializer
     extends JodaDateSerializerBase<Instant>
 {
-    public InstantSerializer() { this(null); }
-    public InstantSerializer(Boolean useTimestamp) {
-        super(Instant.class, useTimestamp);
+    protected final static JacksonJodaFormat DEFAULT_FORMAT = new JacksonJodaFormat(DEFAULT_DATEONLY_FORMAT);
+    
+    public InstantSerializer() { this(DEFAULT_FORMAT); }
+    public InstantSerializer(JacksonJodaFormat format) {
+        super(Instant.class, format);
     }
 
     @Override
-    public InstantSerializer withFormat(Boolean useTimestamp,
-            TimeZone jdkTimezone) {
-        return (useTimestamp == _useTimestamp) ? this
-                : new InstantSerializer(useTimestamp);
+    public InstantSerializer withFormat(JacksonJodaFormat formatter) {
+        return (_format == formatter) ? this : new InstantSerializer(formatter);
     }
 
     @Override
