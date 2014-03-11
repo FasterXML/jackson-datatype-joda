@@ -10,19 +10,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 public abstract class JodaTestBase extends TestCase
 {
-    /*
-    /**********************************************************
-    /* Initialization
-    /**********************************************************
-     */
-
-    protected ObjectMapper jodaMapper()
+    protected static ObjectMapper jodaMapper()
     {
         ObjectMapper mapper = new ObjectMapper();
         mapper.registerModule(new JodaModule());
         return mapper;
     }
-    
+
     /*
     /**********************************************************
     /* Additional assert methods

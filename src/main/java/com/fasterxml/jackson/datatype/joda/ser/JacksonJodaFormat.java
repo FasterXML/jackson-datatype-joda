@@ -40,27 +40,24 @@ public class JacksonJodaFormat
     protected final boolean _explicitLocale;
     
     public JacksonJodaFormat(DateTimeFormatter defaultFormatter) {
-        this(defaultFormatter.withLocale(DEFAULT_LOCALE),
-                null,
-                defaultFormatter.getZone().toTimeZone(), false,
-                DEFAULT_LOCALE, false);
+        _useTimestamp = null;
+        _jdkTimezone = defaultFormatter.getZone().toTimeZone();
+        _locale = DEFAULT_LOCALE;
+        _formatter = defaultFormatter;
+        _explicitTimezone = false;
+        _explicitLocale = false;
     }
 
-    public JacksonJodaFormat(DateTimeFormatter formatter, Boolean useTimestamp,
-            TimeZone jdkTimezone, boolean explicitTimezone,
-            Locale locale, boolean explicitLocale)
+    public JacksonJodaFormat(JacksonJodaFormat base, Boolean useTimestamp)
     {
         _useTimestamp = useTimestamp;
-        _jdkTimezone = jdkTimezone;
-        _locale = locale;
-        if (jdkTimezone != null) {
-            formatter = formatter.withZone(DateTimeZone.forTimeZone(jdkTimezone));
-        }
-        _formatter = formatter;
-        _explicitTimezone = explicitTimezone;
-        _explicitLocale = explicitLocale;
+        _formatter = base._formatter;
+        _jdkTimezone = base._jdkTimezone;
+        _explicitTimezone = base._explicitTimezone;
+        _locale = base._locale;
+        _explicitLocale = base._explicitLocale;
     }
-
+    
     public JacksonJodaFormat(JacksonJodaFormat base,
             DateTimeFormatter formatter)
     {
@@ -72,13 +69,37 @@ public class JacksonJodaFormat
         _explicitLocale = base._explicitLocale;
     }
 
+    public JacksonJodaFormat(JacksonJodaFormat base, TimeZone jdkTimezone)
+    {
+        _useTimestamp = base._useTimestamp;
+        _jdkTimezone = jdkTimezone;
+        _explicitTimezone = true;
+        _locale = base._locale;
+        _explicitLocale = base._explicitLocale;
+        _formatter = base._formatter.withZone(DateTimeZone.forTimeZone(jdkTimezone));
+    }
+
+    public JacksonJodaFormat(JacksonJodaFormat base, Locale locale)
+    {
+        _useTimestamp = base._useTimestamp;
+        _jdkTimezone = base._jdkTimezone;
+        _explicitTimezone = base._explicitTimezone;
+        _locale = locale;
+        _explicitLocale = true;
+        _formatter = base._formatter.withLocale(locale);
+    }
+
+    /*
+    /**********************************************************
+    /* Factory methods
+    /**********************************************************
+     */
+
     protected JacksonJodaFormat withUseTimestamp(Boolean useTimestamp) {
         if (_useTimestamp != null && _useTimestamp.equals(useTimestamp)) {
             return this;
         }
-        return new JacksonJodaFormat(_formatter, useTimestamp,
-                _jdkTimezone, _explicitTimezone,
-                _locale, _explicitLocale);
+        return new JacksonJodaFormat(this, useTimestamp);
     }
     
     protected JacksonJodaFormat withFormat(String format) {
@@ -92,6 +113,10 @@ public class JacksonJodaFormat
         } else {
             formatter = DateTimeFormat.forPattern(format);
         }
+        if (_locale != null) {
+            formatter = formatter.withLocale(_locale);
+        }
+        formatter = formatter.withZone(_formatter.getZone());
         return new JacksonJodaFormat(this, formatter);
     }
     
@@ -99,18 +124,14 @@ public class JacksonJodaFormat
         if ((tz == null) || (_jdkTimezone != null && _jdkTimezone.equals(tz))) {
             return this;
         }
-        return new JacksonJodaFormat(_formatter, _useTimestamp,
-                tz, true,
-                _locale, _explicitLocale);
+        return new JacksonJodaFormat(this, tz);
     }
 
     protected JacksonJodaFormat withLocale(Locale locale) {
         if ((locale == null) || (_locale != null && _locale.equals(locale))) {
             return this;
         }
-        return new JacksonJodaFormat(_formatter, _useTimestamp,
-                _jdkTimezone, _explicitTimezone,
-                locale, true);
+        return new JacksonJodaFormat(this, locale);
     }
 
     /*
