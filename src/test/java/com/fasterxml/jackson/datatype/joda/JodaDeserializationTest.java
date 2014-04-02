@@ -228,6 +228,28 @@ public class JodaDeserializationTest extends JodaTestBase
 
     /*
     /**********************************************************
+    /* Tests for Interval type
+    /**********************************************************
+     */
+    public void testIntervalDeser() throws IOException
+    {
+        Interval interval = MAPPER.readValue(quote("1396439982-1396440001"), Interval.class);
+        assertEquals(1396439982, interval.getStartMillis());
+        assertEquals(1396440001, interval.getEndMillis());
+    }
+
+    public void testIntervalDeserWithTypeInfo() throws IOException
+    {
+        ObjectMapper mapper = jodaMapper();
+        mapper.addMixInAnnotations(Interval.class, ObjectConfiguration.class);
+
+        Interval interval= mapper.readValue("[\"org.joda.time.Interval\",\"1396439982-1396440001\"]", Interval.class);
+        assertEquals(1396439982, interval.getStartMillis());
+        assertEquals(1396440001, interval.getEndMillis());
+    }
+
+    /*
+    /**********************************************************
     /* Tests for LocalDateTime type
     /**********************************************************
      */
