@@ -11,11 +11,23 @@ public class JodaMapper extends ObjectMapper
         registerModule(new JodaModule());
     }
 
+    /**
+     * Convenience method that is shortcut for:
+     *<pre>
+     *  module.isEnabled(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+     *<pre>
+     */
     public boolean getWriteDatesAsTimestamps() {
         return getSerializationConfig().isEnabled(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
     }
 
-    public void setWriteDatesAsTimestamps(boolean writeDatesAsTimestamps) {
-        configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, writeDatesAsTimestamps);
+    /**
+     * Convenience method that is shortcut for:
+     *<pre>
+     *  configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, state)
+     *<pre>
+     */
+    public void setWriteDatesAsTimestamps(boolean state) {
+        configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, state);
     }
 }
