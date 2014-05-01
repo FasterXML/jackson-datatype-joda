@@ -9,7 +9,7 @@
   <groupId>com.fasterxml.jackson.datatype</groupId>
   <artifactId>jackson-datatype-joda</artifactId>
   <name>Jackson-datatype-Joda</name>
-  <version>2.4.0-SNAPSHOT</version>
+  <version>2.4.0-rc2-SNAPSHOT</version>
   <packaging>bundle</packaging>
   <description>Add-on module for Jackson (http://jackson.codehaus.org) to support
 Joda (http://joda-time.sourceforge.net/) data types.
@@ -22,8 +22,8 @@ Joda (http://joda-time.sourceforge.net/) data types.
     <tag>HEAD</tag>
   </scm>
   <properties>
-    <version.jackson.annotations>2.4.0-SNAPSHOT</version.jackson.annotations>
-    <version.jackson.core>2.4.0-SNAPSHOT</version.jackson.core>
+    <version.jackson.annotations>2.4.0-rc1</version.jackson.annotations>
+    <version.jackson.core>2.4.0-rc2</version.jackson.core>
     <!-- Generate PackageVersion.java into this directory. -->
     <packageVersion.dir>com/fasterxml/jackson/datatype/joda</packageVersion.dir>
     <packageVersion.package>${project.groupId}.joda</packageVersion.package>
