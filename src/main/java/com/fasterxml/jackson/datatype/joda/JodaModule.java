@@ -32,6 +32,8 @@ public class JodaModule extends SimpleModule
         addDeserializer(MonthDay.class, new MonthDayDeserializer());
         addDeserializer(YearMonth.class, new YearMonthDeserializer());
 
+		addDeserializer(ReadablePeriod.class, new ReadablePeriodDeserializer());
+
         // then serializers:
         final JsonSerializer<Object> stringSer = ToStringSerializer.instance;
         addSerializer(DateMidnight.class, new DateMidnightSerializer());
