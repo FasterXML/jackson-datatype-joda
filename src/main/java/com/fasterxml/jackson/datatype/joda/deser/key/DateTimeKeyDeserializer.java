@@ -1,4 +1,4 @@
-package com.fasterxml.jackson.datatype.joda.deser;
+package com.fasterxml.jackson.datatype.joda.deser.key;
 
 import java.io.IOException;
 
