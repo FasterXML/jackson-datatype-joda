@@ -3,9 +3,6 @@ package com.fasterxml.jackson.datatype.joda.deser.key;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.KeyDeserializer;
-import org.joda.time.LocalDate;
-import org.joda.time.format.DateTimeFormatter;
-import org.joda.time.format.ISODateTimeFormat;
 
 import java.io.IOException;
 
