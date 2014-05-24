@@ -9,16 +9,11 @@ import org.joda.time.format.ISODateTimeFormat;
 
 import java.io.IOException;
 
-public class LocalTimeKeyDeserializer extends KeyDeserializer
-{
-    private static final long serialVersionUID = 1L;
+public class LocalTimeKeyDeserializer extends JodaKeyDeserializer {
     private static final DateTimeFormatter parser = ISODateTimeFormat.localTimeParser();
 
     @Override
-    public LocalTime deserializeKey(String key, DeserializationContext ctxt) throws IOException, JsonProcessingException {
-        if (key.length() == 0) { // [JACKSON-360]
-            return null;
-        }
+    protected LocalTime deserialize(String key, DeserializationContext ctxt) throws IOException, JsonProcessingException {
         return parser.parseLocalTime(key);
     }
 }
