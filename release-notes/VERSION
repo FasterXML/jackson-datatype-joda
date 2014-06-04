@@ -1,5 +1,5 @@
 Project: jackson-datatype-joda
-Version: 2.4.0 (xx-May-2014)
+Version: 2.4.0 (03-Jun-2014)
 
 #40: Add support for `ReadablePeriod`
  (contributed by 'wimdeblauwe@github')
