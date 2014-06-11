@@ -1,5 +1,5 @@
 Project: jackson-datatype-joda
-Version: 2.2.3 (25-Aug-2013)
+Version: 2.2.4 (10-Jun-2014)
 
 No functional changes.
 
@@ -7,6 +7,7 @@ No functional changes.
 === History: ===
 ------------------------------------------------------------------------
 
+2.2.3 (25-Aug-2013)
 2.2.2 (27-May-2013)
 2.2.1 (04-May-2013)
 
