@@ -23,7 +23,7 @@ Joda (http://joda-time.sourceforge.net/) data types.
   </scm>
   <properties>
     <version.jackson.annotations>2.4.0</version.jackson.annotations>
-    <version.jackson.core>2.4.0</version.jackson.core>
+    <version.jackson.core>2.4.1</version.jackson.core>
     <!-- Generate PackageVersion.java into this directory. -->
     <packageVersion.dir>com/fasterxml/jackson/datatype/joda</packageVersion.dir>
     <packageVersion.package>${project.groupId}.joda</packageVersion.package>
