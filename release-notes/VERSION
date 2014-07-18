@@ -1,11 +1,15 @@
 Project: jackson-datatype-joda
-Version: 2.3.3 (10-Apr-2014)
+Version: 2.3.4 (17-Jul-2014)
 
-#32: Support use of `@JsonFormat(shape=...)` for timestamp/string choice
+No changes.
 
 ------------------------------------------------------------------------
 === History: ===
 ------------------------------------------------------------------------
+
+2.3.3 (10-Apr-2014)
+
+#32: Support use of `@JsonFormat(shape=...)` for timestamp/string choice
 
 2.3.2 (01-Mar-2014)
 
