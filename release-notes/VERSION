@@ -1,11 +1,18 @@
 Project: jackson-datatype-joda
-Version: 2.4.2 (15-Aug-2014)
+Version: 2.4.3 (xx-xxx-2014)
 
-No changes since 2.4.0
+#41: Can't use LocalTime, LocalDate & LocalDateTime as Key type for a Map
+ (contributed by Brad K, reported by Guido M)
+#46: Interval deserialization fails for negative start instants
+ (reported by Dan G, dgrabows@github)
 
 ------------------------------------------------------------------------
 === History: ===
 ------------------------------------------------------------------------
+
+2.4.2 (15-Aug-2014)
+
+No changes since 2.4.0
 
 2.4.1 (17-Jun-2014)
 

@@ -12,11 +12,15 @@ ncjones@github.com:
  * Suggested #23: package as a bundle
   (2.3.1)
 
-Lorcan C:
+Lorcan C
  * Contributed #25: Add `KeyDeserializer` for `DateTime`
   (2.3.1)
 
-Hendy Irawan: (ceefour@github)
+Hendy Irawan (ceefour@github)
  * Contributed #27: Allow support for `DateTimeZone`
   (2.3.1)
+
+Brad Kennedy (bkenned4@github)
+ * Contributed #45: Can't use LocalTime, LocalDate & LocalDateTime as Key type for a Map
+  (2.4.3)
 

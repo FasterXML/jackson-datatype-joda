@@ -14,10 +14,10 @@ public class MixedListTest extends JodaTestBase
 
     public void testMixedList() throws Exception
     {
-    	final Map<String, Object> map = new HashMap<String, Object>();
-    	DateTime dt = new DateTime(DateTimeZone.UTC);
-    	map.put("A", dt);
-    	map.put("B", 0);
+        final Map<String, Object> map = new HashMap<String, Object>();
+        DateTime dt = new DateTime(DateTimeZone.UTC);
+        map.put("A", dt);
+        map.put("B", 0);
     	
 	    final String json = MAPPER.writeValueAsString(map);
 	    // by default, timestamps should come out as longs...
@@ -29,14 +29,14 @@ public class MixedListTest extends JodaTestBase
 	    Object obB = result.get("B");
 	    assertNotNull(obB);
 	    if (!(obB instanceof Number)) {
-	    	fail("Expected 'B' to be a Number; instead of value of type "+obB.getClass().getName());
+	        fail("Expected 'B' to be a Number; instead of value of type "+obB.getClass().getName());
 	    }
 	    
 	    assertEquals(Integer.valueOf(0), result.get("B"));
 	    Object obA = result.get("A");
 	    assertNotNull(obA);
 	    if (!(obA instanceof Number)) {
-	    	fail("Expected 'A' to be a number; instead of value of type "+obA.getClass().getName());
+	        fail("Expected 'A' to be a number; instead of value of type "+obA.getClass().getName());
 	    }
     }    
 }

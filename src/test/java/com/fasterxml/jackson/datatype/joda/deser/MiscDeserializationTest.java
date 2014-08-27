@@ -1,10 +1,12 @@
-package com.fasterxml.jackson.datatype.joda;
+package com.fasterxml.jackson.datatype.joda.deser;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.joda.JodaTestBase;
+
 import org.joda.time.*;
 
 import java.io.IOException;
@@ -18,7 +20,7 @@ import java.util.TimeZone;
  * Basic support is added for handling {@link DateTime}; more can be
  * added over time if and when requested.
  */
-public class JodaDeserializationTest extends JodaTestBase
+public class MiscDeserializationTest extends JodaTestBase
 {
     /*
     /**********************************************************
@@ -235,6 +237,10 @@ public class JodaDeserializationTest extends JodaTestBase
     {
         Interval interval = MAPPER.readValue(quote("1396439982-1396440001"), Interval.class);
         assertEquals(1396439982, interval.getStartMillis());
+        assertEquals(1396440001, interval.getEndMillis());
+
+        interval = MAPPER.readValue(quote("-100-1396440001"), Interval.class);
+        assertEquals(-100, interval.getStartMillis());
         assertEquals(1396440001, interval.getEndMillis());
     }
 
