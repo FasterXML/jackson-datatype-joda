@@ -1,20 +1,17 @@
 package com.fasterxml.jackson.datatype.joda;
 
-import java.io.*;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
 import junit.framework.TestCase;
 
-import static org.junit.Assert.*;
+import java.io.IOException;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import static org.junit.Assert.*;
 
 public abstract class JodaTestBase extends TestCase
 {
     protected static ObjectMapper jodaMapper()
     {
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.registerModule(new JodaModule());
-        return mapper;
+        return new JodaMapper();
     }
 
     /*

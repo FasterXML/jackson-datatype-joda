@@ -1,12 +1,12 @@
 package com.fasterxml.jackson.datatype.joda;
 
-import org.joda.time.*;
-
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import com.fasterxml.jackson.datatype.joda.deser.*;
+import com.fasterxml.jackson.datatype.joda.deser.key.*;
 import com.fasterxml.jackson.datatype.joda.ser.*;
+import org.joda.time.*;
 
 public class JodaModule extends SimpleModule
 {
@@ -19,7 +19,7 @@ public class JodaModule extends SimpleModule
         addDeserializer(DateMidnight.class, new DateMidnightDeserializer());
         addDeserializer(DateTime.class, DateTimeDeserializer.forType(DateTime.class));
         addDeserializer(DateTimeZone.class, new DateTimeZoneDeserializer());
-                
+
         addDeserializer(Duration.class, new DurationDeserializer());
         addDeserializer(Instant.class, new InstantDeserializer());
         addDeserializer(LocalDateTime.class, new LocalDateTimeDeserializer());
@@ -49,8 +49,11 @@ public class JodaModule extends SimpleModule
         addSerializer(MonthDay.class, stringSer);
         addSerializer(YearMonth.class, stringSer);
 
-        // then key deserializers - only one included for DateTime here.
+        // then key deserializers
         addKeyDeserializer(DateTime.class, new DateTimeKeyDeserializer());
+        addKeyDeserializer(LocalTime.class, new LocalTimeKeyDeserializer());
+        addKeyDeserializer(LocalDate.class, new LocalDateKeyDeserializer());
+        addKeyDeserializer(LocalDateTime.class, new LocalDateTimeKeyDeserializer());
     }
 
     @Override
