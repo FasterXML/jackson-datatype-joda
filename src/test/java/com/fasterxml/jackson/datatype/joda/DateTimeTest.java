@@ -79,7 +79,7 @@ public class DateTimeTest extends JodaTestBase
     {
         ObjectMapper m = jodaMapper();
         m.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
-        assertEquals(quote("1970-01-01T00:00:00.000Z"), m.writeValueAsString(DATE_JAN_1_1970_UTC));
+        assertEquals(quote("0/UTC"), m.writeValueAsString(DATE_JAN_1_1970_UTC));
     }
 
     /**
@@ -151,11 +151,11 @@ public class DateTimeTest extends JodaTestBase
         // by default, dates use timestamp, so:
         assertEquals("0", MAPPER.writeValueAsString(dt));
 
-        // but if re-configured, as regular ISO-8601 string
+        // but if re-configured to include the time zone
         ObjectMapper m = jodaMapper();
         m.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
         m.addMixInAnnotations(DateTime.class, ObjectConfiguration.class);
-        assertEquals("[\"org.joda.time.DateTime\",\"1970-01-01T00:00:00.000Z\"]",
+        assertEquals("[\"org.joda.time.DateTime\",\"0/UTC\"]",
                 m.writeValueAsString(dt));
     }
 }
