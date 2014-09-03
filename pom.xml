@@ -29,22 +29,8 @@ Joda (http://joda-time.sourceforge.net/) data types.
     <packageVersion.package>${project.groupId}.joda</packageVersion.package>
 
     <!-- Configuration properties for the OSGi maven-bundle-plugin -->
-    <osgi.import>com.fasterxml.jackson.annotation
-,com.fasterxml.jackson.core
-,com.fasterxml.jackson.core.util
-,com.fasterxml.jackson.databind
-,com.fasterxml.jackson.databind.deser.std
-,com.fasterxml.jackson.databind.introspect
-,com.fasterxml.jackson.databind.jsontype
-,com.fasterxml.jackson.databind.module
-,com.fasterxml.jackson.databind.node
-,com.fasterxml.jackson.databind.ser
-,com.fasterxml.jackson.databind.ser.std
-,org.joda.time
-,org.joda.time.format
-    </osgi.import>
-    <osgi.export>${project.groupId}.joda.*;version=${project.version}
-</osgi.export>
+    <osgi.export>${project.groupId}.joda.*</osgi.export>
+    <osgi.versionpolicy>${range;[===,+);${@}}</osgi.versionpolicy>
   </properties>
 
   <dependencies>
