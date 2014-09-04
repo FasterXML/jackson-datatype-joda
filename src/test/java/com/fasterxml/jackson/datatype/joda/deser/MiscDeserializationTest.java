@@ -1,10 +1,12 @@
-package com.fasterxml.jackson.datatype.joda;
+package com.fasterxml.jackson.datatype.joda.deser;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.joda.JodaTestBase;
+
 import org.joda.time.*;
 
 import java.io.IOException;
@@ -18,7 +20,7 @@ import java.util.TimeZone;
  * Basic support is added for handling {@link DateTime}; more can be
  * added over time if and when requested.
  */
-public class JodaDeserializationTest extends JodaTestBase
+public class MiscDeserializationTest extends JodaTestBase
 {
     /*
     /**********************************************************
@@ -236,6 +238,10 @@ public class JodaDeserializationTest extends JodaTestBase
         Interval interval = MAPPER.readValue(quote("1396439982-1396440001"), Interval.class);
         assertEquals(1396439982, interval.getStartMillis());
         assertEquals(1396440001, interval.getEndMillis());
+
+        interval = MAPPER.readValue(quote("-100-1396440001"), Interval.class);
+        assertEquals(-100, interval.getStartMillis());
+        assertEquals(1396440001, interval.getEndMillis());
     }
 
     public void testIntervalDeserWithTypeInfo() throws IOException
@@ -431,6 +437,30 @@ public class JodaDeserializationTest extends JodaTestBase
 
         assertNotNull(map);
         assertTrue(map.containsKey(DateTime.parse("1970-01-01T00:00:00.000Z")));
+    }
+
+    public void testLocalDateKeyDeserialize() throws IOException {
+
+        final String json = "{" + quote("2014-05-23") + ":0}";
+        final Map<LocalDate, Long> map = MAPPER.readValue(json, new TypeReference<Map<LocalDate, String>>() { });
+
+        assertNotNull(map);
+        assertTrue(map.containsKey(LocalDate.parse("2014-05-23")));
+    }
+
+    public void testLocalTimeKeyDeserialize() throws IOException {
+
+        final String json = "{" + quote("00:00:00.000") + ":0}";
+        final Map<LocalTime, Long> map = MAPPER.readValue(json, new TypeReference<Map<LocalTime, String>>() { });
+        assertNotNull(map);
+        assertTrue(map.containsKey(LocalTime.parse("00:00:00.000")));
+    }
+    public void testLocalDateTimeKeyDeserialize() throws IOException {
+
+        final String json = "{" + quote("2014-05-23T00:00:00.000") + ":0}";
+        final Map<LocalDateTime, Long> map = MAPPER.readValue(json, new TypeReference<Map<LocalDateTime, String>>() { });
+        assertNotNull(map);
+        assertTrue(map.containsKey(LocalDateTime.parse("2014-05-23T00:00:00.000")));
     }
 
     public void testDeserMonthDay() throws Exception
