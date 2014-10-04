@@ -1,5 +1,5 @@
 Project: jackson-datatype-joda
-Version: 2.4.3 (xx-xxx-2014)
+Version: 2.4.3 (04-Oct-2014)
 
 #45: Can't use LocalTime, LocalDate & LocalDateTime as Key type for a Map
  (contributed by Brad K, reported by Guido M)
