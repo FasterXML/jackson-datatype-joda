@@ -49,6 +49,21 @@ public class DateTimeTest extends JodaTestBase
 
     private final DateTime DATE_JAN_1_1970_UTC = new DateTime(0L, DateTimeZone.UTC);
     
+    // November 3, 2013 at 1:00a is the fall back DST transition that year in much of the US.
+    private static final int FALL_BACK_YEAR = 2013;
+
+    private static final int FALL_BACK_MONTH = 11;
+
+    private static final int FALL_BACK_DAY = 3;
+
+    // The first one for America/Los_Angeles happens at 8:00 UTC.
+    private static final int FIRST_FALL_BACK_HOUR = 8;
+
+    // And the second one happens at 9:00 UTC
+    private static final int SECOND_FALL_BACK_HOUR = 9;
+
+    private static final DateTimeZone AMERICA_LOS_ANGELES = DateTimeZone.forID("America/Los_Angeles");
+
     /**
      * First: let's ensure that serialization does not fail
      * with an error (see [JACKSON-157]).
@@ -64,7 +79,53 @@ public class DateTimeTest extends JodaTestBase
     {
         ObjectMapper m = jodaMapper();
         m.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
-        assertEquals(quote("1970-01-01T00:00:00.000Z"), m.writeValueAsString(DATE_JAN_1_1970_UTC));
+        assertEquals(quote("0/UTC"), m.writeValueAsString(DATE_JAN_1_1970_UTC));
+    }
+
+    /**
+     * Test that both the instant and the time zone are preserved across de/serialization.
+     *
+     * @throws IOException on a parsing error
+     */
+    public void testRoundTrip()  throws IOException
+    {
+        DateTime test = new DateTime(2014, 8, 24, 5, 17, 45, DateTimeZone.forID("America/Chicago")); // arbitrary
+
+        ObjectMapper m = jodaMapper();
+        m.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+
+        String serialized = m.writeValueAsString(test);
+        DateTime deserialized = m.readValue(serialized, DateTime.class);
+        assertEquals(test,deserialized);
+    }
+
+    /**
+     * Test that de/serializing an ambiguous time (e.g. a 'fall back' DST transition) works and preserves the proper
+     * instants in time and time zones.
+     *
+     * @throws IOException on a parsing error
+     */
+    public void testFallBackTransition() throws IOException
+    {
+        DateTime firstOneAmUtc = new DateTime(FALL_BACK_YEAR, FALL_BACK_MONTH, FALL_BACK_DAY, FIRST_FALL_BACK_HOUR, 0, 0,
+                                              DateTimeZone.UTC);
+        DateTime secondOneAmUtc = new DateTime(FALL_BACK_YEAR, FALL_BACK_MONTH, FALL_BACK_DAY, SECOND_FALL_BACK_HOUR, 0, 0,
+                                               DateTimeZone.UTC);
+
+        DateTime firstOneAm = new DateTime(firstOneAmUtc, AMERICA_LOS_ANGELES);
+        DateTime secondOneAm = new DateTime(secondOneAmUtc, AMERICA_LOS_ANGELES);
+
+        ObjectMapper m = jodaMapper();
+        m.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+
+        String firstOneAmStr = m.writeValueAsString(firstOneAm);
+        String secondOneAmStr = m.writeValueAsString(secondOneAm);
+
+        DateTime firstRoundTrip = m.readValue(firstOneAmStr, DateTime.class);
+        DateTime secondRoundTrip = m.readValue(secondOneAmStr, DateTime.class);
+
+        assertEquals(firstOneAm, firstRoundTrip);
+        assertEquals(secondOneAm, secondRoundTrip);
     }
 
     public void testAnnotationAsText() throws IOException
@@ -90,11 +151,11 @@ public class DateTimeTest extends JodaTestBase
         // by default, dates use timestamp, so:
         assertEquals("0", MAPPER.writeValueAsString(dt));
 
-        // but if re-configured, as regular ISO-8601 string
+        // but if re-configured to include the time zone
         ObjectMapper m = jodaMapper();
         m.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
         m.addMixInAnnotations(DateTime.class, ObjectConfiguration.class);
-        assertEquals("[\"org.joda.time.DateTime\",\"1970-01-01T00:00:00.000Z\"]",
+        assertEquals("[\"org.joda.time.DateTime\",\"0/UTC\"]",
                 m.writeValueAsString(dt));
     }
 }

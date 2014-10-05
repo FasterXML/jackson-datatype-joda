@@ -53,10 +53,20 @@ public class DateTimeDeserializer
             if (str.length() == 0) { // [JACKSON-360]
                 return null;
             }
-            if (ctxt.isEnabled(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE))
-                return new DateTime(str, dtz);
-            else
-                return DateTime.parse(str);
+            // Split the string at the first slash.  If there's no first
+            // slash, assume we're dealing with an ISO8601 serialization.
+            int firstSlash = str.indexOf('/');
+            if (firstSlash == -1) {
+                if (ctxt.isEnabled(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE))
+                    return new DateTime(str, dtz);
+                else
+                    return DateTime.parse(str);
+            }
+
+            String millisStr = str.substring(0, firstSlash);
+            String zoneStr = str.substring(firstSlash + 1);
+
+            return new DateTime(Long.valueOf(millisStr), DateTimeZone.forID(zoneStr));
         }
         // TODO: in 2.4, use 'handledType()'
         throw ctxt.mappingException(getValueClass());
