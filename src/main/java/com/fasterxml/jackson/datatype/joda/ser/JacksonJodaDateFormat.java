@@ -7,86 +7,60 @@ import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
-import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.SerializerProvider;
 
 /**
  * Simple container used to encapsulate (some of) gory details of
  * customizations related to date/time formatting.
  */
-public class JacksonJodaFormat
+public class JacksonJodaDateFormat extends JacksonJodaFormatBase
 {
     private final static String JODA_STYLE_CHARS = "SMLF-";
 
-    protected final static Locale DEFAULT_LOCALE;
-    static {
-        DEFAULT_LOCALE = Locale.getDefault();
-    }
-
     protected final DateTimeFormatter _formatter;
-    
-    /**
-     * Flag that indicates that serialization must be done as the
-     * Java timestamp, regardless of other settings.
-     */
-    protected final Boolean _useTimestamp;
-    
+
     protected final TimeZone _jdkTimezone;
 
     protected final boolean _explicitTimezone;
     
-    protected final Locale _locale;
-
-    protected final boolean _explicitLocale;
-    
-    public JacksonJodaFormat(DateTimeFormatter defaultFormatter) {
-        _useTimestamp = null;
-        _jdkTimezone = defaultFormatter.getZone().toTimeZone();
-        _locale = DEFAULT_LOCALE;
+    public JacksonJodaDateFormat(DateTimeFormatter defaultFormatter) {
+        super();
         _formatter = defaultFormatter;
+        _jdkTimezone = defaultFormatter.getZone().toTimeZone();
         _explicitTimezone = false;
-        _explicitLocale = false;
     }
 
-    public JacksonJodaFormat(JacksonJodaFormat base, Boolean useTimestamp)
+    public JacksonJodaDateFormat(JacksonJodaDateFormat base, Boolean useTimestamp)
     {
-        _useTimestamp = useTimestamp;
+        super(base, useTimestamp);
         _formatter = base._formatter;
         _jdkTimezone = base._jdkTimezone;
         _explicitTimezone = base._explicitTimezone;
-        _locale = base._locale;
-        _explicitLocale = base._explicitLocale;
     }
     
-    public JacksonJodaFormat(JacksonJodaFormat base,
+    public JacksonJodaDateFormat(JacksonJodaDateFormat base,
             DateTimeFormatter formatter)
     {
-        _useTimestamp = base._useTimestamp;
+        super(base);
         _formatter = formatter;
         _jdkTimezone = base._jdkTimezone;
         _explicitTimezone = base._explicitTimezone;
-        _locale = base._locale;
-        _explicitLocale = base._explicitLocale;
     }
 
-    public JacksonJodaFormat(JacksonJodaFormat base, TimeZone jdkTimezone)
+    public JacksonJodaDateFormat(JacksonJodaDateFormat base, TimeZone jdkTimezone)
     {
-        _useTimestamp = base._useTimestamp;
+        super(base, jdkTimezone);
+        _formatter = base._formatter.withZone(DateTimeZone.forTimeZone(jdkTimezone));
         _jdkTimezone = jdkTimezone;
         _explicitTimezone = true;
-        _locale = base._locale;
-        _explicitLocale = base._explicitLocale;
-        _formatter = base._formatter.withZone(DateTimeZone.forTimeZone(jdkTimezone));
     }
 
-    public JacksonJodaFormat(JacksonJodaFormat base, Locale locale)
+    public JacksonJodaDateFormat(JacksonJodaDateFormat base, Locale locale)
     {
-        _useTimestamp = base._useTimestamp;
+        super(base, locale);
+        _formatter = base._formatter.withLocale(locale);
         _jdkTimezone = base._jdkTimezone;
         _explicitTimezone = base._explicitTimezone;
-        _locale = locale;
-        _explicitLocale = true;
-        _formatter = base._formatter.withLocale(locale);
     }
 
     /*
@@ -95,14 +69,14 @@ public class JacksonJodaFormat
     /**********************************************************
      */
 
-    protected JacksonJodaFormat withUseTimestamp(Boolean useTimestamp) {
+    protected JacksonJodaDateFormat withUseTimestamp(Boolean useTimestamp) {
         if (_useTimestamp != null && _useTimestamp.equals(useTimestamp)) {
             return this;
         }
-        return new JacksonJodaFormat(this, useTimestamp);
+        return new JacksonJodaDateFormat(this, useTimestamp);
     }
     
-    protected JacksonJodaFormat withFormat(String format) {
+    protected JacksonJodaDateFormat withFormat(String format) {
         if (format == null || format.isEmpty()) {
             return this;
         }
@@ -117,21 +91,21 @@ public class JacksonJodaFormat
             formatter = formatter.withLocale(_locale);
         }
         formatter = formatter.withZone(_formatter.getZone());
-        return new JacksonJodaFormat(this, formatter);
+        return new JacksonJodaDateFormat(this, formatter);
     }
-    
-    protected JacksonJodaFormat withTimeZone(TimeZone tz) {
+
+    protected JacksonJodaDateFormat withTimeZone(TimeZone tz) {
         if ((tz == null) || (_jdkTimezone != null && _jdkTimezone.equals(tz))) {
             return this;
         }
-        return new JacksonJodaFormat(this, tz);
+        return new JacksonJodaDateFormat(this, tz);
     }
 
-    protected JacksonJodaFormat withLocale(Locale locale) {
+    protected JacksonJodaDateFormat withLocale(Locale locale) {
         if ((locale == null) || (_locale != null && _locale.equals(locale))) {
             return this;
         }
-        return new JacksonJodaFormat(this, locale);
+        return new JacksonJodaDateFormat(this, locale);
     }
 
     /*
@@ -140,14 +114,6 @@ public class JacksonJodaFormat
     /**********************************************************
      */
 
-    public boolean useTimestamp(SerializerProvider provider)
-    {
-        if (_useTimestamp != null) {
-            return _useTimestamp.booleanValue();
-        }
-        return provider.isEnabled(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-    }
-    
     public DateTimeFormatter createFormatter(SerializerProvider provider)
     {
         DateTimeFormatter formatter = _formatter;

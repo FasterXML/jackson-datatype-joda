@@ -4,8 +4,15 @@ import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.introspect.Annotated;
+import com.fasterxml.jackson.databind.jsonFormatVisitors.JsonArrayFormatVisitor;
+import com.fasterxml.jackson.databind.jsonFormatVisitors.JsonFormatTypes;
+import com.fasterxml.jackson.databind.jsonFormatVisitors.JsonFormatVisitorWrapper;
+import com.fasterxml.jackson.databind.jsonFormatVisitors.JsonIntegerFormatVisitor;
+import com.fasterxml.jackson.databind.jsonFormatVisitors.JsonStringFormatVisitor;
+import com.fasterxml.jackson.databind.jsonFormatVisitors.JsonValueFormat;
 import com.fasterxml.jackson.databind.ser.ContextualSerializer;
 
 public abstract class JodaDateSerializerBase<T> extends JodaSerializerBase<T>
@@ -21,15 +28,28 @@ public abstract class JodaDateSerializerBase<T> extends JodaSerializerBase<T>
     protected final static DateTimeFormatter DEFAULT_LOCAL_DATETIME_FORMAT
         = ISODateTimeFormat.dateTime().withZoneUTC();
 
-    protected final JacksonJodaFormat _format;
-    
-    protected JodaDateSerializerBase(Class<T> type, JacksonJodaFormat format)
+    protected final JacksonJodaDateFormat _format;
+
+    /**
+     * Marker flag that indicates that timestamp-style format uses JSON arrays,
+     * not integral numbers.
+     * 
+     * @since 2.5
+     */
+    protected final boolean _usesArrays;
+
+    protected final SerializationFeature _featureForNumeric;
+
+    protected JodaDateSerializerBase(Class<T> type, JacksonJodaDateFormat format,
+            boolean usesArrays, SerializationFeature numericFeature)
     {
         super(type);
         _format = format;
+        _usesArrays = usesArrays;
+        _featureForNumeric = numericFeature;
     }
 
-    public abstract JodaDateSerializerBase<T> withFormat(JacksonJodaFormat format);
+    public abstract JodaDateSerializerBase<T> withFormat(JacksonJodaDateFormat format);
 
     @Override
     public JsonSerializer<?> createContextual(SerializerProvider prov,
@@ -38,7 +58,7 @@ public abstract class JodaDateSerializerBase<T> extends JodaSerializerBase<T>
         if (property != null) {
             JsonFormat.Value ann = prov.getAnnotationIntrospector().findFormat((Annotated)property.getMember());
             if (ann != null) {
-                JacksonJodaFormat format = _format;
+                JacksonJodaDateFormat format = _format;
 
                 Boolean useTimestamp;
 
@@ -47,6 +67,9 @@ public abstract class JodaDateSerializerBase<T> extends JodaSerializerBase<T>
                     useTimestamp = Boolean.TRUE;
                 } else if (ann.getShape() == JsonFormat.Shape.STRING) {
                     useTimestamp = Boolean.FALSE;
+                } else if (ann.getShape() == JsonFormat.Shape.ARRAY) {
+                    // 17-Nov-2014, tatu: also, arrays typically contain non-string representation
+                    useTimestamp = Boolean.TRUE;
                 } else  {
                     useTimestamp = null;
                 }
@@ -66,6 +89,44 @@ public abstract class JodaDateSerializerBase<T> extends JodaSerializerBase<T>
         return this;
     }
 
+    @Override
+    public JsonNode getSchema(SerializerProvider provider, java.lang.reflect.Type typeHint) {
+        if (_useTimestamp(provider)) {
+            return createSchemaNode(_usesArrays ? "array" : "number", true);
+        }
+        return createSchemaNode("string", true);
+    }
+
+    @Override
+    public void acceptJsonFormatVisitor(JsonFormatVisitorWrapper visitor, JavaType typeHint) throws JsonMappingException
+    {
+        _acceptJsonFormatVisitor(visitor, typeHint, _useTimestamp(visitor.getProvider()));
+    }
+
+    protected void _acceptJsonFormatVisitor(JsonFormatVisitorWrapper visitor, JavaType typeHint,
+            boolean asNumber) throws JsonMappingException
+    {
+        if (asNumber) {
+            if (_usesArrays) {
+                JsonArrayFormatVisitor v2 = visitor.expectArrayFormat(typeHint);
+                if (v2 != null) {
+                    v2.itemsFormat(JsonFormatTypes.INTEGER);
+                }
+            } else {
+                JsonIntegerFormatVisitor v2 = visitor.expectIntegerFormat(typeHint);
+                if (v2 != null) {
+                    v2.numberType(JsonParser.NumberType.LONG);
+                    v2.format(JsonValueFormat.UTC_MILLISEC);
+                }
+            }
+        } else {
+            JsonStringFormatVisitor v2 = visitor.expectStringFormat(typeHint);
+            if (v2 != null) {
+                v2.format(JsonValueFormat.DATE_TIME);
+            }
+        }
+    }
+
     /*
     /**********************************************************
     /* Helper methods
@@ -73,6 +134,6 @@ public abstract class JodaDateSerializerBase<T> extends JodaSerializerBase<T>
      */
 
     protected boolean _useTimestamp(SerializerProvider provider) {
-        return _format.useTimestamp(provider);
+        return _format.useTimestamp(provider, _featureForNumeric);
     }
 }

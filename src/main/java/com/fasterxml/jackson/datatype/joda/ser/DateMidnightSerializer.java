@@ -6,22 +6,24 @@ import org.joda.time.DateMidnight;
 
 import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.SerializerProvider;
+
+import com.fasterxml.jackson.databind.*;
 
 public final class DateMidnightSerializer
     extends JodaDateSerializerBase<DateMidnight>
 {
-    protected final static JacksonJodaFormat DEFAULT_FORMAT
-        = new JacksonJodaFormat(DEFAULT_DATEONLY_FORMAT);
-    
+    protected final static JacksonJodaDateFormat DEFAULT_FORMAT
+        = new JacksonJodaDateFormat(DEFAULT_DATEONLY_FORMAT);
+
     public DateMidnightSerializer() { this(DEFAULT_FORMAT); }
-    public DateMidnightSerializer(JacksonJodaFormat format) {
-        super(DateMidnight.class, format);
+    public DateMidnightSerializer(JacksonJodaDateFormat format) {
+        // true -> use arrays
+        super(DateMidnight.class, format, true,
+                SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
     }
 
     @Override
-    public DateMidnightSerializer withFormat(JacksonJodaFormat formatter) {
+    public DateMidnightSerializer withFormat(JacksonJodaDateFormat formatter) {
         return (_format == formatter) ? this : new DateMidnightSerializer(_format);
     }
 
@@ -39,10 +41,5 @@ public final class DateMidnightSerializer
         } else {
             jgen.writeString(_format.createFormatter(provider).print(value));
         }
-    }
-
-    @Override
-    public JsonNode getSchema(SerializerProvider provider, java.lang.reflect.Type typeHint) {
-        return createSchemaNode(_useTimestamp(provider) ? "array" : "string", true);
     }
 }

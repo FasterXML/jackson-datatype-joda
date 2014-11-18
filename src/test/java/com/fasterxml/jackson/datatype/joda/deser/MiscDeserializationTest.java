@@ -98,7 +98,7 @@ public class MiscDeserializationTest extends JodaTestBase
     public void testDeserDateTimeWithTypeInfo() throws IOException
     {
         ObjectMapper mapper = jodaMapper();
-        mapper.addMixInAnnotations(DateTime.class, ObjectConfiguration.class);
+        mapper.addMixIn(DateTime.class, ObjectConfiguration.class);
         DateTime date = mapper.readValue("[\"org.joda.time.DateTime\",\"1972-12-28T12:00:01.000+0000\"]", DateTime.class);
         assertNotNull(date);
         assertEquals("1972-12-28T12:00:01.000Z", date.toString());
@@ -130,7 +130,7 @@ public class MiscDeserializationTest extends JodaTestBase
     public void testDateMidnightDeserWithTypeInfo() throws IOException
     {
         ObjectMapper mapper = jodaMapper();
-        mapper.addMixInAnnotations(DateMidnight.class, ObjectConfiguration.class);
+        mapper.addMixIn(DateMidnight.class, ObjectConfiguration.class);
 
         // couple of acceptable formats, so:
         DateMidnight date = mapper.readValue("[\"org.joda.time.DateMidnight\",[2001,5,25]]", DateMidnight.class);
@@ -170,7 +170,7 @@ public class MiscDeserializationTest extends JodaTestBase
     public void testLocalDateDeserWithTypeInfo() throws IOException
     {
         ObjectMapper mapper = jodaMapper();
-        mapper.addMixInAnnotations(LocalDate.class, ObjectConfiguration.class);
+        mapper.addMixIn(LocalDate.class, ObjectConfiguration.class);
 
         // couple of acceptable formats, so:
         LocalDate date = mapper.readValue("[\"org.joda.time.LocalDate\",[2001,5,25]]", LocalDate.class);
@@ -212,7 +212,7 @@ public class MiscDeserializationTest extends JodaTestBase
     public void testLocalTimeDeserWithTypeInfo() throws IOException
     {
         ObjectMapper mapper = jodaMapper();
-        mapper.addMixInAnnotations(LocalTime.class, ObjectConfiguration.class);
+        mapper.addMixIn(LocalTime.class, ObjectConfiguration.class);
 
         // couple of acceptable formats, so:
         LocalTime time = mapper.readValue("[\"org.joda.time.LocalTime\",[23,59,1,10]]", LocalTime.class);
@@ -247,7 +247,7 @@ public class MiscDeserializationTest extends JodaTestBase
     public void testIntervalDeserWithTypeInfo() throws IOException
     {
         ObjectMapper mapper = jodaMapper();
-        mapper.addMixInAnnotations(Interval.class, ObjectConfiguration.class);
+        mapper.addMixIn(Interval.class, ObjectConfiguration.class);
 
         Interval interval= mapper.readValue("[\"org.joda.time.Interval\",\"1396439982-1396440001\"]", Interval.class);
         assertEquals(1396439982, interval.getStartMillis());
@@ -290,7 +290,7 @@ public class MiscDeserializationTest extends JodaTestBase
     public void testLocalDateTimeDeserWithTypeInfo() throws IOException
     {
         ObjectMapper mapper = jodaMapper();
-        mapper.addMixInAnnotations(LocalDateTime.class, ObjectConfiguration.class);
+        mapper.addMixIn(LocalDateTime.class, ObjectConfiguration.class);
 
         // couple of acceptable formats again:
         LocalDateTime date = mapper.readValue("[\"org.joda.time.LocalDateTime\",[2001,5,25,10,15,30,37]]", LocalDateTime.class);
@@ -341,7 +341,7 @@ public class MiscDeserializationTest extends JodaTestBase
     public void testPeriodDeserWithTypeInfo() throws IOException
     {
         ObjectMapper mapper = jodaMapper();
-        mapper.addMixInAnnotations(Period.class, ObjectConfiguration.class);
+        mapper.addMixIn(Period.class, ObjectConfiguration.class);
 
         Period out = mapper.readValue("[\"org.joda.time.Period\",\"PT1H2M3.004S\"]", Period.class);
         assertEquals(1, out.getHours());
@@ -397,7 +397,7 @@ public class MiscDeserializationTest extends JodaTestBase
     public void testDurationDeserFromIntWithTypeInfo() throws IOException
     {
         ObjectMapper mapper = jodaMapper();
-        mapper.addMixInAnnotations(Duration.class, ObjectConfiguration.class);
+        mapper.addMixIn(Duration.class, ObjectConfiguration.class);
 
         Duration d = mapper.readValue("[\"org.joda.time.Duration\",1234]", Duration.class);
         assertEquals(1234, d.getMillis());

@@ -5,8 +5,8 @@ import java.io.IOException;
 import org.joda.time.Period;
 
 import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.JsonToken;
+
 import com.fasterxml.jackson.databind.DeserializationContext;
 
 public class PeriodDeserializer
@@ -17,8 +17,7 @@ public class PeriodDeserializer
     public PeriodDeserializer() { super(Period.class); }
    
     @Override
-    public Period deserialize(JsonParser jp, DeserializationContext ctxt)
-            throws IOException, JsonProcessingException
+    public Period deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException
     {
         // TODO: perhaps support array of numbers...
         //if (jp.isExpectedStartArrayToken()) { ]

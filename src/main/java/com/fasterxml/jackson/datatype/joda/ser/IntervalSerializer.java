@@ -8,9 +8,6 @@ import org.joda.time.Interval;
 
 import java.io.IOException;
 
-/**
- * @author jkolobok
- */
 public class IntervalSerializer extends JodaSerializerBase<Interval> {
 
     public IntervalSerializer() {
@@ -19,6 +16,7 @@ public class IntervalSerializer extends JodaSerializerBase<Interval> {
 
     @Override
     public void serialize(Interval interval, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException, JsonGenerationException {
+        // !!! TODO: maybe allow textual format too?
         jsonGenerator.writeString(interval.getStartMillis() + "-" + interval.getEndMillis());
     }
 }

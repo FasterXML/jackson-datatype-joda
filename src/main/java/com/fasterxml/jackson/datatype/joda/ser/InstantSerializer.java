@@ -6,21 +6,22 @@ import org.joda.time.Instant;
 
 import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.SerializerProvider;
 
 public final class InstantSerializer
     extends JodaDateSerializerBase<Instant>
 {
-    protected final static JacksonJodaFormat DEFAULT_FORMAT = new JacksonJodaFormat(DEFAULT_DATEONLY_FORMAT);
+    protected final static JacksonJodaDateFormat DEFAULT_FORMAT = new JacksonJodaDateFormat(DEFAULT_DATEONLY_FORMAT);
     
     public InstantSerializer() { this(DEFAULT_FORMAT); }
-    public InstantSerializer(JacksonJodaFormat format) {
-        super(Instant.class, format);
+    public InstantSerializer(JacksonJodaDateFormat format) {
+        super(Instant.class, format, false,
+                SerializationFeature.WRITE_DURATIONS_AS_TIMESTAMPS);
     }
 
     @Override
-    public InstantSerializer withFormat(JacksonJodaFormat formatter) {
+    public InstantSerializer withFormat(JacksonJodaDateFormat formatter) {
         return (_format == formatter) ? this : new InstantSerializer(formatter);
     }
 
@@ -33,10 +34,5 @@ public final class InstantSerializer
         } else {
             jgen.writeString(value.toString());
         }
-    }
-
-    @Override
-    public JsonNode getSchema(SerializerProvider provider, java.lang.reflect.Type typeHint) {
-        return createSchemaNode(_useTimestamp(provider) ? "number" : "string", true);
     }
 }

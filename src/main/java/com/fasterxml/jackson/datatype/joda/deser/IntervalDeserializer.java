@@ -27,15 +27,21 @@ public class IntervalDeserializer extends JodaDeserializerBase<Interval>
         }
         String v = jsonParser.getText().trim();
 
-        int dashIndex = v.isEmpty() ? -1 : v.indexOf('-', 1);
-        if (dashIndex < 0) {
-            throw deserializationContext.weirdStringException(v, handledType(), "no hyphen found to separate start, end");
+        /* 17-Nov-2014, tatu: Actually let's start with slash, instead of hyphen, because
+         *   that is the separator for standard functionality...
+         */
+        int index = v.indexOf('/', 1);
+        if (index < 0) {
+            index = v.indexOf('-', 1);
+        }
+        if (index < 0) {
+            throw deserializationContext.weirdStringException(v, handledType(), "no slash or hyphen found to separate start, end");
         }
         long start, end;
-        String str = v.substring(0, dashIndex);
+        String str = v.substring(0, index);
         try {
             start = Long.valueOf(str);
-            str = v.substring(dashIndex + 1);
+            str = v.substring(index + 1);
             end = Long.valueOf(str);
         } catch (NumberFormatException e) {
             throw JsonMappingException.from(jsonParser,

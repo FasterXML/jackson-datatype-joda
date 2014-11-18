@@ -4,9 +4,9 @@ import java.io.IOException;
 
 import org.joda.time.Duration;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.core.*;
+
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.SerializerProvider;
 
 /**
@@ -16,15 +16,17 @@ import com.fasterxml.jackson.databind.SerializerProvider;
 public final class DurationSerializer
     extends JodaDateSerializerBase<Duration>
 {
-    protected final static JacksonJodaFormat DEFAULT_FORMAT = new JacksonJodaFormat(DEFAULT_DATEONLY_FORMAT);
+    protected final static JacksonJodaDateFormat DEFAULT_FORMAT = new JacksonJodaDateFormat(DEFAULT_DATEONLY_FORMAT);
 
     public DurationSerializer() { this(DEFAULT_FORMAT); }
-    public DurationSerializer(JacksonJodaFormat formatter) {
-        super(Duration.class, formatter);
+    public DurationSerializer(JacksonJodaDateFormat formatter) {
+        // false -> no arrays (numbers)
+        super(Duration.class, formatter, false,
+                SerializationFeature.WRITE_DURATIONS_AS_TIMESTAMPS);
     }
 
     @Override
-    public DurationSerializer withFormat(JacksonJodaFormat formatter) {
+    public DurationSerializer withFormat(JacksonJodaDateFormat formatter) {
         return (_format == formatter) ? this : new DurationSerializer(formatter);
     }
 
@@ -37,10 +39,5 @@ public final class DurationSerializer
         } else {
             jgen.writeString(value.toString());
         }
-    }
-
-    @Override
-    public JsonNode getSchema(SerializerProvider provider, java.lang.reflect.Type typeHint) {
-        return createSchemaNode(_useTimestamp(provider) ? "number" : "string", true);
     }
 }

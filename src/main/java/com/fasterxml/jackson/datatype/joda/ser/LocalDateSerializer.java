@@ -6,22 +6,23 @@ import org.joda.time.LocalDate;
 
 import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.SerializerProvider;
 
 public final class LocalDateSerializer
     extends JodaDateSerializerBase<LocalDate>
 {
-    protected final static JacksonJodaFormat DEFAULT_FORMAT
-        = new JacksonJodaFormat(DEFAULT_DATEONLY_FORMAT);
+    protected final static JacksonJodaDateFormat DEFAULT_FORMAT
+        = new JacksonJodaDateFormat(DEFAULT_DATEONLY_FORMAT);
 
     public LocalDateSerializer() { this(DEFAULT_FORMAT); }
-    public LocalDateSerializer(JacksonJodaFormat format) {
-        super(LocalDate.class, format);
+    public LocalDateSerializer(JacksonJodaDateFormat format) {
+        super(LocalDate.class, format, true,
+                SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
     }
 
     @Override
-    public LocalDateSerializer withFormat(JacksonJodaFormat formatter) {
+    public LocalDateSerializer withFormat(JacksonJodaDateFormat formatter) {
         return (_format == formatter) ? this : new LocalDateSerializer(formatter);
     }
     
@@ -39,10 +40,5 @@ public final class LocalDateSerializer
         } else {
             jgen.writeString(_format.createFormatter(provider).print(value));
         }
-    }
-
-    @Override
-    public JsonNode getSchema(SerializerProvider provider, java.lang.reflect.Type typeHint) {
-        return createSchemaNode(_useTimestamp(provider) ? "array" : "string", true);
     }
 }
