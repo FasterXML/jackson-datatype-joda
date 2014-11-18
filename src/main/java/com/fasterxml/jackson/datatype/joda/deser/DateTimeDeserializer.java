@@ -1,16 +1,10 @@
 package com.fasterxml.jackson.datatype.joda.deser;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.JsonToken;
-import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.JsonDeserializer;
+import com.fasterxml.jackson.core.*;
 
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
-import org.joda.time.ReadableDateTime;
-import org.joda.time.ReadableInstant;
+import com.fasterxml.jackson.databind.*;
+
+import org.joda.time.*;
 
 import java.io.IOException;
 import java.util.TimeZone;
@@ -36,16 +30,15 @@ public class DateTimeDeserializer
         return (JsonDeserializer<T>) new DateTimeDeserializer(cls);
     }
 
-    @SuppressWarnings("deprecation")
     @Override
     public ReadableDateTime deserialize(JsonParser jp, DeserializationContext ctxt)
-        throws IOException, JsonProcessingException
+        throws IOException
     {
         JsonToken t = jp.getCurrentToken();
-        TimeZone tz = ctxt.getTimeZone();
-        DateTimeZone dtz = (tz == null) ? DateTimeZone.UTC : DateTimeZone.forTimeZone(tz);
 
         if (t == JsonToken.VALUE_NUMBER_INT) {
+            TimeZone tz = ctxt.getTimeZone();
+            DateTimeZone dtz = (tz == null) ? DateTimeZone.UTC : DateTimeZone.forTimeZone(tz);
             return new DateTime(jp.getLongValue(), dtz);
         }
         if (t == JsonToken.VALUE_STRING) {
@@ -53,12 +46,13 @@ public class DateTimeDeserializer
             if (str.length() == 0) { // [JACKSON-360]
                 return null;
             }
-            if (ctxt.isEnabled(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE))
+            if (ctxt.isEnabled(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE)) {
+                TimeZone tz = ctxt.getTimeZone();
+                DateTimeZone dtz = (tz == null) ? DateTimeZone.UTC : DateTimeZone.forTimeZone(tz);
                 return new DateTime(str, dtz);
-            else
-                return DateTime.parse(str);
+            }
+            return DateTime.parse(str);
         }
-        // TODO: in 2.4, use 'handledType()'
-        throw ctxt.mappingException(getValueClass());
+        throw ctxt.mappingException(handledType());
     }
 }

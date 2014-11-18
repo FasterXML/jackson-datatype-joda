@@ -4,10 +4,9 @@ import java.io.IOException;
 
 import org.joda.time.Instant;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.JsonToken;
-import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.core.*;
+
+import com.fasterxml.jackson.databind.*;
 
 /**
  * Basic deserializer for {@link org.joda.time.ReadableDateTime} and its subtypes.
@@ -24,8 +23,7 @@ public class InstantDeserializer
     }
 
     @Override
-    public Instant deserialize(JsonParser jp, DeserializationContext ctxt)
-        throws IOException, JsonProcessingException
+    public Instant deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException
     {
         JsonToken t = jp.getCurrentToken();
         if (t == JsonToken.VALUE_NUMBER_INT) {
@@ -38,7 +36,6 @@ public class InstantDeserializer
             }
             return new Instant(str);
         }
-        // TODO: in 2.4, use 'handledType()'
         throw ctxt.mappingException(Instant.class);
     }
 }

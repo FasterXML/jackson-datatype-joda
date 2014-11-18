@@ -16,7 +16,7 @@ import com.fasterxml.jackson.databind.DeserializationContext;
 public class MonthDayDeserializer extends JodaDeserializerBase<MonthDay>
 {
 
-    private static final long serialVersionUID = -2360834248497553111L;
+    private static final long serialVersionUID = 1L;
 
     public MonthDayDeserializer()
     {
@@ -30,8 +30,7 @@ public class MonthDayDeserializer extends JodaDeserializerBase<MonthDay>
         if (t == JsonToken.VALUE_STRING)
         {
             String str = jp.getText().trim();
-            if (str.isEmpty())
-            {
+            if (str.isEmpty()) {
                 return null;
             }
             return MonthDay.parse(str);

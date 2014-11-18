@@ -15,8 +15,7 @@ import com.fasterxml.jackson.databind.DeserializationContext;
  */
 public class YearMonthDeserializer extends JodaDeserializerBase<YearMonth>
 {
-
-    private static final long serialVersionUID = -3830851040664795250L;
+    private static final long serialVersionUID = 1L;
 
     public YearMonthDeserializer()
     {
@@ -27,11 +26,9 @@ public class YearMonthDeserializer extends JodaDeserializerBase<YearMonth>
     public YearMonth deserialize(final JsonParser jp, final DeserializationContext ctxt) throws IOException
     {
         JsonToken t = jp.getCurrentToken();
-        if (t == JsonToken.VALUE_STRING)
-        {
+        if (t == JsonToken.VALUE_STRING) {
             String str = jp.getText().trim();
-            if (str.isEmpty())
-            {
+            if (str.isEmpty()) {
                 return null;
             }
             return YearMonth.parse(str);

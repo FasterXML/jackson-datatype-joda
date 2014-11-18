@@ -1,17 +1,20 @@
 package com.fasterxml.jackson.datatype.joda;
 
+import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import com.fasterxml.jackson.datatype.joda.deser.*;
 import com.fasterxml.jackson.datatype.joda.deser.key.*;
 import com.fasterxml.jackson.datatype.joda.ser.*;
+
 import org.joda.time.*;
 
 public class JodaModule extends SimpleModule
 {
     private static final long serialVersionUID = 1L;
 
+    @SuppressWarnings("unchecked")
     public JodaModule()
     {
         super(PackageVersion.VERSION);
@@ -25,14 +28,14 @@ public class JodaModule extends SimpleModule
         addDeserializer(LocalDateTime.class, new LocalDateTimeDeserializer());
         addDeserializer(LocalDate.class, new LocalDateDeserializer());
         addDeserializer(LocalTime.class, new LocalTimeDeserializer());
-        addDeserializer(Period.class, new PeriodDeserializer());
+        JsonDeserializer<?> deser = new PeriodDeserializer(true);
+        addDeserializer(Period.class, (JsonDeserializer<Period>) deser);
+        addDeserializer(ReadablePeriod.class, new PeriodDeserializer(false));
         addDeserializer(ReadableDateTime.class, DateTimeDeserializer.forType(ReadableDateTime.class));
         addDeserializer(ReadableInstant.class, DateTimeDeserializer.forType(ReadableInstant.class));
         addDeserializer(Interval.class, new IntervalDeserializer());
         addDeserializer(MonthDay.class, new MonthDayDeserializer());
         addDeserializer(YearMonth.class, new YearMonthDeserializer());
-
-		addDeserializer(ReadablePeriod.class, new ReadablePeriodDeserializer());
 
         // then serializers:
         final JsonSerializer<Object> stringSer = ToStringSerializer.instance;

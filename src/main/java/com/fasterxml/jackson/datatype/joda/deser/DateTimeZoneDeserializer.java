@@ -5,7 +5,6 @@ import java.io.IOException;
 import org.joda.time.DateTimeZone;
 
 import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.DeserializationContext;
 
@@ -22,7 +21,7 @@ public class DateTimeZoneDeserializer extends JodaDeserializerBase<DateTimeZone>
 
     @Override
     public DateTimeZone deserialize(JsonParser jp, DeserializationContext ctxt)
-            throws IOException, JsonProcessingException
+        throws IOException
     {
         JsonToken t = jp.getCurrentToken();
         if (t == JsonToken.VALUE_NUMBER_INT) {

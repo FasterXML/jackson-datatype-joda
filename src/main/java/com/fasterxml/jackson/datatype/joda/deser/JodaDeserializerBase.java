@@ -10,7 +10,7 @@ import com.fasterxml.jackson.databind.jsontype.TypeDeserializer;
 @SuppressWarnings("serial")
 abstract class JodaDeserializerBase<T> extends StdScalarDeserializer<T>
 {
-    protected JodaDeserializerBase(Class<T> cls) {
+    protected JodaDeserializerBase(Class<?> cls) {
         super(cls);
     }
 
