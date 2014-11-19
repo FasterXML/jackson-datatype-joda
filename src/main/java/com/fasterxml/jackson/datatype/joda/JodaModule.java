@@ -59,15 +59,19 @@ public class JodaModule extends SimpleModule
         addKeyDeserializer(LocalDateTime.class, new LocalDateTimeKeyDeserializer());
     }
 
+    // yes, will try to avoid duplicate registations (if MapperFeature enabled)
     @Override
-    public int hashCode()
-    {
+    public String getModuleName() {
+        return getClass().getSimpleName();
+    }
+
+    @Override
+    public int hashCode() {
         return getClass().hashCode();
     }
 
     @Override
-    public boolean equals(Object o)
-    {
+    public boolean equals(Object o) {
         return this == o;
     }
 }
