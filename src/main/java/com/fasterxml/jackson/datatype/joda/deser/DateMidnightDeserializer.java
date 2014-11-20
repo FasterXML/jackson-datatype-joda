@@ -8,7 +8,6 @@ import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
 
 import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.DeserializationContext;
 
@@ -19,11 +18,12 @@ public class DateMidnightDeserializer
 
     final static DateTimeFormatter parser = ISODateTimeFormat.localDateParser();
 
-    public DateMidnightDeserializer() { super(DateMidnight.class); }
+    public DateMidnightDeserializer() {
+        super(DateMidnight.class);
+    }
 
     @Override
-    public DateMidnight deserialize(JsonParser jp, DeserializationContext ctxt)
-        throws IOException, JsonProcessingException
+    public DateMidnight deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException
     {
         // We'll accept either long (timestamp) or array:
         if (jp.isExpectedStartArrayToken()) {
