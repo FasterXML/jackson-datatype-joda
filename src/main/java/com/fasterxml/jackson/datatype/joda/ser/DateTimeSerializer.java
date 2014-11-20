@@ -2,22 +2,18 @@ package com.fasterxml.jackson.datatype.joda.ser;
 
 import java.io.IOException;
 
-import org.joda.time.DateTime;
+import org.joda.time.*;
 
-import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.core.JsonGenerator;
 
 import com.fasterxml.jackson.databind.*;
-
-import org.joda.time.format.ISODateTimeFormat;
+import com.fasterxml.jackson.datatype.joda.cfg.FormatConfig;
+import com.fasterxml.jackson.datatype.joda.cfg.JacksonJodaDateFormat;
 
 public final class DateTimeSerializer
     extends JodaDateSerializerBase<DateTime>
 {
-    protected final static JacksonJodaDateFormat DEFAULT_FORMAT
-        = new JacksonJodaDateFormat(ISODateTimeFormat.dateTime().withZoneUTC());
-    
-    public DateTimeSerializer() { this(DEFAULT_FORMAT); }
+    public DateTimeSerializer() { this(FormatConfig.DEFAULT_DATETIME_FORMAT); }
     public DateTimeSerializer(JacksonJodaDateFormat format) {
         // false -> no arrays (numbers)
         super(DateTime.class, format, false,
@@ -30,8 +26,12 @@ public final class DateTimeSerializer
     }
 
     @Override
-    public void serialize(DateTime value, JsonGenerator jgen, SerializerProvider provider)
-        throws IOException, JsonGenerationException
+    public boolean isEmpty(DateTime value) {
+        return (value.getMillis() == 0L);
+    }
+
+    @Override
+    public void serialize(DateTime value, JsonGenerator jgen, SerializerProvider provider) throws IOException
     {
         if (_useTimestamp(provider)) {
             jgen.writeNumber(value.getMillis());

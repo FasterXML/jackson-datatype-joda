@@ -1,8 +1,5 @@
 package com.fasterxml.jackson.datatype.joda.ser;
 
-import org.joda.time.format.DateTimeFormatter;
-import org.joda.time.format.ISODateTimeFormat;
-
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.*;
@@ -14,20 +11,12 @@ import com.fasterxml.jackson.databind.jsonFormatVisitors.JsonIntegerFormatVisito
 import com.fasterxml.jackson.databind.jsonFormatVisitors.JsonStringFormatVisitor;
 import com.fasterxml.jackson.databind.jsonFormatVisitors.JsonValueFormat;
 import com.fasterxml.jackson.databind.ser.ContextualSerializer;
+import com.fasterxml.jackson.datatype.joda.cfg.JacksonJodaDateFormat;
 
 public abstract class JodaDateSerializerBase<T> extends JodaSerializerBase<T>
 // need contextualization to read per-property annotations
     implements ContextualSerializer
 {
-    protected final static DateTimeFormatter DEFAULT_DATEONLY_FORMAT
-        = ISODateTimeFormat.date().withZoneUTC();
-
-    protected final static DateTimeFormatter DEFAULT_TIMEONLY_FORMAT
-        = ISODateTimeFormat.time().withZoneUTC();
-
-    protected final static DateTimeFormatter DEFAULT_LOCAL_DATETIME_FORMAT
-        = ISODateTimeFormat.dateTime().withZoneUTC();
-
     protected final JacksonJodaDateFormat _format;
 
     /**

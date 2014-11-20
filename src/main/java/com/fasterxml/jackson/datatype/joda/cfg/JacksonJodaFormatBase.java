@@ -1,4 +1,4 @@
-package com.fasterxml.jackson.datatype.joda.ser;
+package com.fasterxml.jackson.datatype.joda.cfg;
 
 import java.util.Locale;
 import java.util.TimeZone;

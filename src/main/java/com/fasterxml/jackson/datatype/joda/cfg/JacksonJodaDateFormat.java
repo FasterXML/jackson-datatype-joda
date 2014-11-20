@@ -1,4 +1,4 @@
-package com.fasterxml.jackson.datatype.joda.ser;
+package com.fasterxml.jackson.datatype.joda.cfg;
 
 import java.util.Locale;
 import java.util.TimeZone;
@@ -69,14 +69,14 @@ public class JacksonJodaDateFormat extends JacksonJodaFormatBase
     /**********************************************************
      */
 
-    protected JacksonJodaDateFormat withUseTimestamp(Boolean useTimestamp) {
+    public JacksonJodaDateFormat withUseTimestamp(Boolean useTimestamp) {
         if (_useTimestamp != null && _useTimestamp.equals(useTimestamp)) {
             return this;
         }
         return new JacksonJodaDateFormat(this, useTimestamp);
     }
     
-    protected JacksonJodaDateFormat withFormat(String format) {
+    public JacksonJodaDateFormat withFormat(String format) {
         if (format == null || format.isEmpty()) {
             return this;
         }
@@ -94,14 +94,14 @@ public class JacksonJodaDateFormat extends JacksonJodaFormatBase
         return new JacksonJodaDateFormat(this, formatter);
     }
 
-    protected JacksonJodaDateFormat withTimeZone(TimeZone tz) {
+    public JacksonJodaDateFormat withTimeZone(TimeZone tz) {
         if ((tz == null) || (_jdkTimezone != null && _jdkTimezone.equals(tz))) {
             return this;
         }
         return new JacksonJodaDateFormat(this, tz);
     }
 
-    protected JacksonJodaDateFormat withLocale(Locale locale) {
+    public JacksonJodaDateFormat withLocale(Locale locale) {
         if ((locale == null) || (_locale != null && _locale.equals(locale))) {
             return this;
         }

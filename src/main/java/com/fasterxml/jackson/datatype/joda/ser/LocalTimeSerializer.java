@@ -4,18 +4,17 @@ import java.io.IOException;
 
 import org.joda.time.LocalTime;
 
-import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.core.JsonGenerator;
+
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.SerializerProvider;
+import com.fasterxml.jackson.datatype.joda.cfg.FormatConfig;
+import com.fasterxml.jackson.datatype.joda.cfg.JacksonJodaDateFormat;
 
 public final class LocalTimeSerializer
     extends JodaDateSerializerBase<LocalTime>
 {
-    protected final static JacksonJodaDateFormat DEFAULT_FORMAT
-        = new JacksonJodaDateFormat(DEFAULT_TIMEONLY_FORMAT);
-
-    public LocalTimeSerializer() { this(DEFAULT_FORMAT); }
+    public LocalTimeSerializer() { this(FormatConfig.DEFAULT_LOCAL_TIMEONLY_FORMAT); }
     public LocalTimeSerializer(JacksonJodaDateFormat format) {
         super(LocalTime.class, format, true,
                 SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
@@ -26,9 +25,16 @@ public final class LocalTimeSerializer
         return (_format == formatter) ? this : new LocalTimeSerializer(formatter);
     }
 
+    // is there a natural "empty" value to check against?
+    /*
     @Override
-    public void serialize(LocalTime value, JsonGenerator jgen, SerializerProvider provider)
-        throws IOException, JsonGenerationException
+    public boolean isEmpty(LocalTime value) {
+        return (value.getMillis() == 0L);
+    }
+    */
+
+    @Override
+    public void serialize(LocalTime value, JsonGenerator jgen, SerializerProvider provider) throws IOException
     {
         if (_useTimestamp(provider)) {
             // Timestamp here actually means an array of values

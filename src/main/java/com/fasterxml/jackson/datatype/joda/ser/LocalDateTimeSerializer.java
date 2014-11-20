@@ -2,20 +2,18 @@ package com.fasterxml.jackson.datatype.joda.ser;
 
 import java.io.IOException;
 
-import org.joda.time.LocalDateTime;
+import org.joda.time.*;
 
 import com.fasterxml.jackson.core.*;
-
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.SerializerProvider;
+import com.fasterxml.jackson.datatype.joda.cfg.FormatConfig;
+import com.fasterxml.jackson.datatype.joda.cfg.JacksonJodaDateFormat;
 
 public final class LocalDateTimeSerializer
     extends JodaDateSerializerBase<LocalDateTime>
 {
-    protected final static JacksonJodaDateFormat DEFAULT_FORMAT
-        = new JacksonJodaDateFormat(DEFAULT_LOCAL_DATETIME_FORMAT);
-
-    public LocalDateTimeSerializer() { this(DEFAULT_FORMAT); }
+    public LocalDateTimeSerializer() { this(FormatConfig.DEFAULT_LOCAL_DATETIME_FORMAT); }
     public LocalDateTimeSerializer(JacksonJodaDateFormat format) {
         super(LocalDateTime.class, format, true,
                 SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
@@ -25,6 +23,14 @@ public final class LocalDateTimeSerializer
     public LocalDateTimeSerializer withFormat(JacksonJodaDateFormat formatter) {
         return (_format == formatter) ? this : new LocalDateTimeSerializer(formatter);
     }
+
+    // is there a natural "empty" value to check against?
+ /*
+    @Override
+    public boolean isEmpty(LocalDateTime value) {
+        return (value.getMillis() == 0L);
+    }
+    */
 
     @Override
     public void serialize(LocalDateTime value, JsonGenerator jgen, SerializerProvider provider)

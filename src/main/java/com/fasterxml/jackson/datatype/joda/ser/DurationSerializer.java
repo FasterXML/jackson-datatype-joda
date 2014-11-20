@@ -5,9 +5,10 @@ import java.io.IOException;
 import org.joda.time.Duration;
 
 import com.fasterxml.jackson.core.*;
-
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.SerializerProvider;
+import com.fasterxml.jackson.datatype.joda.cfg.FormatConfig;
+import com.fasterxml.jackson.datatype.joda.cfg.JacksonJodaDateFormat;
 
 /**
  * Serializes a Duration; either as number of millis, or, if textual output
@@ -16,9 +17,10 @@ import com.fasterxml.jackson.databind.SerializerProvider;
 public final class DurationSerializer
     extends JodaDateSerializerBase<Duration>
 {
-    protected final static JacksonJodaDateFormat DEFAULT_FORMAT = new JacksonJodaDateFormat(DEFAULT_DATEONLY_FORMAT);
-
-    public DurationSerializer() { this(DEFAULT_FORMAT); }
+    // NOTE: formatter is not really used directly for printing, but we do need
+    // it as container for numeric/textual distinction
+    
+    public DurationSerializer() { this(FormatConfig.DEFAULT_DATEONLY_FORMAT); }
     public DurationSerializer(JacksonJodaDateFormat formatter) {
         // false -> no arrays (numbers)
         super(Duration.class, formatter, false,
@@ -30,9 +32,14 @@ public final class DurationSerializer
         return (_format == formatter) ? this : new DurationSerializer(formatter);
     }
 
+    // @since 2.5
     @Override
-    public void serialize(Duration value, JsonGenerator jgen, SerializerProvider provider) throws IOException,
-        JsonProcessingException
+    public boolean isEmpty(Duration value) {
+        return (value.getMillis() == 0L);
+    }
+
+    @Override
+    public void serialize(Duration value, JsonGenerator jgen, SerializerProvider provider) throws IOException
     {
         if (_useTimestamp(provider)) {
             jgen.writeNumber(value.getMillis());

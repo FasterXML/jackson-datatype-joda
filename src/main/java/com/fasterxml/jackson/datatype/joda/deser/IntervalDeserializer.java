@@ -31,7 +31,8 @@ public class IntervalDeserializer extends JodaDeserializerBase<Interval>
          *   that is the separator for standard functionality...
          */
         int index = v.indexOf('/', 1);
-        if (index < 0) {
+        boolean hasSlash = (index > 0);
+        if (!hasSlash) {
             index = v.indexOf('-', 1);
         }
         if (index < 0) {
@@ -39,7 +40,12 @@ public class IntervalDeserializer extends JodaDeserializerBase<Interval>
         }
         long start, end;
         String str = v.substring(0, index);
+
         try {
+            // !!! TODO: configurable formats...
+            if (hasSlash) {
+                return Interval.parse(v);
+            }
             start = Long.valueOf(str);
             str = v.substring(index + 1);
             end = Long.valueOf(str);

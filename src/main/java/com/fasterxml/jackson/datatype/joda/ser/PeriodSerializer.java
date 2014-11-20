@@ -3,16 +3,15 @@ package com.fasterxml.jackson.datatype.joda.ser;
 import java.io.IOException;
 
 import org.joda.time.ReadablePeriod;
-import org.joda.time.format.ISOPeriodFormat;
-import org.joda.time.format.PeriodFormatter;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.core.JsonGenerator;
-
 import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.introspect.Annotated;
 import com.fasterxml.jackson.databind.jsonFormatVisitors.*;
 import com.fasterxml.jackson.databind.ser.ContextualSerializer;
+import com.fasterxml.jackson.datatype.joda.cfg.FormatConfig;
+import com.fasterxml.jackson.datatype.joda.cfg.JacksonJodaPeriodFormat;
 
 /**
  * Serializes a {@link ReadablePeriod} using Joda default formatting.
@@ -25,22 +24,24 @@ public final class PeriodSerializer
     extends JodaSerializerBase<ReadablePeriod>
     implements ContextualSerializer
 {
-    protected final static PeriodFormatter DEFAULT_PERIOD_FORMAT
-        = ISOPeriodFormat.standard();
-
-    protected final static JacksonJodaPeriodFormat DEFAULT_FORMAT
-        = new JacksonJodaPeriodFormat(DEFAULT_PERIOD_FORMAT);
-
     protected final JacksonJodaPeriodFormat _format;
     
     public PeriodSerializer() {
-        this(DEFAULT_FORMAT);
+        this(FormatConfig.DEFAULT_PERIOD_FORMAT);
     }
 
     protected PeriodSerializer(JacksonJodaPeriodFormat format) {
         super(ReadablePeriod.class);
         _format = format;
     }
+
+    // anything naturally "empty" to check?
+    /*
+    @Override
+    public boolean isEmpty(ReadablePeriod value) {
+        return (value.getMillis() == 0L);
+    }
+    */
 
     // Lots of work, although realistically, won't have much or any effect...
     @Override

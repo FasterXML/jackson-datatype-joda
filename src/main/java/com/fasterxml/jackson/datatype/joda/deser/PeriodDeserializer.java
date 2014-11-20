@@ -3,6 +3,8 @@ package com.fasterxml.jackson.datatype.joda.deser;
 import java.io.IOException;
 
 import org.joda.time.*;
+import org.joda.time.format.ISOPeriodFormat;
+import org.joda.time.format.PeriodFormatter;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
@@ -14,6 +16,8 @@ public class PeriodDeserializer
 {
     private static final long serialVersionUID = 1L;
 
+    private final static PeriodFormatter DEFAULT_FORMAT = ISOPeriodFormat.standard();
+    
     private final boolean _requireFullPeriod;
     
     public PeriodDeserializer() {
@@ -35,7 +39,7 @@ public class PeriodDeserializer
             if (str.isEmpty()) {
                 return null;
             }
-            return new Period(str);
+            return DEFAULT_FORMAT.parsePeriod(str);
         }
         if (t == JsonToken.VALUE_NUMBER_INT) {
             return new Period(jp.getLongValue());    

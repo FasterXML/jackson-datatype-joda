@@ -1,4 +1,4 @@
-package com.fasterxml.jackson.datatype.joda.ser;
+package com.fasterxml.jackson.datatype.joda.cfg;
 
 import java.util.Locale;
 
@@ -44,14 +44,14 @@ public class JacksonJodaPeriodFormat extends JacksonJodaFormatBase
     /**********************************************************
      */
 
-    protected JacksonJodaPeriodFormat withUseTimestamp(Boolean useTimestamp) {
+    public JacksonJodaPeriodFormat withUseTimestamp(Boolean useTimestamp) {
         if (_useTimestamp != null && _useTimestamp.equals(useTimestamp)) {
             return this;
         }
         return new JacksonJodaPeriodFormat(this, useTimestamp);
     }
     
-    protected JacksonJodaPeriodFormat withFormat(String format) {
+    public JacksonJodaPeriodFormat withFormat(String format) {
         /* 17-Nov-2014, tatu: Does not look like there is all that much
          *   that can be customized... At most we might be able to
          *   use "alternate" variant?
@@ -59,7 +59,7 @@ public class JacksonJodaPeriodFormat extends JacksonJodaFormatBase
         return this;
     }
 
-    protected JacksonJodaPeriodFormat withLocale(Locale locale) {
+    public JacksonJodaPeriodFormat withLocale(Locale locale) {
         if ((locale == null) || (_locale != null && _locale.equals(locale))) {
             return this;
         }
