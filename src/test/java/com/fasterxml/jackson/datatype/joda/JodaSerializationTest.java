@@ -52,28 +52,6 @@ public class JodaSerializationTest extends JodaTestBase
         mapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);        
         assertEquals("[\"org.joda.time.DateMidnight\",\"2001-05-25\"]", mapper.writeValueAsString(date));
     }
-
-    /*
-    /**********************************************************
-    /* Tests for Interval type
-    /**********************************************************
-     */
-
-    public void testIntervalSer() throws IOException
-    {
-        Interval interval = new Interval(1396439982, 1396440001);
-        assertEquals(quote("1396439982-1396440001"), MAPPER.writeValueAsString(interval));
-    }
-
-    public void testIntervalSerWithTypeInfo() throws IOException
-    {
-        Interval interval = new Interval(1396439982, 1396440001);
-
-        ObjectMapper mapper = jodaMapper();
-        mapper.addMixIn(Interval.class, ObjectConfiguration.class);
-        assertEquals("[\"org.joda.time.Interval\"," + quote("1396439982-1396440001") + "]",
-                mapper.writeValueAsString(interval));
-    }
     
     /*
     /**********************************************************
