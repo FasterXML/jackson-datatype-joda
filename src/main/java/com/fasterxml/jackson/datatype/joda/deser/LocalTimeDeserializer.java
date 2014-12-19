@@ -20,7 +20,7 @@ public class LocalTimeDeserializer
 
     @Override
     public LocalTime deserialize(JsonParser jp, DeserializationContext ctxt)
-        throws IOException, JsonProcessingException
+        throws IOException
     {
         switch (jp.getCurrentToken()) {
         case START_ARRAY:

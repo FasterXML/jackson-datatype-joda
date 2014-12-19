@@ -17,6 +17,8 @@ import com.fasterxml.jackson.datatype.joda.cfg.JacksonJodaDateFormat;
 public final class DurationSerializer
     extends JodaDateSerializerBase<Duration>
 {
+    private static final long serialVersionUID = 1L;
+
     // NOTE: formatter is not really used directly for printing, but we do need
     // it as container for numeric/textual distinction
     
@@ -34,17 +36,17 @@ public final class DurationSerializer
 
     // @since 2.5
     @Override
-    public boolean isEmpty(Duration value) {
+    public boolean isEmpty(SerializerProvider prov, Duration value) {
         return (value.getMillis() == 0L);
     }
 
     @Override
-    public void serialize(Duration value, JsonGenerator jgen, SerializerProvider provider) throws IOException
+    public void serialize(Duration value, JsonGenerator gen, SerializerProvider provider) throws IOException
     {
         if (_useTimestamp(provider)) {
-            jgen.writeNumber(value.getMillis());
+            gen.writeNumber(value.getMillis());
         } else {
-            jgen.writeString(value.toString());
+            gen.writeString(value.toString());
         }
     }
 }

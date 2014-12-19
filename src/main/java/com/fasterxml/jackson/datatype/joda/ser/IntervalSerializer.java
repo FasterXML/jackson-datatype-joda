@@ -14,6 +14,8 @@ import org.joda.time.format.DateTimeFormatter;
 
 public class IntervalSerializer extends JodaDateSerializerBase<Interval>
 {
+    private static final long serialVersionUID = 1L;
+
     public IntervalSerializer() { this(FormatConfig.DEFAULT_DATETIME_FORMAT); }
     public IntervalSerializer(JacksonJodaDateFormat format) {
         super(Interval.class, format, false,
@@ -26,12 +28,12 @@ public class IntervalSerializer extends JodaDateSerializerBase<Interval>
     }
 
     @Override
-    public boolean isEmpty(Interval value) {
+    public boolean isEmpty(SerializerProvider prov, Interval value) {
         return (value.getStartMillis() == value.getEndMillis());
     }
 
     @Override
-    public void serialize(Interval interval, JsonGenerator jsonGenerator, SerializerProvider provider) throws IOException
+    public void serialize(Interval interval, JsonGenerator gen, SerializerProvider provider) throws IOException
     {
         // 19-Nov-2014, tatu: Support textual representation similar to what Joda uses
         //   (and why not exact one? In future we'll make it configurable)
@@ -43,6 +45,6 @@ public class IntervalSerializer extends JodaDateSerializerBase<Interval>
             DateTimeFormatter f = _format.createFormatter(provider);
             repr = f.print(interval.getStart()) + "/" + f.print(interval.getEnd());
         }
-        jsonGenerator.writeString(repr);
+        gen.writeString(repr);
     }
 }

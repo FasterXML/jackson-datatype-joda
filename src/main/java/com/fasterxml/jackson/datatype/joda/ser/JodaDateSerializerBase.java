@@ -17,6 +17,8 @@ public abstract class JodaDateSerializerBase<T> extends JodaSerializerBase<T>
 // need contextualization to read per-property annotations
     implements ContextualSerializer
 {
+    private static final long serialVersionUID = 1L;
+
     protected final JacksonJodaDateFormat _format;
 
     /**
@@ -40,6 +42,12 @@ public abstract class JodaDateSerializerBase<T> extends JodaSerializerBase<T>
 
     public abstract JodaDateSerializerBase<T> withFormat(JacksonJodaDateFormat format);
 
+    @Override
+    @Deprecated // since 2.5 -- remove from 2.6 or later
+    public final boolean isEmpty(T value) {
+        return isEmpty(null, value);
+    }
+    
     @Override
     public JsonSerializer<?> createContextual(SerializerProvider prov,
             BeanProperty property) throws JsonMappingException

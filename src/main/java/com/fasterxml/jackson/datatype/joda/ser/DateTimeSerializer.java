@@ -13,6 +13,8 @@ import com.fasterxml.jackson.datatype.joda.cfg.JacksonJodaDateFormat;
 public final class DateTimeSerializer
     extends JodaDateSerializerBase<DateTime>
 {
+    private static final long serialVersionUID = 1L;
+
     public DateTimeSerializer() { this(FormatConfig.DEFAULT_DATETIME_FORMAT); }
     public DateTimeSerializer(JacksonJodaDateFormat format) {
         // false -> no arrays (numbers)
@@ -26,17 +28,17 @@ public final class DateTimeSerializer
     }
 
     @Override
-    public boolean isEmpty(DateTime value) {
+    public boolean isEmpty(SerializerProvider prov, DateTime value) {
         return (value.getMillis() == 0L);
     }
 
     @Override
-    public void serialize(DateTime value, JsonGenerator jgen, SerializerProvider provider) throws IOException
+    public void serialize(DateTime value, JsonGenerator gen, SerializerProvider provider) throws IOException
     {
         if (_useTimestamp(provider)) {
-            jgen.writeNumber(value.getMillis());
+            gen.writeNumber(value.getMillis());
         } else {
-            jgen.writeString(_format.createFormatter(provider).print(value));
+            gen.writeString(_format.createFormatter(provider).print(value));
         }
     }
 }

@@ -10,6 +10,8 @@ import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 
 abstract class JodaSerializerBase<T> extends StdSerializer<T>
 {
+    private static final long serialVersionUID = 1L;
+
     protected JodaSerializerBase(Class<T> cls) { super(cls); }
 
     @Override

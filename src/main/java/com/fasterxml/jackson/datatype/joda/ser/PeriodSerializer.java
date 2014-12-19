@@ -24,6 +24,8 @@ public final class PeriodSerializer
     extends JodaSerializerBase<ReadablePeriod>
     implements ContextualSerializer
 {
+    private static final long serialVersionUID = 1L;
+
     protected final JacksonJodaPeriodFormat _format;
     
     public PeriodSerializer() {

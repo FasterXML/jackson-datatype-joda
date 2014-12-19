@@ -13,6 +13,8 @@ import com.fasterxml.jackson.datatype.joda.cfg.JacksonJodaDateFormat;
 public final class DateMidnightSerializer
     extends JodaDateSerializerBase<DateMidnight>
 {
+    private static final long serialVersionUID = 1L;
+
     public DateMidnightSerializer() { this(FormatConfig.DEFAULT_DATEONLY_FORMAT); }
     public DateMidnightSerializer(JacksonJodaDateFormat format) {
         // true -> use arrays
@@ -26,7 +28,7 @@ public final class DateMidnightSerializer
     }
 
     @Override
-    public boolean isEmpty(DateMidnight value) {
+    public boolean isEmpty(SerializerProvider provider, DateMidnight value) {
         return (value.getMillis() == 0L);
     }
 

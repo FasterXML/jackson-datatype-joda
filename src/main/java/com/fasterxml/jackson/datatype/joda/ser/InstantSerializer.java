@@ -4,7 +4,6 @@ import java.io.IOException;
 
 import org.joda.time.*;
 
-import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.SerializerProvider;
@@ -14,6 +13,8 @@ import com.fasterxml.jackson.datatype.joda.cfg.JacksonJodaDateFormat;
 public final class InstantSerializer
     extends JodaDateSerializerBase<Instant>
 {
+    private static final long serialVersionUID = 1L;
+
     // NOTE: formatter not used for printing at all, hence choice doesn't matter
     public InstantSerializer() { this(FormatConfig.DEFAULT_TIMEONLY_FORMAT); }
     public InstantSerializer(JacksonJodaDateFormat format) {
@@ -28,18 +29,18 @@ public final class InstantSerializer
 
     // @since 2.5
     @Override
-    public boolean isEmpty(Instant value) {
+    public boolean isEmpty(SerializerProvider prov, Instant value) {
         return (value.getMillis() == 0L);
     }
 
     @Override
-    public void serialize(Instant value, JsonGenerator jgen, SerializerProvider provider)
-        throws IOException, JsonGenerationException
+    public void serialize(Instant value, JsonGenerator gen, SerializerProvider provider)
+        throws IOException
     {
         if (_useTimestamp(provider)) {
-            jgen.writeNumber(value.getMillis());
+            gen.writeNumber(value.getMillis());
         } else {
-            jgen.writeString(value.toString());
+            gen.writeString(value.toString());
         }
     }
 }

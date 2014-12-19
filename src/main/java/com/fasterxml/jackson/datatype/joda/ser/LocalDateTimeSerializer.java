@@ -13,6 +13,8 @@ import com.fasterxml.jackson.datatype.joda.cfg.JacksonJodaDateFormat;
 public final class LocalDateTimeSerializer
     extends JodaDateSerializerBase<LocalDateTime>
 {
+    private static final long serialVersionUID = 1L;
+
     public LocalDateTimeSerializer() { this(FormatConfig.DEFAULT_LOCAL_DATETIME_FORMAT); }
     public LocalDateTimeSerializer(JacksonJodaDateFormat format) {
         super(LocalDateTime.class, format, true,

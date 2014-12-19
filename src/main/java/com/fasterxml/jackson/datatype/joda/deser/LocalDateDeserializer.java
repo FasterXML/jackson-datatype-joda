@@ -7,7 +7,6 @@ import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
 
 import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.DeserializationContext;
 
@@ -21,8 +20,7 @@ public class LocalDateDeserializer
     public LocalDateDeserializer() { super(LocalDate.class); }
 
     @Override
-    public LocalDate deserialize(JsonParser jp, DeserializationContext ctxt)
-        throws IOException, JsonProcessingException
+    public LocalDate deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException
     {
         // [yyyy,mm,dd]
         if (jp.isExpectedStartArrayToken()) {
