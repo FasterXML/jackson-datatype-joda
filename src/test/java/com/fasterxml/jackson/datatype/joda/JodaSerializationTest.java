@@ -1,7 +1,10 @@
 package com.fasterxml.jackson.datatype.joda;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import org.joda.time.*;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
@@ -70,8 +73,14 @@ public class JodaSerializationTest extends JodaTestBase
         ObjectMapper mapper = jodaMapper();
         mapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);        
         assertEquals(quote("2001-05-25"), mapper.writeValueAsString(date));
+
+        // We can also configure beans to not include empty values. In this case,
+        // JodaDateSerializerBase#isEmpty is called to check if the value is empty.
+        mapper = jodaMapper();
+        mapper.setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
+        assertEquals("{\"contents\":[2001,5,25]}", mapper.writeValueAsString(new Container<LocalDate>(date)));
     }
-    
+
     public void testLocalDateSerWithTypeInfo() throws IOException
     {
         LocalDate date = new LocalDate(2001, 5, 25);
@@ -227,6 +236,18 @@ public class JodaSerializationTest extends JodaTestBase
         ObjectMapper mapper = jodaMapper();
         String json = mapper.writeValueAsString(yearMonth);
         assertEquals(quote("2013-08"), json);
+    }
+
+    private static class Container<T> {
+        T contents;
+
+        public Container(T contents) {
+            this.contents = contents;
+        }
+
+        public T getContents() {
+            return contents;
+        }
     }
 
 }
