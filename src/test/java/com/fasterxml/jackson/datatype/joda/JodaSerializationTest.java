@@ -1,8 +1,6 @@
 package com.fasterxml.jackson.datatype.joda;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import org.joda.time.*;
@@ -18,19 +16,32 @@ public class JodaSerializationTest extends JodaTestBase
     private static interface ObjectConfiguration {
     }
 
+    static class Container<T> {
+        T contents;
+
+        public Container(T contents) {
+            this.contents = contents;
+        }
+
+        public T getContents() {
+            return contents;
+        }
+    }
+
     private final ObjectMapper MAPPER = jodaMapper();
     {
         MAPPER.enable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
         MAPPER.enable(SerializationFeature.WRITE_DURATIONS_AS_TIMESTAMPS);
     }
+
     private final ObjectWriter WRITER = MAPPER.writer();
-   
+
     /*
     /**********************************************************
     /* Tests for DateMidnight type
     /**********************************************************
      */
-    
+
     public void testDateMidnightSer() throws IOException
     {
         DateMidnight date = new DateMidnight(2001, 5, 25);
@@ -70,15 +81,17 @@ public class JodaSerializationTest extends JodaTestBase
 
         // but we can force it to be a String as well (note: here we assume this is
         // dynamically changeable)
-        ObjectMapper mapper = jodaMapper();
-        mapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);        
-        assertEquals(quote("2001-05-25"), mapper.writeValueAsString(date));
+        assertEquals(quote("2001-05-25"),
+                WRITER.without(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS).writeValueAsString(date));
 
         // We can also configure beans to not include empty values. In this case,
         // JodaDateSerializerBase#isEmpty is called to check if the value is empty.
-        mapper = jodaMapper();
+        ObjectMapper mapper = jodaMapper();
         mapper.setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
         assertEquals("{\"contents\":[2001,5,25]}", mapper.writeValueAsString(new Container<LocalDate>(date)));
+
+        // also verify pruning by NON_EMPTY
+        assertEquals("{}", mapper.writeValueAsString(new Container<LocalDate>(null)));
     }
 
     public void testLocalDateSerWithTypeInfo() throws IOException
@@ -236,18 +249,6 @@ public class JodaSerializationTest extends JodaTestBase
         ObjectMapper mapper = jodaMapper();
         String json = mapper.writeValueAsString(yearMonth);
         assertEquals(quote("2013-08"), json);
-    }
-
-    private static class Container<T> {
-        T contents;
-
-        public Container(T contents) {
-            this.contents = contents;
-        }
-
-        public T getContents() {
-            return contents;
-        }
     }
 
 }

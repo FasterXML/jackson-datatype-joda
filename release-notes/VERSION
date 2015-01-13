@@ -4,6 +4,11 @@ Project: jackson-datatype-joda
 === Releases ===
 ------------------------------------------------------------------------
 
+2.5.1 (not yet released)
+
+#51: Calling `JodaDateSerializerBase.isEmpty()` results in a `StackOverflowError`.
+ (reported, fix contributed by Charlie L-M)
+
 2.5.0 (01-Jan-2015)
 
 No changes since 2.4
