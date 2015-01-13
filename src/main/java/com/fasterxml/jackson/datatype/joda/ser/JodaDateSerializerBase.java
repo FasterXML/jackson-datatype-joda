@@ -47,7 +47,12 @@ public abstract class JodaDateSerializerBase<T> extends JodaSerializerBase<T>
     public final boolean isEmpty(T value) {
         return isEmpty(null, value);
     }
-    
+
+    @Override
+    public boolean isEmpty(SerializerProvider prov, T value) {
+        return value == null;
+    }
+
     @Override
     public JsonSerializer<?> createContextual(SerializerProvider prov,
             BeanProperty property) throws JsonMappingException
