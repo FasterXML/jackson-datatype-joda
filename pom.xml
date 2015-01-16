@@ -9,7 +9,7 @@
   <groupId>com.fasterxml.jackson.datatype</groupId>
   <artifactId>jackson-datatype-joda</artifactId>
   <name>Jackson-datatype-Joda</name>
-  <version>2.4.5-SNAPSHOT</version>
+  <version>2.4.5</version>
   <packaging>bundle</packaging>
   <description>Add-on module for Jackson (http://jackson.codehaus.org) to support
 Joda (http://joda-time.sourceforge.net/) data types.
@@ -19,7 +19,7 @@ Joda (http://joda-time.sourceforge.net/) data types.
     <connection>scm:git:git@github.com:FasterXML/jackson-datatype-joda.git</connection>
     <developerConnection>scm:git:git@github.com:FasterXML/jackson-datatype-joda.git</developerConnection>
     <url>http://github.com/FasterXML/jackson-datatype-joda</url>    
-    <tag>HEAD</tag>
+    <tag>2.4.5b</tag>
   </scm>
   <properties>
     <version.jackson.annotations>2.4.0</version.jackson.annotations>
