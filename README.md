@@ -4,7 +4,7 @@ to support JSON serialization and deserialization of
 
 ## Status
 
-[![Build Status](https://fasterxml.ci.cloudbees.com/job/jackson-datatype-joda-master/badge/icon)](https://fasterxml.ci.cloudbees.com/job/jackson-datatype-joda-master/)
+[![Build Status](https://travis-ci.org/FasterXML/jackson-datatype-joda.svg)](https://travis-ci.org/FasterXML/jackson-datatype-joda)
 
 As of version 2.0 module is usable and relatively extensive.
 Contributions are always welcome -- not all types are yet supported; and we may want to support even wider alternative
