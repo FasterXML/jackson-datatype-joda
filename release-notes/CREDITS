@@ -27,3 +27,7 @@ Brad Kennedy (bkenned4@github)
 Charlie La Mothe (clamothe@github)
  * Contributed #51: Calling `JodaDateSerializerBase.isEmpty()` results in a `StackOverflowError`.
   (2.5.1)
+
+Thorsten Platz (ThorstenPlatz@github)
+ * Reported #60: Configured date/time format not considered when serializing Joda Instant
+  (2.5.4)

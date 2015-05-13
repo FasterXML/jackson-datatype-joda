@@ -19,7 +19,7 @@ public final class InstantSerializer
     public InstantSerializer() { this(FormatConfig.DEFAULT_TIMEONLY_FORMAT); }
     public InstantSerializer(JacksonJodaDateFormat format) {
         super(Instant.class, format, false,
-                SerializationFeature.WRITE_DURATIONS_AS_TIMESTAMPS);
+                SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
     }
 
     @Override
