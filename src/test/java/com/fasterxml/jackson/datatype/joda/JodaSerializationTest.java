@@ -1,6 +1,7 @@
 package com.fasterxml.jackson.datatype.joda;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import org.joda.time.*;
@@ -234,6 +235,23 @@ public class JodaSerializationTest extends JodaTestBase
                 .without(SerializationFeature.WRITE_DURATIONS_AS_TIMESTAMPS)
                 .writeValueAsString(instant));
     }
+
+    // [datatype-joda#60]
+    public void testInstantConversion() throws Exception
+    {
+        final ObjectMapper mapper = jodaMapper();
+
+        // Configure Date Formatting
+        mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+        mapper.setDateFormat(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'"));
+
+        // Create an instant and serialize and additonally serialize the instant as DateTime to demonstrate the difference
+        org.joda.time.Instant now = new DateTime(1431498572205L).toInstant();
+        
+        String instantString = mapper.writeValueAsString(now);
+
+        assertEquals("\"2015-05-13T06:29:32.205Z\"", instantString);
+    }    
 
     public void testMonthDaySer() throws Exception
     {
