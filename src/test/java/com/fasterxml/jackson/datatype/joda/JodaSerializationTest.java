@@ -232,7 +232,7 @@ public class JodaSerializationTest extends JodaTestBase
 
         // but if re-configured, as regular ISO-8601 string
         assertEquals(quote("1970-01-01T00:00:00.000Z"), MAPPER.writer()
-                .without(SerializationFeature.WRITE_DURATIONS_AS_TIMESTAMPS)
+                .without(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
                 .writeValueAsString(instant));
     }
 
