@@ -1,4 +1,4 @@
-Project to build [Jackson](http://jackson.codehaus.org) module (jar)
+[Jackson](http://jackson.codehaus.org) module (jar)
 to support JSON serialization and deserialization of
 [Joda](http://joda-time.sourceforge.net/) data types.
 
@@ -6,9 +6,13 @@ to support JSON serialization and deserialization of
 
 [![Build Status](https://travis-ci.org/FasterXML/jackson-datatype-joda.svg)](https://travis-ci.org/FasterXML/jackson-datatype-joda)
 
-As of version 2.0 module is usable and relatively extensive.
+Module has been production-ready since version 2.0, and offers relatively extensive support for Joda datatypes.
 Contributions are always welcome -- not all types are yet supported; and we may want to support even wider alternative
 formats on input side.
+
+## License
+
+[Apache License 2.0](http://www.apache.org/licenses/LICENSE-2.0.txt)
 
 ## Usage
 
