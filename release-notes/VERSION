@@ -6,6 +6,9 @@ Project: jackson-datatype-joda
 
 2.6.0 (not yet released)
 
+#62: Allow use of numbers-as-Strings for LocalDate (in array)
+ (contributed by Michal Z)
+
 2.5.4 (not yet released)
 
 #60: Configured date/time format not considered when serializing Joda Instant
