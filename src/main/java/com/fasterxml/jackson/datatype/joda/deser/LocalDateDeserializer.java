@@ -22,14 +22,14 @@ public class LocalDateDeserializer
     @Override
     public LocalDate deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException
     {
-        // [yyyy,mm,dd]
+        // [yyyy,mm,dd] or ["yyyy","mm","dd"]
         if (jp.isExpectedStartArrayToken()) {
-            jp.nextToken(); // VALUE_NUMBER_INT 
-            int year = jp.getIntValue(); 
-            jp.nextToken(); // VALUE_NUMBER_INT
-            int month = jp.getIntValue();
-            jp.nextToken(); // VALUE_NUMBER_INT
-            int day = jp.getIntValue();
+            jp.nextToken(); // VALUE_NUMBER_INT or VALUE_STRING
+            int year = new Integer(jp.getText());
+            jp.nextToken(); // VALUE_NUMBER_INT or VALUE_STRING
+            int month = new Integer(jp.getText());
+            jp.nextToken(); // VALUE_NUMBER_INT or VALUE_STRING
+            int day = new Integer(jp.getText());
             if (jp.nextToken() != JsonToken.END_ARRAY) {
                 throw ctxt.wrongTokenException(jp, JsonToken.END_ARRAY, "after LocalDate ints");
             }
