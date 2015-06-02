@@ -6,6 +6,8 @@ Project: jackson-datatype-joda
 
 2.6.0 (not yet released)
 
+#49: testDateMidnightSerWithTypeInfo test dependent on $TZ
+ (contributed by Michal Z)
 #62: Allow use of numbers-as-Strings for LocalDate (in array)
  (contributed by Michal Z)
 
