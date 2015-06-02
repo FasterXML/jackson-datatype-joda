@@ -116,14 +116,8 @@ public class JacksonJodaDateFormat extends JacksonJodaFormatBase
 
     public DateTimeFormatter createFormatter(SerializerProvider provider)
     {
-        DateTimeFormatter formatter = _formatter;
-        
-        if (!_explicitLocale) {
-            Locale loc = provider.getLocale();
-            if (loc != null && !loc.equals(_locale)) {
-                formatter = formatter.withLocale(loc);
-            }
-        }
+        DateTimeFormatter formatter = createFormatterWithLocale(provider);
+
         if (!_explicitTimezone) {
             TimeZone tz = provider.getTimeZone();
             if (tz != null && !tz.equals(_jdkTimezone)) {
@@ -131,6 +125,20 @@ public class JacksonJodaDateFormat extends JacksonJodaFormatBase
             }
         }
         
+        return formatter;
+    }
+
+    public DateTimeFormatter createFormatterWithLocale(SerializerProvider provider)
+    {
+        DateTimeFormatter formatter = _formatter;
+
+        if (!_explicitLocale) {
+            Locale loc = provider.getLocale();
+            if (loc != null && !loc.equals(_locale)) {
+                formatter = formatter.withLocale(loc);
+            }
+        }
+
         return formatter;
     }
     

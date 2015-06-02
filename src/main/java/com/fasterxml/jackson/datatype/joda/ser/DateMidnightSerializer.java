@@ -15,7 +15,7 @@ public final class DateMidnightSerializer
 {
     private static final long serialVersionUID = 1L;
 
-    public DateMidnightSerializer() { this(FormatConfig.DEFAULT_DATEONLY_FORMAT); }
+    public DateMidnightSerializer() { this(FormatConfig.DEFAULT_LOCAL_DATEONLY_FORMAT); }
     public DateMidnightSerializer(JacksonJodaDateFormat format) {
         // true -> use arrays
         super(DateMidnight.class, format, true,
@@ -44,7 +44,7 @@ public final class DateMidnightSerializer
             jgen.writeNumber(value.dayOfMonth().get());
             jgen.writeEndArray();
         } else {
-            jgen.writeString(_format.createFormatter(provider).print(value));
+            jgen.writeString(_format.createFormatterWithLocale(provider).print(value));
         }
     }
 }
