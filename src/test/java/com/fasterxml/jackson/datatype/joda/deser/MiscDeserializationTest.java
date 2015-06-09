@@ -183,6 +183,15 @@ public class MiscDeserializationTest extends JodaTestBase
         assertEquals(7, date2.getMonthOfYear());
         assertEquals(13, date2.getDayOfMonth());
     }
+
+    public void testLocalDateDeserWithPartsAsString() throws IOException
+    {
+        // couple of acceptable formats, so:
+        LocalDate date = MAPPER.readValue("[\"2001\",\"5\",\"25\"]", LocalDate.class);
+        assertEquals(2001, date.getYear());
+        assertEquals(5, date.getMonthOfYear());
+        assertEquals(25, date.getDayOfMonth());
+    }
     
     /*
     /**********************************************************

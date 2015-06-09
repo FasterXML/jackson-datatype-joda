@@ -31,3 +31,7 @@ Charlie La Mothe (clamothe@github)
 Thorsten Platz (ThorstenPlatz@github)
  * Reported #60: Configured date/time format not considered when serializing Joda Instant
   (2.5.4)
+
+Michał Ziober (ZioberMichal@github)
+ * Contributed #62: Allow use of numbers-as-Strings for LocalDate (in array)
+  (2.6.0)
