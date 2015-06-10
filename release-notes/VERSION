@@ -4,7 +4,7 @@ Project: jackson-datatype-joda
 === Releases ===
 ------------------------------------------------------------------------
 
-2.5.4 (not yet released)
+2.5.4 (09-Jun-2015)
 
 #60: Configured date/time format not considered when serializing Joda Instant
  (reported by Thorsten P)
