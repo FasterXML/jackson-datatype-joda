@@ -51,7 +51,7 @@ public final class PeriodSerializer
             BeanProperty property) throws JsonMappingException
     {
         if (property != null) {
-            JsonFormat.Value ann = prov.getAnnotationIntrospector().findFormat((Annotated)property.getMember());
+            JsonFormat.Value ann = property.findFormatOverrides(prov.getAnnotationIntrospector());
             if (ann != null) {
                 JacksonJodaPeriodFormat format = _format;
 
@@ -84,9 +84,9 @@ public final class PeriodSerializer
     }
     
     @Override
-    public void serialize(ReadablePeriod value, JsonGenerator jgen, SerializerProvider provider) throws IOException
+    public void serialize(ReadablePeriod value, JsonGenerator gen, SerializerProvider provider) throws IOException
     {
-        jgen.writeString(_format.createFormatter(provider).print(value));
+        gen.writeString(_format.createFormatter(provider).print(value));
     }
 
     @Override

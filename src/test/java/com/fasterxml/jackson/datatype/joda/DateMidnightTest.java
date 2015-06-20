@@ -80,18 +80,11 @@ public class DateMidnightTest extends JodaTestBase
         AlternateFormat input = new AlternateFormat(inputDate);
         String json = MAPPER.writeValueAsString(input);
 
-        /*
-        DateTimeFormatter foo = DateTimeFormat.forPattern("dd'.'MM'.'YYYY");
-System.err.println("DEBUG: try with..."+foo.print(inputDate));
-*/
-
-        /*
         if (!json.contains(ALT)) {
             fail("Should contain '"+ALT+"', did not: "+json);
         }
         AlternateFormat output = MAPPER.readValue(json, AlternateFormat.class);
         assertNotNull(output.value);
         assertEquals(inputDate, output.value);
-        */
     }
 }

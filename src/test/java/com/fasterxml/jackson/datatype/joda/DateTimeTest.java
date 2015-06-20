@@ -5,10 +5,9 @@ import java.io.IOException;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.annotation.*;
+
+import com.fasterxml.jackson.databind.*;
 
 public class DateTimeTest extends JodaTestBase
 {
@@ -22,6 +21,7 @@ public class DateTimeTest extends JodaTestBase
     }
 
     private static class CustomDate {
+        // note: 'SS' means 'short representation'
         @JsonFormat(shape=JsonFormat.Shape.STRING, pattern="SS")
         public DateTime date;
 
@@ -31,7 +31,7 @@ public class DateTimeTest extends JodaTestBase
     }
     
     @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.WRAPPER_ARRAY, property = "@class")
-    private static interface ObjectConfiguration {
+    private static interface TypeInfoMixIn {
     }
 
     /*
@@ -93,8 +93,44 @@ public class DateTimeTest extends JodaTestBase
         // but if re-configured, as regular ISO-8601 string
         ObjectMapper m = jodaMapper();
         m.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
-        m.addMixIn(DateTime.class, ObjectConfiguration.class);
+        m.addMixIn(DateTime.class, TypeInfoMixIn.class);
         assertEquals("[\"org.joda.time.DateTime\",\"1970-01-01T00:00:00.000Z\"]",
                 m.writeValueAsString(dt));
     }
+
+    static class Beanie {
+        public final DateTime jodaDateTime;
+        public final java.util.Date javaUtilDate;
+        @JsonCreator
+        public Beanie(@JsonProperty("jodaDateTime") DateTime jodaDateTime,
+            @JsonProperty("javaUtilDate") java.util.Date javaUtilDate) {
+          this.jodaDateTime = jodaDateTime;
+          this.javaUtilDate = javaUtilDate;
+        }
+    }
+
+    public void testIso8601ThroughJoda() throws Exception {
+        ObjectMapper mapper = new ObjectMapper()
+            .registerModule(new JodaModule())
+            .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+
+        java.text.DateFormat df = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss zzz");
+        java.util.Date targetDate = df.parse("2000-01-01 00:00:00 UTC");
+        Beanie expectedBean = new Beanie(new DateTime(targetDate.getTime()), targetDate);
+
+        String expectedJSON =
+            "{\"jodaDateTime\":\"2000-01-01T00:00:00.000Z\","
+                + "\"javaUtilDate\":\"2000-01-01T00:00:00.000+0000\"}";
+        String actualJSON = mapper.writeValueAsString(expectedBean);
+        assertEquals(actualJSON, expectedJSON);
+
+        Beanie actualBean = mapper.readValue(actualJSON, Beanie.class);
+        assertEquals(actualBean.javaUtilDate, expectedBean.javaUtilDate);
+        assertEquals(actualBean.jodaDateTime.getMillis(), expectedBean.jodaDateTime.getMillis());
+
+        assertEquals(expectedBean.jodaDateTime.getMillis(), actualBean.jodaDateTime.getMillis());
+
+        // note: timezone/offset may vary, shouldn't check:
+//        assertEquals(expectedBean.jodaDateTime, actualBean.jodaDateTime);
+      }
 }

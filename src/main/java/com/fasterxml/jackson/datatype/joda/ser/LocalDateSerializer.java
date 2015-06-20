@@ -36,17 +36,17 @@ public final class LocalDateSerializer
     */
 
     @Override
-    public void serialize(LocalDate value, JsonGenerator jgen, SerializerProvider provider) throws IOException
+    public void serialize(LocalDate value, JsonGenerator gen, SerializerProvider provider) throws IOException
     {
         if (_useTimestamp(provider)) {
             // Timestamp here actually means an array of values
-            jgen.writeStartArray();
-            jgen.writeNumber(value.year().get());
-            jgen.writeNumber(value.monthOfYear().get());
-            jgen.writeNumber(value.dayOfMonth().get());
-            jgen.writeEndArray();
+            gen.writeStartArray();
+            gen.writeNumber(value.year().get());
+            gen.writeNumber(value.monthOfYear().get());
+            gen.writeNumber(value.dayOfMonth().get());
+            gen.writeEndArray();
         } else {
-            jgen.writeString(_format.createFormatter(provider).print(value));
+            gen.writeString(_format.createFormatter(provider).print(value));
         }
     }
 }

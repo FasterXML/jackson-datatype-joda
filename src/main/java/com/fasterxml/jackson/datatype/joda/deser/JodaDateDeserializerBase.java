@@ -36,7 +36,6 @@ public abstract class JodaDateDeserializerBase<T>
             JsonFormat.Value ann = prop.findFormatOverrides(ctxt.getAnnotationIntrospector());
             if (ann != null) {
                 JacksonJodaDateFormat format = _format;
-
                 Boolean useTimestamp;
 
                 // Simple case first: serialize as numeric timestamp?

@@ -15,9 +15,8 @@ public class DateTimeZoneSerializer extends JodaSerializerBase<DateTimeZone>
     public DateTimeZoneSerializer() { super(DateTimeZone.class); }
 
     @Override
-    public void serialize(DateTimeZone value, JsonGenerator jgen, SerializerProvider provider) throws IOException
+    public void serialize(DateTimeZone value, JsonGenerator gen, SerializerProvider provider) throws IOException
     {
-        jgen.writeString(value.getID());
+        gen.writeString(value.getID());
     }
-
 }

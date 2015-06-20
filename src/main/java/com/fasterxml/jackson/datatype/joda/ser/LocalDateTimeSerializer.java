@@ -35,22 +35,22 @@ public final class LocalDateTimeSerializer
     */
 
     @Override
-    public void serialize(LocalDateTime value, JsonGenerator jgen, SerializerProvider provider)
+    public void serialize(LocalDateTime value, JsonGenerator gen, SerializerProvider provider)
         throws IOException
     {
         if (_useTimestamp(provider)) {
             // Timestamp here actually means an array of values
-            jgen.writeStartArray();
-            jgen.writeNumber(value.year().get());
-            jgen.writeNumber(value.monthOfYear().get());
-            jgen.writeNumber(value.dayOfMonth().get());
-            jgen.writeNumber(value.hourOfDay().get());
-            jgen.writeNumber(value.minuteOfHour().get());
-            jgen.writeNumber(value.secondOfMinute().get());
-            jgen.writeNumber(value.millisOfSecond().get());
-            jgen.writeEndArray();
+            gen.writeStartArray();
+            gen.writeNumber(value.year().get());
+            gen.writeNumber(value.monthOfYear().get());
+            gen.writeNumber(value.dayOfMonth().get());
+            gen.writeNumber(value.hourOfDay().get());
+            gen.writeNumber(value.minuteOfHour().get());
+            gen.writeNumber(value.secondOfMinute().get());
+            gen.writeNumber(value.millisOfSecond().get());
+            gen.writeEndArray();
         } else {
-            jgen.writeString(_format.createFormatter(provider).print(value));
+            gen.writeString(_format.createFormatter(provider).print(value));
         }
     }
 }

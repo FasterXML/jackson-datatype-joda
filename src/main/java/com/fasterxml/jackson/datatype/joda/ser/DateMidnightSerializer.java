@@ -5,7 +5,6 @@ import java.io.IOException;
 import org.joda.time.DateMidnight;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-
 import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.datatype.joda.cfg.FormatConfig;
 import com.fasterxml.jackson.datatype.joda.cfg.JacksonJodaDateFormat;
@@ -24,7 +23,7 @@ public final class DateMidnightSerializer
 
     @Override
     public DateMidnightSerializer withFormat(JacksonJodaDateFormat formatter) {
-        return (_format == formatter) ? this : new DateMidnightSerializer(_format);
+        return (_format == formatter) ? this : new DateMidnightSerializer(formatter);
     }
 
     @Override
@@ -33,17 +32,18 @@ public final class DateMidnightSerializer
     }
 
     @Override
-    public void serialize(DateMidnight value, JsonGenerator jgen, SerializerProvider provider) throws IOException
+    public void serialize(DateMidnight value, JsonGenerator gen,
+            SerializerProvider provider) throws IOException
     {
         if (_useTimestamp(provider)) {
             // same as with other date-only values
-            jgen.writeStartArray();
-            jgen.writeNumber(value.year().get());
-            jgen.writeNumber(value.monthOfYear().get());
-            jgen.writeNumber(value.dayOfMonth().get());
-            jgen.writeEndArray();
+            gen.writeStartArray();
+            gen.writeNumber(value.year().get());
+            gen.writeNumber(value.monthOfYear().get());
+            gen.writeNumber(value.dayOfMonth().get());
+            gen.writeEndArray();
         } else {
-            jgen.writeString(_format.createFormatterWithLocale(provider).print(value));
+            gen.writeString(_format.createFormatterWithLocale(provider).print(value));
         }
     }
 }

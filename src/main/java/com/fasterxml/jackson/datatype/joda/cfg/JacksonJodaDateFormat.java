@@ -23,7 +23,8 @@ public class JacksonJodaDateFormat extends JacksonJodaFormatBase
 
     protected final boolean _explicitTimezone;
     
-    public JacksonJodaDateFormat(DateTimeFormatter defaultFormatter) {
+    public JacksonJodaDateFormat(DateTimeFormatter defaultFormatter)
+    {
         super();
         _formatter = defaultFormatter;
         _jdkTimezone = defaultFormatter.getZone().toTimeZone();
@@ -90,6 +91,7 @@ public class JacksonJodaDateFormat extends JacksonJodaFormatBase
         if (_locale != null) {
             formatter = formatter.withLocale(_locale);
         }
+        // copy TimeZone from previous formatter
         formatter = formatter.withZone(_formatter.getZone());
         
         return new JacksonJodaDateFormat(this, formatter);

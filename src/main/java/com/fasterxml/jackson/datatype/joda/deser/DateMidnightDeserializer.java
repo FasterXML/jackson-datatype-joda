@@ -32,28 +32,28 @@ public class DateMidnightDeserializer extends
     }
 
     @Override
-    public DateMidnight deserialize(JsonParser jp, DeserializationContext ctxt)
+    public DateMidnight deserialize(JsonParser p, DeserializationContext ctxt)
         throws IOException
     {
         // We'll accept either long (timestamp) or array:
-        if (jp.isExpectedStartArrayToken()) {
-            jp.nextToken(); // VALUE_NUMBER_INT
-            int year = jp.getIntValue();
-            jp.nextToken(); // VALUE_NUMBER_INT
-            int month = jp.getIntValue();
-            jp.nextToken(); // VALUE_NUMBER_INT
-            int day = jp.getIntValue();
-            if (jp.nextToken() != JsonToken.END_ARRAY) {
-                throw ctxt.wrongTokenException(jp, JsonToken.END_ARRAY,
+        if (p.isExpectedStartArrayToken()) {
+            p.nextToken(); // VALUE_NUMBER_INT
+            int year = p.getIntValue();
+            p.nextToken(); // VALUE_NUMBER_INT
+            int month = p.getIntValue();
+            p.nextToken(); // VALUE_NUMBER_INT
+            int day = p.getIntValue();
+            if (p.nextToken() != JsonToken.END_ARRAY) {
+                throw ctxt.wrongTokenException(p, JsonToken.END_ARRAY,
                         "after DateMidnight ints");
             }
             return new DateMidnight(year, month, day);
         }
-        switch (jp.getCurrentToken()) {
+        switch (p.getCurrentToken()) {
         case VALUE_NUMBER_INT:
-            return new DateMidnight(jp.getLongValue());
+            return new DateMidnight(p.getLongValue());
         case VALUE_STRING:
-            String str = jp.getText().trim();
+            String str = p.getText().trim();
             if (str.length() == 0) { // [JACKSON-360]
                 return null;
             }
@@ -64,7 +64,7 @@ public class DateMidnightDeserializer extends
             return local.toDateMidnight();
         default:
         }
-        throw ctxt.wrongTokenException(jp, JsonToken.START_ARRAY,
+        throw ctxt.wrongTokenException(p, JsonToken.START_ARRAY,
                 "expected JSON Array, Number or String");
     }
 }
