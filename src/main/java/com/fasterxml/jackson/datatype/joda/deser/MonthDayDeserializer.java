@@ -37,5 +37,4 @@ public class MonthDayDeserializer extends JodaDeserializerBase<MonthDay>
         }
         throw ctxt.wrongTokenException(jp, JsonToken.VALUE_STRING, "expected JSON String");
     }
-
 }

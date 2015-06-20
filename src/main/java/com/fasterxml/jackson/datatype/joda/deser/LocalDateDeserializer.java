@@ -11,7 +11,7 @@ import com.fasterxml.jackson.datatype.joda.cfg.FormatConfig;
 import com.fasterxml.jackson.datatype.joda.cfg.JacksonJodaDateFormat;
 
 public class LocalDateDeserializer
-extends JodaDateDeserializerBase<LocalDate>
+    extends JodaDateDeserializerBase<LocalDate>
 {
     private static final long serialVersionUID = 1L;
 
@@ -33,10 +33,8 @@ extends JodaDateDeserializerBase<LocalDate>
     {
         if (p.getCurrentToken() == JsonToken.VALUE_STRING) {
             String str = p.getText().trim();
-            if (str.length() == 0) {
-                return null;
-            }
-            return _format.createParser(ctxt).parseLocalDate(str);
+            return (str.length() == 0) ? null
+                    : _format.createParser(ctxt).parseLocalDate(str);
         }
         if (p.getCurrentToken() == JsonToken.VALUE_NUMBER_INT) {
             return new LocalDate(p.getLongValue());            

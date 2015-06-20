@@ -16,7 +16,7 @@ public final class LocalTimeSerializer
 {
     private static final long serialVersionUID = 1L;
 
-    public LocalTimeSerializer() { this(FormatConfig.DEFAULT_LOCAL_TIMEONLY_FORMAT); }
+    public LocalTimeSerializer() { this(FormatConfig.DEFAULT_LOCAL_TIMEONLY_PRINTER); }
     public LocalTimeSerializer(JacksonJodaDateFormat format) {
         super(LocalTime.class, format, true,
                 SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);

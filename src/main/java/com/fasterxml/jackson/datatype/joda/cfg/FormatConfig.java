@@ -19,48 +19,53 @@ public class FormatConfig
 {
     // Actual Joda formatters
 
+    /*
     public final static DateTimeFormatter DEFAULT_JODA_DATEONLY_FORMAT
-        = ISODateTimeFormat.date().withZoneUTC();
+        = ;
 
     public final static DateTimeFormatter DEFAULT_JODA_TIMEONLY_FORMAT
-        = ISODateTimeFormat.time().withZoneUTC();
+        = ;
 
     public final static DateTimeFormatter DEFAULT_JODA_DATETIME_FORMAT
-        = ISODateTimeFormat.dateTime().withZoneUTC();
+        = ;
 
     public final static PeriodFormatter DEFAULT_JODA_PERIOD_FORMAT
-        = ISOPeriodFormat.standard();
+        =
+        */
     
     // Matching wrappers for more information needed with formatter
     
     public final static JacksonJodaDateFormat DEFAULT_DATEONLY_FORMAT
-        = new JacksonJodaDateFormat(FormatConfig.DEFAULT_JODA_DATEONLY_FORMAT);
+        = new JacksonJodaDateFormat(ISODateTimeFormat.date().withZoneUTC());
     
     public final static JacksonJodaDateFormat DEFAULT_TIMEONLY_FORMAT
-        = new JacksonJodaDateFormat(FormatConfig.DEFAULT_JODA_TIMEONLY_FORMAT);
+        = new JacksonJodaDateFormat(ISODateTimeFormat.time().withZoneUTC());
 
     public final static JacksonJodaDateFormat DEFAULT_DATETIME_FORMAT
-        = new JacksonJodaDateFormat(FormatConfig.DEFAULT_JODA_DATETIME_FORMAT);
-
-    // should these differ from ones above? Presumably should use local timezone or... ?
-
-    public final static JacksonJodaDateFormat DEFAULT_LOCAL_DATETIME_FORMAT
-        = new JacksonJodaDateFormat(FormatConfig.DEFAULT_JODA_DATETIME_FORMAT
-                .withZone(DateTimeZone.getDefault())
-                        );
-
-    public final static JacksonJodaDateFormat DEFAULT_LOCAL_DATEONLY_FORMAT
-        = new JacksonJodaDateFormat(FormatConfig.DEFAULT_JODA_DATEONLY_FORMAT
-             .withZone(DateTimeZone.getDefault())
-                );
-//  final static DateTimeFormatter parser = ISODateTimeFormat.localDateOptionalTimeParser();
-
-    public final static JacksonJodaDateFormat DEFAULT_LOCAL_TIMEONLY_FORMAT
-        = new JacksonJodaDateFormat(FormatConfig.DEFAULT_JODA_TIMEONLY_FORMAT
-              .withZone(DateTimeZone.getDefault())
-                );
-
+        = new JacksonJodaDateFormat(ISODateTimeFormat.dateTime().withZoneUTC());
 
     public final static JacksonJodaPeriodFormat DEFAULT_PERIOD_FORMAT
-        = new JacksonJodaPeriodFormat(DEFAULT_JODA_PERIOD_FORMAT);
+        = new JacksonJodaPeriodFormat(ISOPeriodFormat.standard());
+    
+    // should these differ from ones above? Presumably should use local timezone or... ?
+
+    public final static JacksonJodaDateFormat DEFAULT_LOCAL_DATEONLY_FORMAT
+        = new JacksonJodaDateFormat(ISODateTimeFormat.date()
+             .withZone(DateTimeZone.getDefault()));
+
+    public final static JacksonJodaDateFormat DEFAULT_LOCAL_TIMEONLY_PRINTER
+        = new JacksonJodaDateFormat(ISODateTimeFormat.time()
+              .withZone(DateTimeZone.getDefault()));
+
+    public final static JacksonJodaDateFormat DEFAULT_LOCAL_TIMEONLY_PARSER
+        = new JacksonJodaDateFormat(ISODateTimeFormat.localTimeParser()
+              .withZone(DateTimeZone.getDefault()));
+    
+    public final static JacksonJodaDateFormat DEFAULT_LOCAL_DATETIME_PRINTER
+        = new JacksonJodaDateFormat(ISODateTimeFormat.dateTime()
+                .withZone(DateTimeZone.getDefault()));
+
+    public final static JacksonJodaDateFormat DEFAULT_LOCAL_DATETIME_PARSER
+        = new JacksonJodaDateFormat(ISODateTimeFormat.localDateOptionalTimeParser()
+                .withZone(DateTimeZone.getDefault()));
 }

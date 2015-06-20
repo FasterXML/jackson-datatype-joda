@@ -3,57 +3,64 @@ package com.fasterxml.jackson.datatype.joda.deser;
 import java.io.IOException;
 
 import org.joda.time.LocalTime;
-import org.joda.time.format.DateTimeFormatter;
-import org.joda.time.format.ISODateTimeFormat;
 
 import com.fasterxml.jackson.core.*;
 import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.datatype.joda.cfg.FormatConfig;
+import com.fasterxml.jackson.datatype.joda.cfg.JacksonJodaDateFormat;
 
 public class LocalTimeDeserializer
-    extends JodaDeserializerBase<LocalTime>
+    extends JodaDateDeserializerBase<LocalTime>
 {
     private static final long serialVersionUID = 1L;
 
-    final static DateTimeFormatter parser = ISODateTimeFormat.localTimeParser();
+    public LocalTimeDeserializer() {
+        this(FormatConfig.DEFAULT_LOCAL_TIMEONLY_PARSER);
+    }
 
-    public LocalTimeDeserializer() { super(LocalTime.class); }
+    public LocalTimeDeserializer(JacksonJodaDateFormat format) {
+        super(LocalTime.class, format);
+    }
 
     @Override
-    public LocalTime deserialize(JsonParser jp, DeserializationContext ctxt)
+    public JodaDateDeserializerBase<?> withFormat(JacksonJodaDateFormat format) {
+        return new LocalTimeDeserializer(format);
+    }
+
+    @Override
+    public LocalTime deserialize(JsonParser p, DeserializationContext ctxt)
         throws IOException
     {
-        switch (jp.getCurrentToken()) {
+        switch (p.getCurrentToken()) {
         case START_ARRAY:
             // [HH,MM,ss,ms?]
-            if (jp.isExpectedStartArrayToken()) {
-                jp.nextToken(); // VALUE_NUMBER_INT 
-                int hour = jp.getIntValue(); 
-                jp.nextToken(); // VALUE_NUMBER_INT
-                int minute = jp.getIntValue();
-                jp.nextToken(); // VALUE_NUMBER_INT
-                int second = jp.getIntValue();
-                jp.nextToken(); // VALUE_NUMBER_INT | END_ARRAY
+            if (p.isExpectedStartArrayToken()) {
+                p.nextToken(); // VALUE_NUMBER_INT 
+                int hour = p.getIntValue(); 
+                p.nextToken(); // VALUE_NUMBER_INT
+                int minute = p.getIntValue();
+                p.nextToken(); // VALUE_NUMBER_INT
+                int second = p.getIntValue();
+                p.nextToken(); // VALUE_NUMBER_INT | END_ARRAY
                 int millis = 0;
-                if (jp.getCurrentToken() != JsonToken.END_ARRAY) {
-                    millis = jp.getIntValue();
-                    jp.nextToken(); // END_ARRAY?
+                if (p.getCurrentToken() != JsonToken.END_ARRAY) {
+                    millis = p.getIntValue();
+                    p.nextToken(); // END_ARRAY?
                 }
-                if (jp.getCurrentToken() != JsonToken.END_ARRAY) {
-                    throw ctxt.wrongTokenException(jp, JsonToken.END_ARRAY, "after LocalTime ints");
+                if (p.getCurrentToken() != JsonToken.END_ARRAY) {
+                    throw ctxt.wrongTokenException(p, JsonToken.END_ARRAY, "after LocalTime ints");
                 }
                 return new LocalTime(hour, minute, second, millis);
             }
             break;
         case VALUE_NUMBER_INT:
-            return new LocalTime(jp.getLongValue());            
+            return new LocalTime(p.getLongValue());            
         case VALUE_STRING:
-            String str = jp.getText().trim();
-            if (str.length() == 0) { // [JACKSON-360]
-                return null;
-            }
-            return parser.parseLocalTime(str);
+            String str = p.getText().trim();
+            return (str.length() == 0) ? null
+                    : _format.createParser(ctxt).parseLocalTime(str);
         default:
         }
-        throw ctxt.wrongTokenException(jp, JsonToken.START_ARRAY, "expected JSON Array, String or Number");
+        throw ctxt.wrongTokenException(p, JsonToken.START_ARRAY, "expected JSON Array, String or Number");
     }
 }
