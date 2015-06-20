@@ -9,9 +9,7 @@ import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.DeserializationContext;
 
 /**
- * Deserializes Joda {@link DateTimeZone}.
- * Until https://jira.codehaus.org/browse/JACKSON-909 is fixed, here's my take.
- * @author ceefour
+ * Deserializer for Joda {@link DateTimeZone}.
  */
 public class DateTimeZoneDeserializer extends JodaDeserializerBase<DateTimeZone>
 {
@@ -20,16 +18,16 @@ public class DateTimeZoneDeserializer extends JodaDeserializerBase<DateTimeZone>
     public DateTimeZoneDeserializer() { super(DateTimeZone.class); }
 
     @Override
-    public DateTimeZone deserialize(JsonParser jp, DeserializationContext ctxt)
+    public DateTimeZone deserialize(JsonParser p, DeserializationContext ctxt)
         throws IOException
     {
-        JsonToken t = jp.getCurrentToken();
+        JsonToken t = p.getCurrentToken();
         if (t == JsonToken.VALUE_NUMBER_INT) {
             // for fun let's allow use of offsets...
-            return DateTimeZone.forOffsetHours(jp.getIntValue());
+            return DateTimeZone.forOffsetHours(p.getIntValue());
         }
         if (t == JsonToken.VALUE_STRING) {
-            return DateTimeZone.forID(jp.getText().trim());
+            return DateTimeZone.forID(p.getText().trim());
         }
         throw ctxt.mappingException(DateTimeZone.class, JsonToken.VALUE_STRING);
     }

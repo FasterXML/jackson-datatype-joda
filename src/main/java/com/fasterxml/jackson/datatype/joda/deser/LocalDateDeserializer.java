@@ -3,31 +3,40 @@ package com.fasterxml.jackson.datatype.joda.deser;
 import java.io.IOException;
 
 import org.joda.time.LocalDate;
-import org.joda.time.format.DateTimeFormatter;
-import org.joda.time.format.ISODateTimeFormat;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.datatype.joda.cfg.FormatConfig;
+import com.fasterxml.jackson.datatype.joda.cfg.JacksonJodaDateFormat;
 
 public class LocalDateDeserializer
-    extends JodaDeserializerBase<LocalDate>
+extends JodaDateDeserializerBase<LocalDate>
 {
     private static final long serialVersionUID = 1L;
 
-    final static DateTimeFormatter parser = ISODateTimeFormat.localDateParser();
+    public LocalDateDeserializer() {
+        this(FormatConfig.DEFAULT_LOCAL_DATEONLY_FORMAT);
+    }
+    
+    public LocalDateDeserializer(JacksonJodaDateFormat format) {
+        super(LocalDate.class, format);
+    }
 
-    public LocalDateDeserializer() { super(LocalDate.class); }
+    @Override
+    public JodaDateDeserializerBase<?> withFormat(JacksonJodaDateFormat format) {
+        return new LocalDateDeserializer(format);
+    }
 
     @Override
     public LocalDate deserialize(JsonParser p, DeserializationContext ctxt) throws IOException
     {
         if (p.getCurrentToken() == JsonToken.VALUE_STRING) {
             String str = p.getText().trim();
-            if (str.length() == 0) { // [JACKSON-360]
+            if (str.length() == 0) {
                 return null;
             }
-            return parser.parseLocalDate(str);
+            return _format.createParser(ctxt).parseLocalDate(str);
         }
         if (p.getCurrentToken() == JsonToken.VALUE_NUMBER_INT) {
             return new LocalDate(p.getLongValue());            

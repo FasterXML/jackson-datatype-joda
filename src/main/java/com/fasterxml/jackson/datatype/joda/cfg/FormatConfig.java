@@ -28,7 +28,7 @@ public class FormatConfig
     public final static DateTimeFormatter DEFAULT_JODA_DATETIME_FORMAT
         = ISODateTimeFormat.dateTime().withZoneUTC();
 
-    protected final static PeriodFormatter DEFAULT_JODA_PERIOD_FORMAT
+    public final static PeriodFormatter DEFAULT_JODA_PERIOD_FORMAT
         = ISOPeriodFormat.standard();
     
     // Matching wrappers for more information needed with formatter
@@ -53,6 +53,7 @@ public class FormatConfig
         = new JacksonJodaDateFormat(FormatConfig.DEFAULT_JODA_DATEONLY_FORMAT
              .withZone(DateTimeZone.getDefault())
                 );
+//  final static DateTimeFormatter parser = ISODateTimeFormat.localDateOptionalTimeParser();
 
     public final static JacksonJodaDateFormat DEFAULT_LOCAL_TIMEONLY_FORMAT
         = new JacksonJodaDateFormat(FormatConfig.DEFAULT_JODA_TIMEONLY_FORMAT
