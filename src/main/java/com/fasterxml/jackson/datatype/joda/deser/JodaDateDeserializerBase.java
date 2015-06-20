@@ -20,7 +20,7 @@ public abstract class JodaDateDeserializerBase<T>
 
     protected final JacksonJodaDateFormat _format;
 
-    protected JodaDateDeserializerBase(Class<T> type, JacksonJodaDateFormat format)
+    protected JodaDateDeserializerBase(Class<?> type, JacksonJodaDateFormat format)
     {
         super(type);
         _format = format;

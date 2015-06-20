@@ -11,8 +11,9 @@ import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.datatype.joda.cfg.FormatConfig;
 import com.fasterxml.jackson.datatype.joda.cfg.JacksonJodaDateFormat;
 
-public class DateMidnightDeserializer extends
-        JodaDateDeserializerBase<DateMidnight> {
+public class DateMidnightDeserializer
+    extends JodaDateDeserializerBase<DateMidnight>
+{
     private static final long serialVersionUID = 1L;
 
     // final static DateTimeFormatter parser =
@@ -57,7 +58,7 @@ public class DateMidnightDeserializer extends
             if (str.length() == 0) { // [JACKSON-360]
                 return null;
             }
-            LocalDate local = _format.createFormatter(ctxt).parseLocalDate(str);
+            LocalDate local = _format.createParser(ctxt).parseLocalDate(str);
             if (local == null) {
                 return null;
             }

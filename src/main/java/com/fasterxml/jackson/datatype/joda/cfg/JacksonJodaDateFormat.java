@@ -7,7 +7,9 @@ import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
-import com.fasterxml.jackson.databind.DatabindContext;
+import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.SerializerProvider;
 
 /**
  * Simple container used to encapsulate (some of) gory details of
@@ -120,32 +122,53 @@ public class JacksonJodaDateFormat extends JacksonJodaFormatBase
     public DateTimeFormatter rawFormatter() {
         return _formatter;
     }
-    
-    public DateTimeFormatter createFormatter(DatabindContext provider)
-    {
-        DateTimeFormatter formatter = createFormatterWithLocale(provider);
 
+    public DateTimeFormatter createFormatter(SerializerProvider ctxt)
+    {
+        DateTimeFormatter formatter = createFormatterWithLocale(ctxt);
         if (!_explicitTimezone) {
-            TimeZone tz = provider.getTimeZone();
+            TimeZone tz = ctxt.getTimeZone();
             if (tz != null && !tz.equals(_jdkTimezone)) {
                 formatter = formatter.withZone(DateTimeZone.forTimeZone(tz));
             }
         }
-        
         return formatter;
     }
 
-    public DateTimeFormatter createFormatterWithLocale(DatabindContext provider)
+    public DateTimeFormatter createFormatterWithLocale(SerializerProvider ctxt)
     {
         DateTimeFormatter formatter = _formatter;
-
         if (!_explicitLocale) {
-            Locale loc = provider.getLocale();
+            Locale loc = ctxt.getLocale();
             if (loc != null && !loc.equals(_locale)) {
                 formatter = formatter.withLocale(loc);
             }
         }
+        return formatter;
+    }
 
+    /**
+     * Accessor used during deserialization.
+     */
+    public DateTimeFormatter createParser(DeserializationContext ctxt)
+    {
+        DateTimeFormatter formatter = _formatter;
+        if (!_explicitLocale) {
+            Locale loc = ctxt.getLocale();
+            if (loc != null && !loc.equals(_locale)) {
+                formatter = formatter.withLocale(loc);
+            }
+        }
+        if (!_explicitTimezone) {
+            if (ctxt.isEnabled(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE)) {
+                TimeZone tz = ctxt.getTimeZone();
+                if (tz != null && !tz.equals(_jdkTimezone)) {
+                    formatter = formatter.withZone(DateTimeZone.forTimeZone(tz));
+                }
+            } else {
+                formatter = formatter.withOffsetParsed();
+            }
+        }
         return formatter;
     }
     

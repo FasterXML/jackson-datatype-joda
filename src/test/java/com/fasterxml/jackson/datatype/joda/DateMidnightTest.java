@@ -3,8 +3,6 @@ package com.fasterxml.jackson.datatype.joda;
 import java.io.IOException;
 
 import org.joda.time.DateMidnight;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;

@@ -2,16 +2,14 @@ package com.fasterxml.jackson.datatype.joda;
 
 import java.io.IOException;
 
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
+import org.joda.time.*;
 
 import com.fasterxml.jackson.annotation.*;
-
 import com.fasterxml.jackson.databind.*;
 
 public class DateTimeTest extends JodaTestBase
 {
-    private static class DateAsText {
+    static class DateAsText {
         @JsonFormat(shape=JsonFormat.Shape.STRING)
         public DateTime date;
 
@@ -20,7 +18,7 @@ public class DateTimeTest extends JodaTestBase
         }
     }
 
-    private static class CustomDate {
+    static class CustomDate {
         // note: 'SS' means 'short representation'
         @JsonFormat(shape=JsonFormat.Shape.STRING, pattern="SS")
         public DateTime date;
@@ -29,7 +27,28 @@ public class DateTimeTest extends JodaTestBase
             date = d;
         }
     }
-    
+
+    static class EuroDate {
+        @JsonFormat(shape=JsonFormat.Shape.STRING, pattern="dd.MM.YYYY' 'HH:mm")
+        public DateTime date;
+
+        public EuroDate() { }
+        public EuroDate(DateTime d) {
+            date = d;
+        }
+    }
+
+    static class Beanie {
+        public final DateTime jodaDateTime;
+        public final java.util.Date javaUtilDate;
+        @JsonCreator
+        public Beanie(@JsonProperty("jodaDateTime") DateTime jodaDateTime,
+            @JsonProperty("javaUtilDate") java.util.Date javaUtilDate) {
+          this.jodaDateTime = jodaDateTime;
+          this.javaUtilDate = javaUtilDate;
+        }
+    }
+
     @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.WRAPPER_ARRAY, property = "@class")
     private static interface TypeInfoMixIn {
     }
@@ -98,17 +117,6 @@ public class DateTimeTest extends JodaTestBase
                 m.writeValueAsString(dt));
     }
 
-    static class Beanie {
-        public final DateTime jodaDateTime;
-        public final java.util.Date javaUtilDate;
-        @JsonCreator
-        public Beanie(@JsonProperty("jodaDateTime") DateTime jodaDateTime,
-            @JsonProperty("javaUtilDate") java.util.Date javaUtilDate) {
-          this.jodaDateTime = jodaDateTime;
-          this.javaUtilDate = javaUtilDate;
-        }
-    }
-
     public void testIso8601ThroughJoda() throws Exception {
         ObjectMapper mapper = new ObjectMapper()
             .registerModule(new JodaModule())
@@ -133,4 +141,22 @@ public class DateTimeTest extends JodaTestBase
         // note: timezone/offset may vary, shouldn't check:
 //        assertEquals(expectedBean.jodaDateTime, actualBean.jodaDateTime);
       }
+
+    public void testCustomFormat() throws Exception
+    {
+        String STR = "2015-06-19T19:05Z";
+        String ALT = "19.06.2015 19:05";
+
+        final DateTime inputDate = new DateTime(STR);
+        EuroDate input = new EuroDate(inputDate);
+        String json = MAPPER.writeValueAsString(input);
+
+        if (!json.contains(ALT)) {
+            fail("Should contain '"+ALT+"', did not: "+json);
+        }
+        EuroDate output = MAPPER.readValue(json, EuroDate.class);
+        assertNotNull(output.date);
+        // Timezone may (and most likely will) differ so...
+        assertEquals(inputDate.getMillis(), output.date.getMillis());
+    }
 }

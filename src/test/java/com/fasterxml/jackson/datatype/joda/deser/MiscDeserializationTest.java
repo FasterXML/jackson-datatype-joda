@@ -60,7 +60,6 @@ public class MiscDeserializationTest extends JodaTestBase
         assertNotNull(date);
         assertEquals("1972-12-28T12:00:01.000Z", date.toString());
 
-        // since 1.6.1, for [JACKSON-360]
         assertNull(MAPPER.readValue(quote(""), ReadableDateTime.class));
     }
 
@@ -69,7 +68,8 @@ public class MiscDeserializationTest extends JodaTestBase
         TimeZone timeZone = TimeZone.getTimeZone("GMT-6");
         DateTimeZone dateTimeZone = DateTimeZone.forTimeZone(timeZone);
         MAPPER.setTimeZone(timeZone);
-        ReadableDateTime date = MAPPER.readValue(quote("1972-12-28T12:00:01.000-0600"), ReadableDateTime.class);
+        ReadableDateTime date = MAPPER.readValue(quote("1972-12-28T12:00:01.000-0600"),
+                ReadableDateTime.class);
         assertNotNull(date);
         assertEquals("1972-12-28T12:00:01.000-06:00", date.toString());
         assertEquals(dateTimeZone, date.getZone());
@@ -78,7 +78,6 @@ public class MiscDeserializationTest extends JodaTestBase
         ReadableDateTime otherTzDate = MAPPER.readValue(quote("1972-12-28T12:00:01.000-0700"), ReadableDateTime.class);
         assertEquals(dateTimeZone, otherTzDate.getZone());
 
-        // since 1.6.1, for [JACKSON-360]
         assertNull(MAPPER.readValue(quote(""), ReadableDateTime.class));
     }
 
@@ -86,7 +85,8 @@ public class MiscDeserializationTest extends JodaTestBase
         ObjectMapper mapper = jodaMapper();
         mapper.disable(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE);
         mapper.setTimeZone(TimeZone.getTimeZone("GMT-6"));
-        ReadableDateTime date = mapper.readValue(quote("2014-01-20T08:59:01.000-0500"), ReadableDateTime.class);
+        ReadableDateTime date = mapper.readValue(quote("2014-01-20T08:59:01.000-0500"),
+                ReadableDateTime.class);
         assertEquals(DateTimeZone.forOffsetHours(-5), date.getZone());
     }
 
@@ -95,7 +95,6 @@ public class MiscDeserializationTest extends JodaTestBase
         assertNotNull(date);
         assertEquals("1972-12-28T12:00:01.000Z", date.toString());
 
-        // since 1.6.1, for [JACKSON-360]
         assertNull(MAPPER.readValue(quote(""), ReadableInstant.class));
     }
 
