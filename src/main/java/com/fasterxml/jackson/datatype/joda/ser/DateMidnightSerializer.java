@@ -4,8 +4,8 @@ import java.io.IOException;
 
 import org.joda.time.DateMidnight;
 
-import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.core.JsonGenerator;
+
 import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.datatype.joda.cfg.FormatConfig;
 import com.fasterxml.jackson.datatype.joda.cfg.JacksonJodaDateFormat;
@@ -33,8 +33,7 @@ public final class DateMidnightSerializer
     }
 
     @Override
-    public void serialize(DateMidnight value, JsonGenerator jgen, SerializerProvider provider)
-        throws IOException, JsonGenerationException
+    public void serialize(DateMidnight value, JsonGenerator jgen, SerializerProvider provider) throws IOException
     {
         if (_useTimestamp(provider)) {
             // same as with other date-only values

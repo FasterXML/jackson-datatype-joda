@@ -22,6 +22,10 @@ import java.util.TimeZone;
  */
 public class MiscDeserializationTest extends JodaTestBase
 {
+    @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.WRAPPER_ARRAY, property = "@class")
+    private static interface ObjectConfiguration {
+    }
+    
     /*
     /**********************************************************
     /* Tests for DateTime (and closely related)
@@ -104,46 +108,6 @@ public class MiscDeserializationTest extends JodaTestBase
         assertEquals("1972-12-28T12:00:01.000Z", date.toString());
     }
 
-    /*
-    /**********************************************************
-    /* Tests for DateMidnight type
-    /**********************************************************
-     */
-
-    public void testDateMidnightDeser() throws IOException
-    {
-        // couple of acceptable formats, so:
-        DateMidnight date = MAPPER.readValue("[2001,5,25]", DateMidnight.class);
-        assertEquals(2001, date.getYear());
-        assertEquals(5, date.getMonthOfYear());
-        assertEquals(25, date.getDayOfMonth());
-
-        DateMidnight date2 = MAPPER.readValue(quote("2005-07-13"), DateMidnight.class);
-        assertEquals(2005, date2.getYear());
-        assertEquals(7, date2.getMonthOfYear());
-        assertEquals(13, date2.getDayOfMonth());
-
-        // since 1.6.1, for [JACKSON-360]
-        assertNull(MAPPER.readValue(quote(""), DateMidnight.class));
-    }
-
-    public void testDateMidnightDeserWithTypeInfo() throws IOException
-    {
-        ObjectMapper mapper = jodaMapper();
-        mapper.addMixIn(DateMidnight.class, ObjectConfiguration.class);
-
-        // couple of acceptable formats, so:
-        DateMidnight date = mapper.readValue("[\"org.joda.time.DateMidnight\",[2001,5,25]]", DateMidnight.class);
-        assertEquals(2001, date.getYear());
-        assertEquals(5, date.getMonthOfYear());
-        assertEquals(25, date.getDayOfMonth());
-
-        DateMidnight date2 = mapper.readValue("[\"org.joda.time.DateMidnight\",\"2005-07-13\"]", DateMidnight.class);
-        assertEquals(2005, date2.getYear());
-        assertEquals(7, date2.getMonthOfYear());
-        assertEquals(13, date2.getDayOfMonth());
-    }
-    
     /*
     /**********************************************************
     /* Tests for LocalDate type
@@ -411,12 +375,6 @@ public class MiscDeserializationTest extends JodaTestBase
         Duration d = mapper.readValue("[\"org.joda.time.Duration\",1234]", Duration.class);
         assertEquals(1234, d.getMillis());
     }
-
-    @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.WRAPPER_ARRAY, property = "@class")
-    private static interface ObjectConfiguration {
-    }
-
-
 
     public void testDeserInstantFromNumber() throws IOException
     {

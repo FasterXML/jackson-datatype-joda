@@ -7,7 +7,7 @@ import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
-import com.fasterxml.jackson.databind.SerializerProvider;
+import com.fasterxml.jackson.databind.DatabindContext;
 
 /**
  * Simple container used to encapsulate (some of) gory details of
@@ -91,6 +91,7 @@ public class JacksonJodaDateFormat extends JacksonJodaFormatBase
             formatter = formatter.withLocale(_locale);
         }
         formatter = formatter.withZone(_formatter.getZone());
+        
         return new JacksonJodaDateFormat(this, formatter);
     }
 
@@ -114,7 +115,11 @@ public class JacksonJodaDateFormat extends JacksonJodaFormatBase
     /**********************************************************
      */
 
-    public DateTimeFormatter createFormatter(SerializerProvider provider)
+    public DateTimeFormatter rawFormatter() {
+        return _formatter;
+    }
+    
+    public DateTimeFormatter createFormatter(DatabindContext provider)
     {
         DateTimeFormatter formatter = createFormatterWithLocale(provider);
 
@@ -128,7 +133,7 @@ public class JacksonJodaDateFormat extends JacksonJodaFormatBase
         return formatter;
     }
 
-    public DateTimeFormatter createFormatterWithLocale(SerializerProvider provider)
+    public DateTimeFormatter createFormatterWithLocale(DatabindContext provider)
     {
         DateTimeFormatter formatter = _formatter;
 
@@ -154,5 +159,11 @@ public class JacksonJodaDateFormat extends JacksonJodaFormatBase
         }
         return (JODA_STYLE_CHARS.indexOf(formatStr.charAt(0)) >= 0)
                 && (JODA_STYLE_CHARS.indexOf(formatStr.charAt(0)) >= 0);
+    }
+
+    @Override
+    public String toString() {
+        return String.format("[JacksonJodaFormat, explicitTZ? %s, JDK tz = %s, formatter = %s]",
+                _explicitTimezone, _jdkTimezone.getID(), _formatter);
     }
 }
