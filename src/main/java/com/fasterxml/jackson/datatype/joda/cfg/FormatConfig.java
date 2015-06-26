@@ -17,22 +17,6 @@ import org.joda.time.format.PeriodFormatter;
  */
 public class FormatConfig
 {
-    // Actual Joda formatters
-
-    /*
-    public final static DateTimeFormatter DEFAULT_JODA_DATEONLY_FORMAT
-        = ;
-
-    public final static DateTimeFormatter DEFAULT_JODA_TIMEONLY_FORMAT
-        = ;
-
-    public final static DateTimeFormatter DEFAULT_JODA_DATETIME_FORMAT
-        = ;
-
-    public final static PeriodFormatter DEFAULT_JODA_PERIOD_FORMAT
-        =
-        */
-    
     // Matching wrappers for more information needed with formatter
     
     public final static JacksonJodaDateFormat DEFAULT_DATEONLY_FORMAT
