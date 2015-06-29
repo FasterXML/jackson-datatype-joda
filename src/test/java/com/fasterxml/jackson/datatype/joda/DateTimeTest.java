@@ -20,7 +20,7 @@ public class DateTimeTest extends JodaTestBase
 
     static class CustomDate {
         // note: 'SS' means 'short representation'
-        @JsonFormat(shape=JsonFormat.Shape.STRING, pattern="SS")
+        @JsonFormat(shape=JsonFormat.Shape.STRING, pattern="SS", locale="en")
         public DateTime date;
 
         public CustomDate(DateTime d) {
