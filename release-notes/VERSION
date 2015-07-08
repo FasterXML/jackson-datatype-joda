@@ -11,6 +11,7 @@ Project: jackson-datatype-joda
 #62: Allow use of numbers-as-Strings for LocalDate (in array)
  (contributed by Michal Z)
 #64: Support `@JsonFormat(pattern=...)` for deserialization
+#66: Support `SerializationFeature.WRITE_DATES_WITH_ZONE_ID` 
 
 2.5.4 (not yet released)
 

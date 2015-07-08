@@ -52,9 +52,45 @@ public class DateTimeDeserializer
             if (str.length() == 0) { // [JACKSON-360]
                 return null;
             }
+            // 08-Jul-2015, tatu: as per [datatype-joda#44], optional TimeZone inclusion
+            // NOTE: on/off feature only for serialization; on deser should accept both
+            int ix = str.indexOf('[');
+            if (ix > 0) {
+                int ix2 = str.lastIndexOf(']');
+                String tzId = (ix2 < ix)
+                        ? str.substring(ix+1)
+                        : str.substring(ix+1, ix2);
+                DateTimeZone tz;
+                try {
+                    tz = DateTimeZone.forID(tzId);
+                } catch (IllegalArgumentException e) {
+                    throw ctxt.mappingException(String.format("Unknown DateTimeZone id '%s'", tzId));
+                }
+                str = str.substring(0, ix);
+
+                // One more thing; do we have plain timestamp?
+                if (_allDigits(str)) {
+                    return new DateTime(Long.parseLong(str), tz);
+                }
+                return _format.createParser(ctxt)
+                        .parseDateTime(str)
+                        .withZone(tz);
+            }
+            
             // Not sure if it should use timezone or not...
             return _format.createParser(ctxt).parseDateTime(str);
         }
         throw ctxt.mappingException(handledType());
+    }
+
+    private static boolean _allDigits(String str)
+    {
+        for (int i = 0, len = str.length(); i < len; ++i) {
+            int c = str.charAt(i);
+            if (c > '9' | c < '0') {
+                return false;
+            }
+        }
+        return true;
     }
 }

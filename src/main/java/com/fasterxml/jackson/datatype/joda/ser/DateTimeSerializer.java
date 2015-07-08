@@ -35,10 +35,29 @@ public final class DateTimeSerializer
     @Override
     public void serialize(DateTime value, JsonGenerator gen, SerializerProvider provider) throws IOException
     {
-        if (_useTimestamp(provider)) {
-            gen.writeNumber(value.getMillis());
+        // First: simple, non-timezone-included output
+        if (!provider.isEnabled(SerializationFeature.WRITE_DATES_WITH_ZONE_ID)) {
+            if (_useTimestamp(provider)) {
+                gen.writeNumber(value.getMillis());
+            } else {
+                gen.writeString(_format.createFormatter(provider).print(value));
+            }
         } else {
-            gen.writeString(_format.createFormatter(provider).print(value));
+            // and then as per [datatype-joda#44], optional TimeZone inclusion
+            
+            StringBuilder sb;
+            
+            if (_useTimestamp(provider)) {
+                sb = new StringBuilder(20)
+                    .append(value.getMillis());
+            } else {
+                sb = new StringBuilder(40)
+                    .append(_format.createFormatter(provider).print(value));
+            }
+            sb = sb.append('[')
+                    .append(value.getZone())
+                    .append(']');
+            gen.writeString(sb.toString());
         }
     }
 }
