@@ -5,8 +5,9 @@ import java.io.IOException;
 import org.joda.time.Interval;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-
-import com.fasterxml.jackson.databind.*;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
+import com.fasterxml.jackson.databind.SerializationFeature;
 
 public class IntervalSerializationTest extends JodaTestBase
 {
@@ -47,5 +48,4 @@ public class IntervalSerializationTest extends JodaTestBase
         assertEquals("[\"org.joda.time.Interval\"," + quote("1396439982-1396440001") + "]",
                 mapper.writeValueAsString(interval));
     }
-
 }

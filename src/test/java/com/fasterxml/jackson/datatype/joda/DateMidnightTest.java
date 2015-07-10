@@ -1,6 +1,7 @@
 package com.fasterxml.jackson.datatype.joda;
 
 import java.io.IOException;
+import java.util.TimeZone;
 
 import org.joda.time.DateMidnight;
 
@@ -35,6 +36,40 @@ public class DateMidnightTest extends JodaTestBase
     /**********************************************************
      */
 
+    public void testDateMidnightDeserWithTimeZone() throws IOException
+    {
+    	MAPPER.setTimeZone(TimeZone.getTimeZone("Europe/Paris"));
+        // couple of acceptable formats, so:
+        DateMidnight date = MAPPER.readValue("[2001,5,25]", DateMidnight.class);
+        assertEquals(2001, date.getYear());
+        assertEquals(5, date.getMonthOfYear());
+        assertEquals(25, date.getDayOfMonth());
+
+        DateMidnight date2 = MAPPER.readValue(quote("2005-07-13"), DateMidnight.class);
+        assertEquals(2005, date2.getYear());
+        assertEquals(7, date2.getMonthOfYear());
+        assertEquals(13, date2.getDayOfMonth());
+
+        // since 1.6.1, for [JACKSON-360]
+        assertNull(MAPPER.readValue(quote(""), DateMidnight.class));
+
+        
+    	MAPPER.setTimeZone(TimeZone.getTimeZone("America/Los_Angeles"));
+        // couple of acceptable formats, so:
+        date = MAPPER.readValue("[2001,5,25]", DateMidnight.class);
+        assertEquals(2001, date.getYear());
+        assertEquals(5, date.getMonthOfYear());
+        assertEquals(25, date.getDayOfMonth());
+
+        date2 = MAPPER.readValue(quote("2005-07-13"), DateMidnight.class);
+        assertEquals(2005, date2.getYear());
+        assertEquals(7, date2.getMonthOfYear());
+        assertEquals(13, date2.getDayOfMonth());
+
+        // since 1.6.1, for [JACKSON-360]
+        assertNull(MAPPER.readValue(quote(""), DateMidnight.class));
+    }
+    
     public void testDateMidnightDeser() throws IOException
     {
         // couple of acceptable formats, so:

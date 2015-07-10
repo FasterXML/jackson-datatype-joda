@@ -1,14 +1,18 @@
 package com.fasterxml.jackson.datatype.joda.deser;
 
-import com.fasterxml.jackson.core.*;
-import com.fasterxml.jackson.databind.*;
+import java.io.IOException;
+
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
+import org.joda.time.ReadableDateTime;
+import org.joda.time.ReadableInstant;
+
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonToken;
+import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.datatype.joda.cfg.FormatConfig;
 import com.fasterxml.jackson.datatype.joda.cfg.JacksonJodaDateFormat;
-
-import org.joda.time.*;
-
-import java.io.IOException;
-import java.util.TimeZone;
 
 /**
  * Basic deserializer for {@link ReadableDateTime} and its subtypes.
@@ -43,9 +47,8 @@ public class DateTimeDeserializer
         JsonToken t = p.getCurrentToken();
 
         if (t == JsonToken.VALUE_NUMBER_INT) {
-            TimeZone tz = ctxt.getTimeZone();
-            DateTimeZone dtz = (tz == null) ? DateTimeZone.UTC : DateTimeZone.forTimeZone(tz);
-            return new DateTime(p.getLongValue(), dtz);
+            DateTimeZone dtz = getDateTimeZone(ctxt);
+            return new DateTime(p.getLongValue(), dtz == null ? DateTimeZone.UTC : dtz);
         }
         if (t == JsonToken.VALUE_STRING) {
             String str = p.getText().trim();

@@ -48,7 +48,7 @@ public class DateMidnightDeserializer
                 throw ctxt.wrongTokenException(p, JsonToken.END_ARRAY,
                         "after DateMidnight ints");
             }
-            return new DateMidnight(year, month, day);
+            return new DateMidnight(year, month, day, getDateTimeZone(ctxt));
         }
         switch (p.getCurrentToken()) {
         case VALUE_NUMBER_INT:

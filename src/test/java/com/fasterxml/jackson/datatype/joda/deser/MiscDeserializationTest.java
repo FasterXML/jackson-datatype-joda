@@ -1,19 +1,32 @@
 package com.fasterxml.jackson.datatype.joda.deser;
 
+import java.io.IOException;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+import java.util.Map;
+import java.util.TimeZone;
+
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
+import org.joda.time.Duration;
+import org.joda.time.Instant;
+import org.joda.time.Interval;
+import org.joda.time.LocalDate;
+import org.joda.time.LocalDateTime;
+import org.joda.time.LocalTime;
+import org.joda.time.MonthDay;
+import org.joda.time.Period;
+import org.joda.time.ReadableDateTime;
+import org.joda.time.ReadableInstant;
+import org.joda.time.YearMonth;
+import org.joda.time.chrono.ISOChronology;
+
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.joda.JodaTestBase;
-
-import org.joda.time.*;
-
-import java.io.IOException;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
-import java.util.Map;
-import java.util.TimeZone;
 
 /**
  * Unit tests for verifying limited interoperability for Joda time.
@@ -113,6 +126,32 @@ public class MiscDeserializationTest extends JodaTestBase
     /**********************************************************
      */
 
+	/**
+	 * LocalDate is supposed to be without timezone, so it doesn't matter how it is set.
+	 */
+	public void testLocalDateDeserWithTimeZone() throws IOException 
+	{
+		MAPPER.setTimeZone(TimeZone.getTimeZone("America/Los_Angeles"));
+
+		// couple of acceptable formats, so:
+		LocalDate date = MAPPER.readValue("[2001,5,25]", LocalDate.class);
+		assertEquals(2001, date.getYear());
+		assertEquals(5, date.getMonthOfYear());
+		assertEquals(25, date.getDayOfMonth());
+		assertEquals(ISOChronology.getInstanceUTC(), date.getChronology());
+
+		MAPPER.setTimeZone(TimeZone.getTimeZone("Asia/Taipei"));
+		LocalDate date2 = MAPPER
+				.readValue(quote("2005-07-13"), LocalDate.class);
+		assertEquals(2005, date2.getYear());
+		assertEquals(7, date2.getMonthOfYear());
+		assertEquals(13, date2.getDayOfMonth());
+		assertEquals(ISOChronology.getInstanceUTC(), date.getChronology());
+
+		// since 1.6.1, for [JACKSON-360]
+		assertNull(MAPPER.readValue(quote(""), LocalDate.class));
+	}
+    
     public void testLocalDateDeser() throws IOException
     {
         // couple of acceptable formats, so:
@@ -216,6 +255,25 @@ public class MiscDeserializationTest extends JodaTestBase
         assertEquals(1396440001, interval.getEndMillis());
     }
 
+    public void testIntervalDeserWithTimeZone() throws IOException
+    {
+    	MAPPER.setTimeZone(TimeZone.getTimeZone("Europe/Paris"));
+
+        Interval interval = MAPPER.readValue(quote("1396439982-1396440001"), Interval.class);
+        assertEquals(1396439982, interval.getStartMillis());
+        assertEquals(1396440001, interval.getEndMillis());
+        assertEquals(ISOChronology.getInstance(DateTimeZone.forID("Europe/Paris")), interval.getChronology());
+
+    	MAPPER.setTimeZone(TimeZone.getTimeZone("America/Los_Angeles"));
+
+        interval = MAPPER.readValue(quote("-100-1396440001"), Interval.class);
+        assertEquals(-100, interval.getStartMillis());
+        assertEquals(1396440001, interval.getEndMillis());
+        assertEquals(ISOChronology.getInstance(DateTimeZone.forID("America/Los_Angeles")), interval.getChronology());
+
+    }
+
+    
     public void testIntervalDeserWithTypeInfo() throws IOException
     {
         ObjectMapper mapper = jodaMapper();
@@ -232,6 +290,39 @@ public class MiscDeserializationTest extends JodaTestBase
     /**********************************************************
      */
 
+
+    public void testLocalDateTimeDeserWithTimeZone() throws IOException
+    {
+        MAPPER.setTimeZone(TimeZone.getTimeZone("America/Los_Angeles"));
+        
+        // couple of acceptable formats again:
+        LocalDateTime date = MAPPER.readValue("[2001,5,25,10,15,30,37]", LocalDateTime.class);
+        assertEquals(2001, date.getYear());
+        assertEquals(5, date.getMonthOfYear());
+        assertEquals(25, date.getDayOfMonth());
+
+        assertEquals(10, date.getHourOfDay());
+        assertEquals(15, date.getMinuteOfHour());
+        assertEquals(30, date.getSecondOfMinute());
+        assertEquals(37, date.getMillisOfSecond());
+        assertEquals(ISOChronology.getInstanceUTC(), date.getChronology());
+
+        MAPPER.setTimeZone(TimeZone.getTimeZone("Asia/Taipei"));
+        LocalDateTime date2 = MAPPER.readValue(quote("2007-06-30T08:34:09.001"), LocalDateTime.class);
+        assertEquals(2007, date2.getYear());
+        assertEquals(6, date2.getMonthOfYear());
+        assertEquals(30, date2.getDayOfMonth());
+
+        assertEquals(8, date2.getHourOfDay());
+        assertEquals(34, date2.getMinuteOfHour());
+        assertEquals(9, date2.getSecondOfMinute());
+        assertEquals(1, date2.getMillisOfSecond());
+        assertEquals(ISOChronology.getInstanceUTC(), date.getChronology());
+        
+        // since 1.6.1, for [JACKSON-360]
+        assertNull(MAPPER.readValue(quote(""), LocalDateTime.class));
+    }
+    
     public void testLocalDateTimeDeser() throws IOException
     {
         // couple of acceptable formats again:
@@ -429,6 +520,17 @@ public class MiscDeserializationTest extends JodaTestBase
         assertTrue(map.containsKey(LocalDateTime.parse("2014-05-23T00:00:00.000")));
     }
 
+    public void testDeserMonthDayWithTimeZone() throws Exception
+    {
+        MAPPER.setTimeZone(TimeZone.getTimeZone("Europe/Paris"));
+        
+        String monthDayString = new MonthDay(7, 23).toString();
+        MonthDay monthDay = MAPPER.readValue(quote(monthDayString), MonthDay.class);
+        assertEquals(new MonthDay(7, 23), monthDay);
+        
+        assertEquals(ISOChronology.getInstanceUTC(), monthDay.getChronology());
+    }
+    
     public void testDeserMonthDay() throws Exception
     {
         String monthDayString = new MonthDay(7, 23).toString();
@@ -454,6 +556,16 @@ public class MiscDeserializationTest extends JodaTestBase
         }
     }
 
+    public void testDeserYearMonthWithTimeZone() throws Exception
+    {
+        MAPPER.setTimeZone(TimeZone.getTimeZone("America/Los_Angeles"));
+        
+        String yearMonthString = new YearMonth(2013, 8).toString();
+        YearMonth yearMonth = MAPPER.readValue(quote(yearMonthString), YearMonth.class);
+        assertEquals(new YearMonth(2013, 8), yearMonth);
+        assertEquals(ISOChronology.getInstanceUTC(), yearMonth.getChronology());
+    }
+    
     public void testDeserYearMonth() throws Exception
     {
         String yearMonthString = new YearMonth(2013, 8).toString();
