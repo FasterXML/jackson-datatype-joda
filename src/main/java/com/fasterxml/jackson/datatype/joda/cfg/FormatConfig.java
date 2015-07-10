@@ -1,10 +1,8 @@
 package com.fasterxml.jackson.datatype.joda.cfg;
 
 import org.joda.time.DateTimeZone;
-import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
 import org.joda.time.format.ISOPeriodFormat;
-import org.joda.time.format.PeriodFormatter;
 
 /**
  * Simple container class that holds both default formatter information

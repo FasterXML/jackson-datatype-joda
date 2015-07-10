@@ -53,6 +53,6 @@ public class IntervalDeserializer extends JodaDeserializerBase<Interval>
             throw JsonMappingException.from(jsonParser,
                     "Failed to parse number from '"+str+"' (full source String '"+v+"') to construct "+handledType().getName());
         }
-        return new Interval(start, end);
+        return new Interval(start, end, getDateTimeZone(deserializationContext));
     }
 }
