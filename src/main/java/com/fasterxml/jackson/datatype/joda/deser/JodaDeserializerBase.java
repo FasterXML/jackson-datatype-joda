@@ -19,7 +19,7 @@ abstract class JodaDeserializerBase<T> extends StdScalarDeserializer<T>
     }
     
     @Override
-    public Object deserializeWithType(JsonParser jp, DeserializationContext ctxt, TypeDeserializer typeDeserializer) throws IOException, JsonProcessingException {
-        return typeDeserializer.deserializeTypedFromAny(jp, ctxt);
+    public Object deserializeWithType(JsonParser p, DeserializationContext ctxt, TypeDeserializer typeDeserializer) throws IOException, JsonProcessingException {
+        return typeDeserializer.deserializeTypedFromAny(p, ctxt);
     }
 }

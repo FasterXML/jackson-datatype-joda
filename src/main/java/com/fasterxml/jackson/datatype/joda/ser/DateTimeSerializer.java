@@ -44,16 +44,21 @@ public final class DateTimeSerializer
             }
         } else {
             // and then as per [datatype-joda#44], optional TimeZone inclusion
-            
-            StringBuilder sb;
-            
             if (_useTimestamp(provider)) {
+                /* 12-Jul-2015, tatu: Initially planned to support "timestamp[zone-id]"
+                 *    format as well as textual, but since JSR-310 datatype (Java 8 datetime)
+                 *    does not support it, was left out of 2.6.
+                 */
+                /*
                 sb = new StringBuilder(20)
-                    .append(value.getMillis());
-            } else {
-                sb = new StringBuilder(40)
-                    .append(_format.createFormatter(provider).print(value));
+                .append(value.getMillis());
+                */
+
+                gen.writeNumber(value.getMillis());
+                return;
             }
+            StringBuilder sb = new StringBuilder(40)
+                    .append(_format.createFormatter(provider).print(value));
             sb = sb.append('[')
                     .append(value.getZone())
                     .append(']');

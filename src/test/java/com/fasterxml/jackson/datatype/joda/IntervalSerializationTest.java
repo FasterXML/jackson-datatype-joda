@@ -2,10 +2,11 @@ package com.fasterxml.jackson.datatype.joda;
 
 import java.io.IOException;
 
+import org.joda.time.DateTimeZone;
 import org.joda.time.Interval;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-
 import com.fasterxml.jackson.databind.*;
 
 public class IntervalSerializationTest extends JodaTestBase
@@ -14,18 +15,24 @@ public class IntervalSerializationTest extends JodaTestBase
     private static interface ObjectConfiguration {
     }
 
+    static class FormattedInterval
+    {
+        @JsonFormat(timezone="EST")
+        public Interval interval;
+    }
+    
+    /*
+    /**********************************************************
+    /* Test methods
+    /**********************************************************
+     */
+    
     private final ObjectMapper MAPPER = jodaMapper();
     {
         MAPPER.enable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
         MAPPER.enable(SerializationFeature.WRITE_DURATIONS_AS_TIMESTAMPS);
     }
     private final ObjectWriter WRITER = MAPPER.writer();
-
-    /*
-    /**********************************************************
-    /* Tests for Interval type
-    /**********************************************************
-     */
 
     public void testIntervalSerBasic() throws IOException
     {
@@ -48,4 +55,23 @@ public class IntervalSerializationTest extends JodaTestBase
                 mapper.writeValueAsString(interval));
     }
 
+    public void testWithTimeZoneOverride() throws Exception
+    {
+        Interval int1 = new Interval(1396439982, 1396440001);
+        FormattedInterval input = new FormattedInterval();
+        input.interval = int1;
+        String json = MAPPER.writeValueAsString(input);
+
+        FormattedInterval result = MAPPER.readValue(json, FormattedInterval.class);
+        assertNotNull(result);
+
+        // Ensure timezone sticks:
+        Interval resultInt = result.interval;
+        assertEquals(1396439982, resultInt.getStartMillis());
+        assertEquals(1396440001, resultInt.getEndMillis());
+
+        DateTimeZone resultTz = resultInt.getStart().getZone();
+        // Is this stable enough for testing?
+        assertEquals("America/New_York", resultTz.getID());
+    }
 }

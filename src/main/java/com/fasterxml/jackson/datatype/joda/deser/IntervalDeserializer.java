@@ -1,30 +1,38 @@
 package com.fasterxml.jackson.datatype.joda.deser;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.JsonToken;
-import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.JsonMappingException;
-
-import org.joda.time.Interval;
-
 import java.io.IOException;
 
-public class IntervalDeserializer extends JodaDeserializerBase<Interval>
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonProcessingException;
+
+import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.datatype.joda.cfg.FormatConfig;
+import com.fasterxml.jackson.datatype.joda.cfg.JacksonJodaDateFormat;
+
+import org.joda.time.*;
+
+public class IntervalDeserializer extends JodaDateDeserializerBase<Interval>
 {
     private static final long serialVersionUID = 1L;
 
     public IntervalDeserializer() {
-        super(Interval.class);
+        // NOTE: not currently used, but must pass something
+        this(FormatConfig.DEFAULT_DATETIME_FORMAT);
+    }
+
+    public IntervalDeserializer(JacksonJodaDateFormat format) {
+        super(Interval.class, format);
     }
 
     @Override
-    public Interval deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException, JsonProcessingException
+    public JodaDateDeserializerBase<?> withFormat(JacksonJodaDateFormat format) {
+        return new IntervalDeserializer(format);
+    }
+
+    @Override
+    public Interval deserialize(JsonParser jsonParser, DeserializationContext ctxt) throws IOException, JsonProcessingException
     {
-        JsonToken t = jsonParser.getCurrentToken();
-        if (t != JsonToken.VALUE_STRING) {
-            throw deserializationContext.mappingException("expected JSON String, got "+t);
-        }
         String v = jsonParser.getText().trim();
 
         /* 17-Nov-2014, tatu: Actually let's start with slash, instead of hyphen, because
@@ -36,23 +44,32 @@ public class IntervalDeserializer extends JodaDeserializerBase<Interval>
             index = v.indexOf('-', 1);
         }
         if (index < 0) {
-            throw deserializationContext.weirdStringException(v, handledType(), "no slash or hyphen found to separate start, end");
+            throw ctxt.weirdStringException(v, handledType(), "no slash or hyphen found to separate start, end");
         }
         long start, end;
         String str = v.substring(0, index);
+        Interval result;
 
         try {
             // !!! TODO: configurable formats...
             if (hasSlash) {
-                return Interval.parse(v);
+                result = Interval.parse(v);
+            } else {
+                start = Long.valueOf(str);
+                str = v.substring(index + 1);
+                end = Long.valueOf(str);
+                result = new Interval(start, end);
             }
-            start = Long.valueOf(str);
-            str = v.substring(index + 1);
-            end = Long.valueOf(str);
         } catch (NumberFormatException e) {
             throw JsonMappingException.from(jsonParser,
                     "Failed to parse number from '"+str+"' (full source String '"+v+"') to construct "+handledType().getName());
         }
-        return new Interval(start, end);
+        DateTimeZone tz = _format.getTimeZone();
+        if (tz != null) {
+            if (!tz.equals(result.getStart().getZone())) {
+                result = new Interval(result.getStartMillis(), result.getEndMillis(), tz);
+            }
+        }
+        return result;
     }
 }

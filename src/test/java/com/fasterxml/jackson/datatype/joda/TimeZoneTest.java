@@ -54,9 +54,14 @@ public class TimeZoneTest extends JodaTestBase
         // then with zone id
 
         w = w.with(SerializationFeature.WRITE_DATES_WITH_ZONE_ID);
+
+        // 12-Jul-2015, tatu: Despite initial plans, support for timezone id with timestamps
+        //    was not included in 2.6.0 final.
+        /*
         assertEquals(quote("0[UTC]"),
                 w.with(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
                 .writeValueAsString(DATE_JAN_1_1970_UTC));
+                */
         assertEquals(quote("1970-01-01T00:00:00.000Z[UTC]"),
                 w.without(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
                 .writeValueAsString(DATE_JAN_1_1970_UTC));
@@ -67,21 +72,24 @@ public class TimeZoneTest extends JodaTestBase
         ObjectWriter w = MAPPER.writer()
                 .with(SerializationFeature.WRITE_DATES_WITH_ZONE_ID);
         DateTime input = new DateTime(2014, 8, 24, 5, 17, 45, DateTimeZone.forID("America/Chicago")); // arbitrary
+        String json;
+        DateTime result;
 
-        // First as timestamp
-
-        String json = w.with(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
-                .writeValueAsString(input);
-        DateTime result = MAPPER.readValue(json, DateTime.class);
-        assertEquals("Actual timepoints differ", input.getMillis(), result.getMillis());
-        assertEquals("TimeZones differ", input, result);
-
-        // then as regular tet
+        // Time zone id only supported as regular text
         json = w.without(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
                 .writeValueAsString(input);
         result = MAPPER.readValue(json, DateTime.class);
         assertEquals("Actual timepoints differ", input.getMillis(), result.getMillis());
         assertEquals("TimeZones differ", input, result);
+
+        // Then timestamp: will not currently (2.6) write out timezone id
+        json = w.with(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+                .writeValueAsString(input);
+        result = MAPPER.readValue(json, DateTime.class);
+        assertEquals("Actual timepoints differ", input.getMillis(), result.getMillis());
+        
+        // .. meaning we can not test this:
+//        assertEquals("TimeZones differ", input, result);
     }
 
     /**
@@ -119,11 +127,11 @@ public class TimeZoneTest extends JodaTestBase
     {
         // but if re-configured to include the time zone
         ObjectMapper m = jodaMapper();
-        m.enable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+        m.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
         m.enable(SerializationFeature.WRITE_DATES_WITH_ZONE_ID);
         
         m.addMixIn(DateTime.class, TypeInfoMixIn.class);
-        assertEquals("[\"org.joda.time.DateTime\",\"0[UTC]\"]",
+        assertEquals("[\"org.joda.time.DateTime\",\"1970-01-01T00:00:00.000Z[UTC]\"]",
                 m.writeValueAsString(DATE_JAN_1_1970_UTC));
     }
 }

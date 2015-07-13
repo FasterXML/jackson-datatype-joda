@@ -23,6 +23,8 @@ public class JacksonJodaDateFormat extends JacksonJodaFormatBase
 
     protected final TimeZone _jdkTimezone;
 
+    protected transient DateTimeZone _jodaTimezone;
+    
     protected final boolean _explicitTimezone;
     
     public JacksonJodaDateFormat(DateTimeFormatter defaultFormatter)
@@ -111,6 +113,31 @@ public class JacksonJodaDateFormat extends JacksonJodaFormatBase
             return this;
         }
         return new JacksonJodaDateFormat(this, locale);
+    }
+
+    /*
+    /**********************************************************
+    /* Accessors
+    /**********************************************************
+     */
+
+    /**
+     * @since 2.6
+     */
+    public DateTimeZone getTimeZone() {
+        if (_jodaTimezone != null) {
+            return _jodaTimezone;
+        }
+        if (_jdkTimezone == null) {
+            return null;
+        }
+        DateTimeZone tz = DateTimeZone.forTimeZone(_jdkTimezone);
+        _jodaTimezone = tz;
+        return tz;
+    }
+
+    public Locale getLocale() {
+        return _locale;
     }
 
     /*

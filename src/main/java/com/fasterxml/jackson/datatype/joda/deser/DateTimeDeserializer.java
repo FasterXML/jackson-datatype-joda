@@ -68,10 +68,16 @@ public class DateTimeDeserializer
                 }
                 str = str.substring(0, ix);
 
+                /* 12-Jul-2015, tatu: Initially planned to support "timestamp[zone-id]"
+                 *    format as well as textual, but since JSR-310 datatype (Java 8 datetime)
+                 *    does not support it, was left out of 2.6.
+                 */
+                /*
                 // One more thing; do we have plain timestamp?
                 if (_allDigits(str)) {
                     return new DateTime(Long.parseLong(str), tz);
                 }
+                */
                 return _format.createParser(ctxt)
                         .parseDateTime(str)
                         .withZone(tz);

@@ -8,6 +8,7 @@ Project: jackson-datatype-joda
 
 #49: testDateMidnightSerWithTypeInfo test dependent on $TZ
  (contributed by Michal Z)
+#58: Support timezone configuration for Interval deserializer
 #62: Allow use of numbers-as-Strings for LocalDate (in array)
  (contributed by Michal Z)
 #64: Support `@JsonFormat(pattern=...)` for deserialization
