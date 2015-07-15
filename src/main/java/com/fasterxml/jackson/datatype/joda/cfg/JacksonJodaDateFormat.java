@@ -198,6 +198,14 @@ public class JacksonJodaDateFormat extends JacksonJodaFormatBase
         }
         return formatter;
     }
+
+    /**
+     * Differentiate if TimeZone is specified by caller 
+     * @return true if TimeZone is specified by caller; false otherwise.
+     */
+    public boolean isTimezoneExplicit() {
+    	return _explicitTimezone;
+    }
     
     /*
     /**********************************************************

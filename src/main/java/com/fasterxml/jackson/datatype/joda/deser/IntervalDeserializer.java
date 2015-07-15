@@ -2,15 +2,15 @@ package com.fasterxml.jackson.datatype.joda.deser;
 
 import java.io.IOException;
 
+import org.joda.time.DateTimeZone;
+import org.joda.time.Interval;
+
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
-
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.datatype.joda.cfg.FormatConfig;
 import com.fasterxml.jackson.datatype.joda.cfg.JacksonJodaDateFormat;
-
-import org.joda.time.*;
 
 public class IntervalDeserializer extends JodaDateDeserializerBase<Interval>
 {
@@ -64,7 +64,8 @@ public class IntervalDeserializer extends JodaDateDeserializerBase<Interval>
             throw JsonMappingException.from(jsonParser,
                     "Failed to parse number from '"+str+"' (full source String '"+v+"') to construct "+handledType().getName());
         }
-        DateTimeZone tz = _format.getTimeZone();
+        
+        DateTimeZone tz = _format.isTimezoneExplicit() ? _format.getTimeZone() : DateTimeZone.forTimeZone(ctxt.getTimeZone());
         if (tz != null) {
             if (!tz.equals(result.getStart().getZone())) {
                 result = new Interval(result.getStartMillis(), result.getEndMillis(), tz);

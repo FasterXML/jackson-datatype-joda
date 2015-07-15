@@ -1,14 +1,18 @@
 package com.fasterxml.jackson.datatype.joda.deser;
 
-import com.fasterxml.jackson.core.*;
-import com.fasterxml.jackson.databind.*;
+import java.io.IOException;
+
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
+import org.joda.time.ReadableDateTime;
+import org.joda.time.ReadableInstant;
+
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonToken;
+import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.datatype.joda.cfg.FormatConfig;
 import com.fasterxml.jackson.datatype.joda.cfg.JacksonJodaDateFormat;
-
-import org.joda.time.*;
-
-import java.io.IOException;
-import java.util.TimeZone;
 
 /**
  * Basic deserializer for {@link ReadableDateTime} and its subtypes.
@@ -42,10 +46,10 @@ public class DateTimeDeserializer
     {
         JsonToken t = p.getCurrentToken();
 
+        DateTimeZone tz = _format.isTimezoneExplicit() ? _format.getTimeZone() : DateTimeZone.forTimeZone(ctxt.getTimeZone());
+        
         if (t == JsonToken.VALUE_NUMBER_INT) {
-            TimeZone tz = ctxt.getTimeZone();
-            DateTimeZone dtz = (tz == null) ? DateTimeZone.UTC : DateTimeZone.forTimeZone(tz);
-            return new DateTime(p.getLongValue(), dtz);
+            return new DateTime(p.getLongValue(), tz);
         }
         if (t == JsonToken.VALUE_STRING) {
             String str = p.getText().trim();
@@ -60,7 +64,6 @@ public class DateTimeDeserializer
                 String tzId = (ix2 < ix)
                         ? str.substring(ix+1)
                         : str.substring(ix+1, ix2);
-                DateTimeZone tz;
                 try {
                     tz = DateTimeZone.forID(tzId);
                 } catch (IllegalArgumentException e) {
@@ -87,16 +90,5 @@ public class DateTimeDeserializer
             return _format.createParser(ctxt).parseDateTime(str);
         }
         throw ctxt.mappingException(handledType());
-    }
-
-    private static boolean _allDigits(String str)
-    {
-        for (int i = 0, len = str.length(); i < len; ++i) {
-            int c = str.charAt(i);
-            if (c > '9' | c < '0') {
-                return false;
-            }
-        }
-        return true;
     }
 }

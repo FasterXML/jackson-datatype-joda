@@ -2,10 +2,15 @@ package com.fasterxml.jackson.datatype.joda;
 
 import java.io.IOException;
 
-import org.joda.time.*;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 
-import com.fasterxml.jackson.annotation.*;
-import com.fasterxml.jackson.databind.*;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 
 public class DateTimeTest extends JodaTestBase
 {
@@ -47,6 +52,11 @@ public class DateTimeTest extends JodaTestBase
           this.jodaDateTime = jodaDateTime;
           this.javaUtilDate = javaUtilDate;
         }
+    }
+    
+    static class FormattedDateTime {
+        @JsonFormat(timezone="EST")
+        public DateTime dateTime;
     }
 
     @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.WRAPPER_ARRAY, property = "@class")
@@ -158,5 +168,29 @@ public class DateTimeTest extends JodaTestBase
         assertNotNull(output.date);
         // Timezone may (and most likely will) differ so...
         assertEquals(inputDate.getMillis(), output.date.getMillis());
+    }
+    
+    public void testWithTimeZoneOverride() throws Exception
+    {
+        ObjectMapper mapper = jodaMapper();
+
+        DateTime date = mapper.readValue(quote("2014-01-20T08:59:01.000-0500"), DateTime.class);
+
+        FormattedDateTime input = new FormattedDateTime();
+        input.dateTime = date;
+        String json = mapper.writeValueAsString(input);
+
+        FormattedDateTime result = mapper.readValue(json, FormattedDateTime.class);
+        assertNotNull(result);
+
+        // Ensure timezone sticks:
+        DateTime resultMidnight = result.dateTime;
+        assertEquals(2014, resultMidnight.getYear());
+        assertEquals(1, resultMidnight.getMonthOfYear());
+        assertEquals(20, resultMidnight.getDayOfMonth());
+
+        DateTimeZone resultTz = resultMidnight.getZone();
+        // Is this stable enough for testing?
+        assertEquals("America/New_York", resultTz.getID());
     }
 }

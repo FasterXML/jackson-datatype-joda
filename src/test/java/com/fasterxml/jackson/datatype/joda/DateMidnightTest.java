@@ -1,8 +1,10 @@
 package com.fasterxml.jackson.datatype.joda;
 
 import java.io.IOException;
+import java.util.TimeZone;
 
 import org.joda.time.DateMidnight;
+import org.joda.time.DateTimeZone;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
@@ -29,12 +31,51 @@ public class DateMidnightTest extends JodaTestBase
         }
     }
     
+    static class FormattedDateMidnight {
+        @JsonFormat(timezone="EST")
+        public DateMidnight dateMidnight;
+    }
+    
     /*
     /**********************************************************
     /* Test methods
     /**********************************************************
      */
 
+    public void testDateMidnightDeserWithTimeZone() throws IOException
+    {
+    	MAPPER.setTimeZone(TimeZone.getTimeZone("Europe/Paris"));
+        // couple of acceptable formats, so:
+        DateMidnight date = MAPPER.readValue("[2001,5,25]", DateMidnight.class);
+        assertEquals(2001, date.getYear());
+        assertEquals(5, date.getMonthOfYear());
+        assertEquals(25, date.getDayOfMonth());
+
+        DateMidnight date2 = MAPPER.readValue(quote("2005-07-13"), DateMidnight.class);
+        assertEquals(2005, date2.getYear());
+        assertEquals(7, date2.getMonthOfYear());
+        assertEquals(13, date2.getDayOfMonth());
+
+        // since 1.6.1, for [JACKSON-360]
+        assertNull(MAPPER.readValue(quote(""), DateMidnight.class));
+
+        
+    	MAPPER.setTimeZone(TimeZone.getTimeZone("America/Los_Angeles"));
+        // couple of acceptable formats, so:
+        date = MAPPER.readValue("[2001,5,25]", DateMidnight.class);
+        assertEquals(2001, date.getYear());
+        assertEquals(5, date.getMonthOfYear());
+        assertEquals(25, date.getDayOfMonth());
+
+        date2 = MAPPER.readValue(quote("2005-07-13"), DateMidnight.class);
+        assertEquals(2005, date2.getYear());
+        assertEquals(7, date2.getMonthOfYear());
+        assertEquals(13, date2.getDayOfMonth());
+
+        // since 1.6.1, for [JACKSON-360]
+        assertNull(MAPPER.readValue(quote(""), DateMidnight.class));
+    }
+    
     public void testDateMidnightDeser() throws IOException
     {
         // couple of acceptable formats, so:
@@ -84,5 +125,28 @@ public class DateMidnightTest extends JodaTestBase
         AlternateFormat output = MAPPER.readValue(json, AlternateFormat.class);
         assertNotNull(output.value);
         assertEquals(inputDate, output.value);
+    }
+    
+    public void testWithTimeZoneOverride() throws Exception
+    {
+        ObjectMapper mapper = jodaMapper();
+
+        DateMidnight date = mapper.readValue("[2001,5,25]", DateMidnight.class);
+        FormattedDateMidnight input = new FormattedDateMidnight();
+        input.dateMidnight = date;
+        String json = mapper.writeValueAsString(input);
+
+        FormattedDateMidnight result = mapper.readValue(json, FormattedDateMidnight.class);
+        assertNotNull(result);
+
+        // Ensure timezone sticks:
+        DateMidnight resultMidnight = result.dateMidnight;
+        assertEquals(2001, resultMidnight.getYear());
+        assertEquals(5, resultMidnight.getMonthOfYear());
+        assertEquals(25, resultMidnight.getDayOfMonth());
+
+        DateTimeZone resultTz = resultMidnight.getZone();
+        // Is this stable enough for testing?
+        assertEquals("America/New_York", resultTz.getID());
     }
 }

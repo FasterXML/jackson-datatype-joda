@@ -3,6 +3,7 @@ package com.fasterxml.jackson.datatype.joda.deser;
 import java.io.IOException;
 
 import org.joda.time.DateMidnight;
+import org.joda.time.DateTimeZone;
 import org.joda.time.LocalDate;
 
 import com.fasterxml.jackson.core.JsonParser;
@@ -36,6 +37,7 @@ public class DateMidnightDeserializer
     public DateMidnight deserialize(JsonParser p, DeserializationContext ctxt)
         throws IOException
     {
+    	
         // We'll accept either long (timestamp) or array:
         if (p.isExpectedStartArrayToken()) {
             p.nextToken(); // VALUE_NUMBER_INT
@@ -48,7 +50,9 @@ public class DateMidnightDeserializer
                 throw ctxt.wrongTokenException(p, JsonToken.END_ARRAY,
                         "after DateMidnight ints");
             }
-            return new DateMidnight(year, month, day);
+            DateTimeZone tz = _format.isTimezoneExplicit() ? _format.getTimeZone() : DateTimeZone.forTimeZone(ctxt.getTimeZone());
+
+            return new DateMidnight(year, month, day, tz);
         }
         switch (p.getCurrentToken()) {
         case VALUE_NUMBER_INT:

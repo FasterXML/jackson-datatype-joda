@@ -2,7 +2,7 @@ package com.fasterxml.jackson.datatype.joda.ser;
 
 import java.io.IOException;
 
-import org.joda.time.*;
+import org.joda.time.Instant;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializationFeature;
