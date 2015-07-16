@@ -5,7 +5,6 @@ import java.io.IOException;
 import org.joda.time.DateTimeZone;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-
 import com.fasterxml.jackson.databind.SerializerProvider;
 
 public class DateTimeZoneSerializer extends JodaSerializerBase<DateTimeZone>
