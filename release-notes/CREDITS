@@ -35,3 +35,8 @@ Thorsten Platz (ThorstenPlatz@github)
 Michał Ziober (ZioberMichal@github)
  * Contributed #62: Allow use of numbers-as-Strings for LocalDate (in array)
   (2.6.0)
+
+Jerry Yang (islanerman@github)
+  * Contributed #68: TimeZone in DeserializationContext is ignored with
+   `SerializationFeature.WRITE_DATES_WITH_ZONE_ID`
+  (2.6.0)

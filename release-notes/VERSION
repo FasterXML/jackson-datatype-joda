@@ -13,6 +13,9 @@ Project: jackson-datatype-joda
  (contributed by Michal Z)
 #64: Support `@JsonFormat(pattern=...)` for deserialization
 #66: Support `SerializationFeature.WRITE_DATES_WITH_ZONE_ID` 
+#68: TimeZone in DeserializationContext is ignored with
+   `SerializationFeature.WRITE_DATES_WITH_ZONE_ID`
+ (contributed by Jerry Y, islanderman@github)
 
 2.5.4 (not yet released)
 
