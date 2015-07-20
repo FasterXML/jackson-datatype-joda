@@ -22,8 +22,8 @@ Joda (http://joda-time.sourceforge.net/) data types.
     <tag>HEAD</tag>
   </scm>
   <properties>
-    <version.jackson.annotations>2.6.0-rc4</version.jackson.annotations>
-    <version.jackson.core>2.6.0-rc4</version.jackson.core>
+    <version.jackson.annotations>2.6.0</version.jackson.annotations>
+    <version.jackson.core>2.6.0</version.jackson.core>
     <!-- Generate PackageVersion.java into this directory. -->
     <packageVersion.dir>com/fasterxml/jackson/datatype/joda</packageVersion.dir>
     <packageVersion.package>${project.groupId}.joda</packageVersion.package>
