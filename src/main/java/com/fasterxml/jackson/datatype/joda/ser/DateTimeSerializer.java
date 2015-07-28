@@ -15,7 +15,7 @@ public final class DateTimeSerializer
 {
     private static final long serialVersionUID = 1L;
 
-    public DateTimeSerializer() { this(FormatConfig.DEFAULT_DATETIME_FORMAT); }
+    public DateTimeSerializer() { this(FormatConfig.DEFAULT_DATETIME_PRINTER); }
     public DateTimeSerializer(JacksonJodaDateFormat format) {
         // false -> no arrays (numbers)
         super(DateTime.class, format, false,

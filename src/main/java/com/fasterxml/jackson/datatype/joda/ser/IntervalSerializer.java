@@ -16,7 +16,7 @@ public class IntervalSerializer extends JodaDateSerializerBase<Interval>
 {
     private static final long serialVersionUID = 1L;
 
-    public IntervalSerializer() { this(FormatConfig.DEFAULT_DATETIME_FORMAT); }
+    public IntervalSerializer() { this(FormatConfig.DEFAULT_DATETIME_PRINTER); }
     public IntervalSerializer(JacksonJodaDateFormat format) {
         super(Interval.class, format, false,
                 SerializationFeature.WRITE_DURATIONS_AS_TIMESTAMPS);

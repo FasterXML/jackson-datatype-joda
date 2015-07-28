@@ -18,7 +18,7 @@ public class IntervalDeserializer extends JodaDateDeserializerBase<Interval>
 
     public IntervalDeserializer() {
         // NOTE: not currently used, but must pass something
-        this(FormatConfig.DEFAULT_DATETIME_FORMAT);
+        this(FormatConfig.DEFAULT_DATETIME_PARSER);
     }
 
     public IntervalDeserializer(JacksonJodaDateFormat format) {

@@ -32,7 +32,7 @@ public class DateTimeDeserializer
     public static <T extends ReadableInstant> JsonDeserializer<T> forType(Class<T> cls)
     {
         return (JsonDeserializer<T>) new DateTimeDeserializer(cls,
-                FormatConfig.DEFAULT_DATETIME_FORMAT);
+                FormatConfig.DEFAULT_DATETIME_PARSER);
     }
 
     @Override
