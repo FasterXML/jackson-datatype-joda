@@ -18,7 +18,7 @@ import com.fasterxml.jackson.datatype.joda.cfg.JacksonJodaPeriodFormat;
  * TODO: allow serialization as an array of numbers, for numeric ("timestamp")
  * notation?
  */
-public final class PeriodSerializer
+public class PeriodSerializer // non final since 2.6.1
 // alas, difficult to extend JodaDateSerializerBase
     extends JodaSerializerBase<ReadablePeriod>
     implements ContextualSerializer

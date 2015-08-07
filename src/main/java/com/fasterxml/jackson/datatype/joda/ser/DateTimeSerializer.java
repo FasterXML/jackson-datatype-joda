@@ -10,7 +10,7 @@ import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.datatype.joda.cfg.FormatConfig;
 import com.fasterxml.jackson.datatype.joda.cfg.JacksonJodaDateFormat;
 
-public final class DateTimeSerializer
+public class DateTimeSerializer // non final since 2.6.1
     extends JodaDateSerializerBase<DateTime>
 {
     private static final long serialVersionUID = 1L;

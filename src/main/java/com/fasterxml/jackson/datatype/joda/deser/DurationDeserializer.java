@@ -14,7 +14,7 @@ import com.fasterxml.jackson.databind.deser.std.StdScalarDeserializer;
  * constructor on a JSON string. By default the only supported string format is that used by {@link
  * Duration#toString()}. (That format for a 3,248 millisecond duration is "PT3.248S".)
  */
-public final class DurationDeserializer extends StdScalarDeserializer<Duration>
+public class DurationDeserializer extends StdScalarDeserializer<Duration>
 {
     private static final long serialVersionUID = 1L;
 

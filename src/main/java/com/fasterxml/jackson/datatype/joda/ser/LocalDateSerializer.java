@@ -11,7 +11,7 @@ import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.datatype.joda.cfg.FormatConfig;
 import com.fasterxml.jackson.datatype.joda.cfg.JacksonJodaDateFormat;
 
-public final class LocalDateSerializer
+public class LocalDateSerializer // non final since 2.6.1
     extends JodaDateSerializerBase<LocalDate>
 {
     private static final long serialVersionUID = 1L;

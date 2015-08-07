@@ -15,7 +15,6 @@ import com.fasterxml.jackson.databind.DeserializationContext;
  */
 public class MonthDayDeserializer extends JodaDeserializerBase<MonthDay>
 {
-
     private static final long serialVersionUID = 1L;
 
     public MonthDayDeserializer()

@@ -9,7 +9,7 @@ import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.datatype.joda.cfg.FormatConfig;
 import com.fasterxml.jackson.datatype.joda.cfg.JacksonJodaDateFormat;
 
-public final class DateMidnightSerializer
+public class DateMidnightSerializer // non-final since 2.6.1
     extends JodaDateSerializerBase<DateMidnight>
 {
     private static final long serialVersionUID = 1L;

@@ -14,7 +14,7 @@ import com.fasterxml.jackson.datatype.joda.cfg.JacksonJodaDateFormat;
  * Serializes a Duration; either as number of millis, or, if textual output
  * requested, using ISO-8601 format.
  */
-public final class DurationSerializer
+public class DurationSerializer // non final since 2.6.1
     extends JodaDateSerializerBase<Duration>
 {
     private static final long serialVersionUID = 1L;
