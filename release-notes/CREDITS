@@ -40,3 +40,7 @@ Jerry Yang (islanerman@github)
   * Contributed #68: TimeZone in DeserializationContext is ignored with
    `SerializationFeature.WRITE_DATES_WITH_ZONE_ID`
   (2.6.0)
+
+jamesmcmillan@github
+  * Reported #70: Default DateTime parser format is stricter than
+   previous versions, causing incompatibility

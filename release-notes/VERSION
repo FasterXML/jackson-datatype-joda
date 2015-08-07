@@ -8,6 +8,12 @@ Project: jackson-datatype-joda
 
 - Removed `final` from serializer implementations, to allow sub-class overriding
 
+2.6.0-1 (29-Jul-2015) (micro-patch)
+
+#70: Default DateTime parser format is stricter than previous versions,
+  causing incompatibility
+ (reported by jamesmcmillan@github)
+
 2.6.0 (19-Jul-2015)
 
 #49: testDateMidnightSerWithTypeInfo test dependent on $TZ
