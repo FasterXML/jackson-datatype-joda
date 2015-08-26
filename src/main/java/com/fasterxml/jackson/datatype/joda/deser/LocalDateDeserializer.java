@@ -2,8 +2,8 @@ package com.fasterxml.jackson.datatype.joda.deser;
 
 import java.io.IOException;
 
+import org.joda.time.DateTimeZone;
 import org.joda.time.LocalDate;
-
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.DeserializationContext;
@@ -37,7 +37,7 @@ public class LocalDateDeserializer
                     : _format.createParser(ctxt).parseLocalDate(str);
         }
         if (p.getCurrentToken() == JsonToken.VALUE_NUMBER_INT) {
-            return new LocalDate(p.getLongValue());            
+            return new LocalDate(p.getLongValue(), DateTimeZone.forTimeZone(ctxt.getTimeZone()));
         }
         
         // [yyyy,mm,dd] or ["yyyy","mm","dd"]
