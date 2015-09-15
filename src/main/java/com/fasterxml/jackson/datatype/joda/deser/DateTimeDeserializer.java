@@ -45,10 +45,9 @@ public class DateTimeDeserializer
         throws IOException
     {
         JsonToken t = p.getCurrentToken();
-
-        DateTimeZone tz = _format.isTimezoneExplicit() ? _format.getTimeZone() : DateTimeZone.forTimeZone(ctxt.getTimeZone());
         
         if (t == JsonToken.VALUE_NUMBER_INT) {
+            DateTimeZone tz = _format.isTimezoneExplicit() ? _format.getTimeZone() : DateTimeZone.forTimeZone(ctxt.getTimeZone());
             return new DateTime(p.getLongValue(), tz);
         }
         if (t == JsonToken.VALUE_STRING) {
@@ -64,6 +63,7 @@ public class DateTimeDeserializer
                 String tzId = (ix2 < ix)
                         ? str.substring(ix+1)
                         : str.substring(ix+1, ix2);
+                DateTimeZone tz;
                 try {
                     tz = DateTimeZone.forID(tzId);
                 } catch (IllegalArgumentException e) {
@@ -85,8 +85,8 @@ public class DateTimeDeserializer
                         .parseDateTime(str)
                         .withZone(tz);
             }
-            
             // Not sure if it should use timezone or not...
+            // 15-Sep-2015, tatu: impl of 'createParser()' SHOULD handle all timezone/locale setup
             return _format.createParser(ctxt).parseDateTime(str);
         }
         throw ctxt.mappingException(handledType());

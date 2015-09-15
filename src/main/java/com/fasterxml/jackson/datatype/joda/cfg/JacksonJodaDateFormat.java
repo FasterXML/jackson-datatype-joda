@@ -204,7 +204,7 @@ public class JacksonJodaDateFormat extends JacksonJodaFormatBase
      * @return true if TimeZone is specified by caller; false otherwise.
      */
     public boolean isTimezoneExplicit() {
-    	return _explicitTimezone;
+        return _explicitTimezone;
     }
     
     /*
