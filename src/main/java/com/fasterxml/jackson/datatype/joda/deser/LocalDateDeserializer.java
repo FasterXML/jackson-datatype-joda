@@ -4,8 +4,10 @@ import java.io.IOException;
 
 import org.joda.time.DateTimeZone;
 import org.joda.time.LocalDate;
+
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
+import com.fasterxml.jackson.core.JsonTokenId;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.datatype.joda.cfg.FormatConfig;
 import com.fasterxml.jackson.datatype.joda.cfg.JacksonJodaDateFormat;
@@ -31,17 +33,18 @@ public class LocalDateDeserializer
     @Override
     public LocalDate deserialize(JsonParser p, DeserializationContext ctxt) throws IOException
     {
-        if (p.getCurrentToken() == JsonToken.VALUE_STRING) {
+        switch (p.getCurrentTokenId()) {
+        case JsonTokenId.ID_STRING:
             String str = p.getText().trim();
             return (str.length() == 0) ? null
                     : _format.createParser(ctxt).parseLocalDate(str);
-        }
-        if (p.getCurrentToken() == JsonToken.VALUE_NUMBER_INT) {
-            return new LocalDate(p.getLongValue(), DateTimeZone.forTimeZone(ctxt.getTimeZone()));
-        }
-        
-        // [yyyy,mm,dd] or ["yyyy","mm","dd"]
-        if (p.isExpectedStartArrayToken()) {
+        case JsonTokenId.ID_NUMBER_INT:
+            {
+                DateTimeZone tz = _format.isTimezoneExplicit() ? _format.getTimeZone() : DateTimeZone.forTimeZone(ctxt.getTimeZone());
+                return new LocalDate(p.getLongValue(), tz);
+            }
+        case JsonTokenId.ID_START_ARRAY:
+            // [yyyy,mm,dd] or ["yyyy","mm","dd"]
             int year = p.nextIntValue(-1); // fast speculative case
             if (year == -1) { // either -1, or not an integral number; slow path
                 year = _parseIntPrimitive(p, ctxt);

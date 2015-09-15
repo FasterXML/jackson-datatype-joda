@@ -5,8 +5,8 @@ import java.io.IOException;
 import org.joda.time.DateTimeZone;
 import org.joda.time.LocalDateTime;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonToken;
+import com.fasterxml.jackson.core.*;
+
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.datatype.joda.cfg.FormatConfig;
 import com.fasterxml.jackson.datatype.joda.cfg.JacksonJodaDateFormat;
@@ -33,43 +33,55 @@ public class LocalDateTimeDeserializer
     public LocalDateTime deserialize(JsonParser p, DeserializationContext ctxt)
         throws IOException
     {
-        switch (p.getCurrentToken()) {
-        case VALUE_STRING:
-            String str = p.getText().trim();
-            return (str.length() == 0) ? null
-                    : _format.createParser(ctxt).parseLocalDateTime(str);
-        case VALUE_NUMBER_INT:
-            return new LocalDateTime(p.getLongValue(), DateTimeZone.forTimeZone(ctxt.getTimeZone()));
-        case START_ARRAY:
+        switch (p.getCurrentTokenId()) {
+        case JsonTokenId.ID_STRING:
+            {
+                String str = p.getText().trim();
+                return (str.length() == 0) ? null
+                        : _format.createParser(ctxt).parseLocalDateTime(str);
+            }
+        case JsonTokenId.ID_NUMBER_INT:
+            {
+                DateTimeZone tz = _format.isTimezoneExplicit() ? _format.getTimeZone() : DateTimeZone.forTimeZone(ctxt.getTimeZone());
+                return new LocalDateTime(p.getLongValue(), tz);
+            }
+        case JsonTokenId.ID_START_ARRAY:
             // [yyyy,mm,dd,hh,MM,ss,ms]
-            if (p.isExpectedStartArrayToken()) {
-                p.nextToken(); // VALUE_NUMBER_INT
+            JsonToken t = p.nextToken();
+            LocalDateTime dt = null;
+            do {
+                if (!t.isNumeric()) { break; }
                 int year = p.getIntValue();
-                p.nextToken(); // VALUE_NUMBER_INT
+                t = p.nextToken(); // VALUE_NUMBER_INT
+                if (!t.isNumeric()) { break; }
                 int month = p.getIntValue();
-                p.nextToken(); // VALUE_NUMBER_INT
+                t = p.nextToken(); // VALUE_NUMBER_INT
+                if (!t.isNumeric()) { break; }
                 int day = p.getIntValue();
-                p.nextToken(); // VALUE_NUMBER_INT
+                t = p.nextToken(); // VALUE_NUMBER_INT
+                if (!t.isNumeric()) { break; }
                 int hour = p.getIntValue();
-                p.nextToken(); // VALUE_NUMBER_INT
+                t = p.nextToken(); // VALUE_NUMBER_INT
+                if (!t.isNumeric()) { break; }
                 int minute = p.getIntValue();
-                p.nextToken(); // VALUE_NUMBER_INT
+                t = p.nextToken(); // VALUE_NUMBER_INT
+                if (!t.isNumeric()) { break; }
                 int second = p.getIntValue();
-                p.nextToken(); // VALUE_NUMBER_INT | END_ARRAY
+                t = p.nextToken(); // VALUE_NUMBER_INT | END_ARRAY
                 // let's leave milliseconds optional?
                 int millisecond = 0;
-                if (p.getCurrentToken() != JsonToken.END_ARRAY) { // VALUE_NUMBER_INT           
+                if (t.isNumeric()) { // VALUE_NUMBER_INT           
                     millisecond = p.getIntValue();
-                    p.nextToken(); // END_ARRAY?
+                    t = p.nextToken(); // END_ARRAY?
                 }
-                if (p.getCurrentToken() != JsonToken.END_ARRAY) {
-                    throw ctxt.wrongTokenException(p, JsonToken.END_ARRAY, "after LocalDateTime ints");
-                }
-                return new LocalDateTime(year, month, day, hour, minute, second, millisecond);                 
+                dt = new LocalDateTime(year, month, day, hour, minute, second, millisecond);                 
+            } while (false); // bogus loop to allow break from within
+            if (t == JsonToken.END_ARRAY) {
+                return dt;
             }
-            break;
+            throw ctxt.wrongTokenException(p, JsonToken.END_ARRAY, "after LocalDateTime ints");
         default:
         }
-        throw ctxt.wrongTokenException(p, JsonToken.START_ARRAY, "expected JSON Array, Number or String");
+        throw ctxt.wrongTokenException(p, JsonToken.START_ARRAY, "expected String, Number or JSON Array");
     }
 }

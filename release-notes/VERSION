@@ -6,7 +6,9 @@ Project: jackson-datatype-joda
 
 2.6.2 (15-Sep-2015)
 
-No changes since 2.6.1
+#71: Adjust LocalDate / LocalDateTime deserializer to support
+  `DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE`
+ (contributed by Luke N)
 
 2.6.1 (09-Aug-2015)
 
