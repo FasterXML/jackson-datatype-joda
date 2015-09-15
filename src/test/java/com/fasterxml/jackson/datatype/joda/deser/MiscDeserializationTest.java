@@ -143,8 +143,16 @@ public class MiscDeserializationTest extends JodaTestBase
         assertNull(MAPPER.readValue(quote(""), LocalDate.class));
     }
 
-	public void testLocalDateDeserWithTimeZone() throws IOException 
+	public void testLocalDateDeserWithTimeZone() throws IOException
 	{
+    final String trickyInstant = "1238558582001";
+    // MAPPER is using default TimeZone (GMT)
+    LocalDate date3 = MAPPER.readValue(trickyInstant, LocalDate.class);
+    assertEquals(2009, date3.getYear());
+    assertEquals(4, date3.getMonthOfYear());
+    assertEquals(1, date3.getDayOfMonth());
+    assertEquals(ISOChronology.getInstanceUTC(), date3.getChronology());
+
 		MAPPER.setTimeZone(TimeZone.getTimeZone("America/Los_Angeles"));
 
 		// couple of acceptable formats, so:
@@ -164,6 +172,14 @@ public class MiscDeserializationTest extends JodaTestBase
 
 		// since 1.6.1, for [JACKSON-360]
 		assertNull(MAPPER.readValue(quote(""), LocalDate.class));
+
+    MAPPER.setTimeZone(TimeZone.getTimeZone("America/Los_Angeles"));
+
+    LocalDate date4 = MAPPER.readValue(trickyInstant, LocalDate.class);
+    assertEquals(2009, date4.getYear());
+    assertEquals(3, date4.getMonthOfYear());
+    assertEquals(31, date4.getDayOfMonth());
+    assertEquals(ISOChronology.getInstanceUTC(), date4.getChronology());
 	}
     
     public void testLocalDateDeserWithTypeInfo() throws IOException
@@ -313,6 +329,17 @@ public class MiscDeserializationTest extends JodaTestBase
 
         // since 1.6.1, for [JACKSON-360]
         assertNull(MAPPER.readValue(quote(""), LocalDateTime.class));
+
+        // MAPPER is using default TimeZone (GMT)
+        LocalDateTime date3 = MAPPER.readValue("1238558582001", LocalDateTime.class);
+        assertEquals(2009, date3.getYear());
+        assertEquals(4, date3.getMonthOfYear());
+        assertEquals(1, date3.getDayOfMonth());
+        assertEquals(4, date3.getHourOfDay());
+        assertEquals(3, date3.getMinuteOfHour());
+        assertEquals(2, date3.getSecondOfMinute());
+        assertEquals(1, date3.getMillisOfSecond());
+        assertEquals(ISOChronology.getInstanceUTC(), date3.getChronology());
     }
 
     public void testLocalDateTimeDeserWithTimeZone() throws IOException

@@ -2,6 +2,7 @@ package com.fasterxml.jackson.datatype.joda.deser;
 
 import java.io.IOException;
 
+import org.joda.time.DateTimeZone;
 import org.joda.time.LocalDateTime;
 
 import com.fasterxml.jackson.core.JsonParser;
@@ -38,7 +39,7 @@ public class LocalDateTimeDeserializer
             return (str.length() == 0) ? null
                     : _format.createParser(ctxt).parseLocalDateTime(str);
         case VALUE_NUMBER_INT:
-            return new LocalDateTime(p.getLongValue());            
+            return new LocalDateTime(p.getLongValue(), DateTimeZone.forTimeZone(ctxt.getTimeZone()));
         case START_ARRAY:
             // [yyyy,mm,dd,hh,MM,ss,ms]
             if (p.isExpectedStartArrayToken()) {
