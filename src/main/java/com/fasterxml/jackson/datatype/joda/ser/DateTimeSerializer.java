@@ -58,7 +58,7 @@ public class DateTimeSerializer // non final since 2.6.1
                 return;
             }
             StringBuilder sb = new StringBuilder(40)
-                    .append(_format.createFormatter(provider).print(value));
+                    .append(_format.createFormatter(provider).withOffsetParsed().print(value));
             sb = sb.append('[')
                     .append(value.getZone())
                     .append(']');
