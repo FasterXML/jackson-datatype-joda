@@ -46,8 +46,11 @@ jamesmcmillan@github
    previous versions, causing incompatibility
 
 Luke Nezda (nezda@github)
-
   * Contributed #71: Adjust LocalDate / LocalDateTime deserializer to support
   `DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE`
   (2.6.2)
 
+Fabian Buch (fabianbuch@github)
+  * Contributed #73: `SerializationFeature.WRITE_DATES_WITH_ZONE_ID` writes
+   inconsistent Zone Offset
+  (2.6.3)

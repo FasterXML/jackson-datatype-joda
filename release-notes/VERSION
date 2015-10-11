@@ -9,6 +9,9 @@ Project: jackson-datatype-joda
 #71: Adjust LocalDate / LocalDateTime deserializer to support
   `DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE`
  (contributed by Luke N)
+#73: `SerializationFeature.WRITE_DATES_WITH_ZONE_ID` writes
+  inconsistent Zone Offset
+ (contributed by Fabian B)
 
 2.6.1 (09-Aug-2015)
 
