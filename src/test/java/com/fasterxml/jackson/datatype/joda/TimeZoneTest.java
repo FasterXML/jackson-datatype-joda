@@ -25,6 +25,7 @@ public class TimeZoneTest extends JodaTestBase
     private static final DateTimeZone AMERICA_LOS_ANGELES = DateTimeZone.forID("America/Los_Angeles");
 
     private final DateTime DATE_JAN_1_1970_UTC = new DateTime(0L, DateTimeZone.UTC);
+    private final DateTime DATE_JAN_1_1970_UTC_IN_AMERICA_LA = new DateTime(0L, AMERICA_LOS_ANGELES);
 
     @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.WRAPPER_ARRAY, property = "@class")
     private static interface TypeInfoMixIn {
@@ -65,6 +66,22 @@ public class TimeZoneTest extends JodaTestBase
         assertEquals(quote("1970-01-01T00:00:00.000Z[UTC]"),
                 w.without(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
                 .writeValueAsString(DATE_JAN_1_1970_UTC));
+    }
+
+    /**
+     * Make sure zoneId and zoneOffset are serialized consistently as jsr310 does.
+     *
+     * https://github.com/FasterXML/jackson-datatype-joda/issues/73
+     */
+    public void testWriteDatesWithZoneIdAndConsistentZoneOffset() throws Exception
+    {
+        ObjectWriter w = MAPPER.writer();
+
+        w = w.with(SerializationFeature.WRITE_DATES_WITH_ZONE_ID);
+
+        assertEquals(quote("1969-12-31T16:00:00.000-08:00[America/Los_Angeles]"),
+                w.without(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+                        .writeValueAsString(DATE_JAN_1_1970_UTC_IN_AMERICA_LA));
     }
 
     public void testRoundTrip()  throws Exception
