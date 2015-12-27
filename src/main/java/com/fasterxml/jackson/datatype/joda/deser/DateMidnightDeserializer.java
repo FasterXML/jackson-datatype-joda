@@ -12,6 +12,13 @@ import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.datatype.joda.cfg.FormatConfig;
 import com.fasterxml.jackson.datatype.joda.cfg.JacksonJodaDateFormat;
 
+/**
+ * Note: Joda has <code>DateMidnight</code> deprecated since at least 2.4,
+ * but we still support it for now.
+ *
+ * @deprecated Since 2.7
+ */
+@Deprecated // since Jackson 2.7 (and Joda 2.4)
 public class DateMidnightDeserializer
     extends JodaDateDeserializerBase<DateMidnight>
 {

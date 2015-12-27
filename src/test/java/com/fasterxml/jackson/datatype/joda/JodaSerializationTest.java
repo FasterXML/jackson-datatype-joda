@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+
 import org.joda.time.*;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
@@ -43,6 +44,7 @@ public class JodaSerializationTest extends JodaTestBase
     /**********************************************************
      */
 
+    @SuppressWarnings("deprecation") // since Jackson 2.7 / Joda 2.4
     public void testDateMidnightSer() throws IOException
     {
         DateMidnight date = new DateMidnight(2001, 5, 25);
@@ -53,11 +55,8 @@ public class JodaSerializationTest extends JodaTestBase
         assertEquals(quote("2001-05-25"),
                 WRITER.without(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
                 .writeValueAsString(date));
-    }
-    
-    public void testDateMidnightSerWithTypeInfo() throws IOException
-    {
-        DateMidnight date = new DateMidnight(2001, 5, 25);
+
+        date = new DateMidnight(2001, 5, 25);
         // default format is that of JSON array...
         assertEquals("[2001,5,25]", WRITER.writeValueAsString(date));
         // but we can force it to be a String as well (note: here we assume this is

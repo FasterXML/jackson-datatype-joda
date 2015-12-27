@@ -14,12 +14,11 @@ public class JodaModule extends SimpleModule
 {
     private static final long serialVersionUID = 1L;
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({ "unchecked", "deprecation" })
     public JodaModule()
     {
         super(PackageVersion.VERSION);
         // first deserializers
-        addDeserializer(DateMidnight.class, new DateMidnightDeserializer());
         addDeserializer(DateTime.class, DateTimeDeserializer.forType(DateTime.class));
         addDeserializer(DateTimeZone.class, new DateTimeZoneDeserializer());
 
@@ -39,7 +38,6 @@ public class JodaModule extends SimpleModule
 
         // then serializers:
         final JsonSerializer<Object> stringSer = ToStringSerializer.instance;
-        addSerializer(DateMidnight.class, new DateMidnightSerializer());
         addSerializer(DateTime.class, new DateTimeSerializer());
         addSerializer(DateTimeZone.class, new DateTimeZoneSerializer());
         addSerializer(Duration.class, new DurationSerializer());
@@ -57,9 +55,15 @@ public class JodaModule extends SimpleModule
         addKeyDeserializer(LocalTime.class, new LocalTimeKeyDeserializer());
         addKeyDeserializer(LocalDate.class, new LocalDateKeyDeserializer());
         addKeyDeserializer(LocalDateTime.class, new LocalDateTimeKeyDeserializer());
+
+        // 26-Dec-2015, tatu: Joda has deprecated following types:
+        
+        // DateMidnight since at least Joda 2.4:
+        addDeserializer(DateMidnight.class, new DateMidnightDeserializer());
+        addSerializer(DateMidnight.class, new DateMidnightSerializer());
     }
 
-    // yes, will try to avoid duplicate registations (if MapperFeature enabled)
+    // yes, will try to avoid duplicate registrations (if MapperFeature enabled)
     @Override
     public String getModuleName() {
         return getClass().getSimpleName();

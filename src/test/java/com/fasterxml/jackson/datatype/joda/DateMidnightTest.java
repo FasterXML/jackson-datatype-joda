@@ -3,14 +3,14 @@ package com.fasterxml.jackson.datatype.joda;
 import java.io.IOException;
 import java.util.TimeZone;
 
-import org.joda.time.DateMidnight;
-import org.joda.time.DateTimeZone;
+import org.joda.time.*;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
+@SuppressWarnings("deprecation") // because DateMidnight deprecated by Joda
 public class DateMidnightTest extends JodaTestBase
 {
     // let's default to String serialization
