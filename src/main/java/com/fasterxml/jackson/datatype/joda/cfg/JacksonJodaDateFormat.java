@@ -31,7 +31,8 @@ public class JacksonJodaDateFormat extends JacksonJodaFormatBase
     {
         super();
         _formatter = defaultFormatter;
-        _jdkTimezone = defaultFormatter.getZone().toTimeZone();
+        DateTimeZone tz = defaultFormatter.getZone();
+        _jdkTimezone = (tz == null) ? null : tz.toTimeZone();
         _explicitTimezone = false;
     }
 
@@ -155,7 +156,7 @@ public class JacksonJodaDateFormat extends JacksonJodaFormatBase
         DateTimeFormatter formatter = createFormatterWithLocale(ctxt);
         if (!_explicitTimezone) {
             TimeZone tz = ctxt.getTimeZone();
-            if (tz != null && !tz.equals(_jdkTimezone)) {
+            if ((tz != null) && !tz.equals(_jdkTimezone)) {
                 formatter = formatter.withZone(DateTimeZone.forTimeZone(tz));
             }
         }

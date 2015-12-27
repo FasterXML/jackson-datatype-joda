@@ -52,7 +52,7 @@ public class DateTimeDeserializer
         }
         if (t == JsonToken.VALUE_STRING) {
             String str = p.getText().trim();
-            if (str.length() == 0) { // [JACKSON-360]
+            if (str.length() == 0) {
                 return null;
             }
             // 08-Jul-2015, tatu: as per [datatype-joda#44], optional TimeZone inclusion
