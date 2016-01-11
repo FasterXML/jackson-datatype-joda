@@ -38,7 +38,7 @@ Joda (http://joda-time.sourceforge.net/) data types.
       -->
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
-      <version>${version.jackson.annotations}</version>
+      <artifactId>jackson-annotations</artifactId>
     </dependency>
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
