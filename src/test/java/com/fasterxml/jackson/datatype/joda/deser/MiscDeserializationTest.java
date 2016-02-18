@@ -543,6 +543,20 @@ public class MiscDeserializationTest extends JodaTestBase
         assertNotNull(map);
         assertTrue(map.containsKey(LocalDateTime.parse("2014-05-23T00:00:00.000")));
     }
+    public void testDurationKeyDeserialize() throws IOException {
+
+        final String json = "{" + quote("PT60s") + ":0}";
+        final Map<Duration, Long> map = MAPPER.readValue(json, new TypeReference<Map<Duration, String>>() { });
+        assertNotNull(map);
+        assertTrue(map.containsKey(Duration.standardMinutes(1L)));
+    }
+    public void testPeriodKeyDeserialize() throws IOException {
+
+        final String json = "{" + quote("PT1H2M3.004S") + ":0}";
+        final Map<Period, Long> map = MAPPER.readValue(json, new TypeReference<Map<Period, String>>() { });
+        assertNotNull(map);
+        assertTrue(map.containsKey(new Period(1, 2, 3, 4)));
+    }
 
     public void testDeserMonthDay() throws Exception
     {

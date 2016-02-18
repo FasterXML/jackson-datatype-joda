@@ -55,6 +55,8 @@ public class JodaModule extends SimpleModule
         addKeyDeserializer(LocalTime.class, new LocalTimeKeyDeserializer());
         addKeyDeserializer(LocalDate.class, new LocalDateKeyDeserializer());
         addKeyDeserializer(LocalDateTime.class, new LocalDateTimeKeyDeserializer());
+        addKeyDeserializer(Duration.class, new DurationKeyDeserializer());
+        addKeyDeserializer(Period.class, new PeriodKeyDeserializer());
 
         // 26-Dec-2015, tatu: Joda has deprecated following types:
         
