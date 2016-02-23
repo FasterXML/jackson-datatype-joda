@@ -54,3 +54,7 @@ Fabian Buch (fabianbuch@github)
   * Contributed #73: `SerializationFeature.WRITE_DATES_WITH_ZONE_ID` writes
    inconsistent Zone Offset
   (2.6.3)
+
+Jochen Schalanda (joschi@github)
+  * Contributed #81: Add key deserializers for `Duration` and `Period` classes
+  (2.7.2)
