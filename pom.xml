@@ -23,6 +23,11 @@ Joda (http://joda-time.sourceforge.net/) data types.
   </scm>
   <properties>
     <version.jackson.core>2.7.1</version.jackson.core>
+
+    <!-- 23-Feb-2016, tatu: Try to keep JDK6 runtime, still -->
+    <javac.src.version>1.6</javac.src.version>
+    <javac.target.version>1.6</javac.target.version>
+
     <!-- Generate PackageVersion.java into this directory. -->
     <packageVersion.dir>com/fasterxml/jackson/datatype/joda</packageVersion.dir>
     <packageVersion.package>${project.groupId}.joda</packageVersion.package>
