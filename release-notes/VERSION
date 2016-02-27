@@ -4,7 +4,7 @@ Project: jackson-datatype-joda
 === Releases ===
 ------------------------------------------------------------------------
 
-2.7.2 (not yet released)
+2.7.2 (27-Feb-2016)
 
 #81: Add key deserializers for `Duration` and `Period` classes
  (contributed by Jochen S)
