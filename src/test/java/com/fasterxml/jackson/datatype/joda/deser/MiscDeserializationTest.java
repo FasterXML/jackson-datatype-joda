@@ -6,19 +6,7 @@ import java.util.GregorianCalendar;
 import java.util.Map;
 import java.util.TimeZone;
 
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
-import org.joda.time.Duration;
-import org.joda.time.Instant;
-import org.joda.time.Interval;
-import org.joda.time.LocalDate;
-import org.joda.time.LocalDateTime;
-import org.joda.time.LocalTime;
-import org.joda.time.MonthDay;
-import org.joda.time.Period;
-import org.joda.time.ReadableDateTime;
-import org.joda.time.ReadableInstant;
-import org.joda.time.YearMonth;
+import org.joda.time.*;
 import org.joda.time.chrono.ISOChronology;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
@@ -38,7 +26,15 @@ public class MiscDeserializationTest extends JodaTestBase
     @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.WRAPPER_ARRAY, property = "@class")
     private static interface ObjectConfiguration {
     }
-    
+
+    static class DateTimeZoneWrapper {
+        @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.WRAPPER_ARRAY, property = "@class")
+        public DateTimeZone tz;
+
+        public DateTimeZoneWrapper() { }
+        public DateTimeZoneWrapper(DateTimeZone tz0) { tz = tz0; }
+    }
+
     /*
     /**********************************************************
     /* Tests for DateTime (and closely related)
@@ -76,8 +72,9 @@ public class MiscDeserializationTest extends JodaTestBase
         assertNull(MAPPER.readValue(quote(""), ReadableDateTime.class));
     }
 
-    // since 2.1.3, for github issue #8
-    public void testDeserReadableDateTimeWithTimeZoneInfo() throws IOException {
+    // [datatype-joda#8]
+    public void testDeserReadableDateTimeWithTimeZoneInfo() throws IOException
+    {
         TimeZone timeZone = TimeZone.getTimeZone("GMT-6");
         DateTimeZone dateTimeZone = DateTimeZone.forTimeZone(timeZone);
         MAPPER.setTimeZone(timeZone);
@@ -511,6 +508,41 @@ public class MiscDeserializationTest extends JodaTestBase
         assertNull(MAPPER.readValue(quote(""), Instant.class));
     }
 
+    /*
+    /**********************************************************
+    /* Tests for DateTimeZone
+    /**********************************************************
+     */
+ 
+    // [datatype-joda#82]
+    public void testSimpleDateTimeZone() throws Exception
+    {
+        TimeZone timeZone = TimeZone.getTimeZone("GMT-6");
+        DateTimeZone input = DateTimeZone.forTimeZone(timeZone);
+        String json = MAPPER.writeValueAsString(input);
+        assertEquals(quote("-06:00"), json);
+
+        DateTimeZone result = MAPPER.readValue(json, DateTimeZone.class);
+        assertEquals(result, input);
+
+        // But then verify polymorphic handling
+        DateTimeZoneWrapper input2 = new DateTimeZoneWrapper(input);
+        json = MAPPER.writeValueAsString(input2);
+        if (json.indexOf("DateTimeZone") < 0) {
+            fail("Should contain type information, json = "+json);
+        }
+
+        DateTimeZoneWrapper result2 = MAPPER.readValue(json, DateTimeZoneWrapper.class);    
+        assertNotNull(result2.tz);
+        assertEquals(input, result2.tz);
+    }
+
+    /*
+    /**********************************************************
+    /* Tests for key deserializers
+    /**********************************************************
+     */
+    
     public void testDateTimeKeyDeserialize() throws IOException {
 
         final String json = "{" + quote("1970-01-01T00:00:00.000Z") + ":0}";
@@ -596,6 +628,12 @@ public class MiscDeserializationTest extends JodaTestBase
         assertEquals(new YearMonth(2013, 8), yearMonth);
         assertEquals(ISOChronology.getInstanceUTC(), yearMonth.getChronology());
     }
+
+    /*
+    /**********************************************************
+    /* Misc other tests
+    /**********************************************************
+     */
     
     public void testDeserYearMonthFromEmptyString() throws Exception
     {

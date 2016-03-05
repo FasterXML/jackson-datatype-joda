@@ -4,6 +4,11 @@ Project: jackson-datatype-joda
 === Releases ===
 ------------------------------------------------------------------------
 
+2.6.6 (not yet released)
+
+#82: Can't deserialize a serialized DateTimeZone with default typing
+ (reported by Chris P)
+
 2.6.5 (19-Jan-2016)
 2.6.4 (07-Dec-2015)
 2.6.3 (12-Oct-2015)

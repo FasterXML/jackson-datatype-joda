@@ -54,3 +54,7 @@ Fabian Buch (fabianbuch@github)
   * Contributed #73: `SerializationFeature.WRITE_DATES_WITH_ZONE_ID` writes
    inconsistent Zone Offset
   (2.6.3)
+
+Chris Plummer (strmer15@github)
+  * Reported #82: Can't deserialize a serialized DateTimeZone with default typing
+  (2.6.6 / 2.7.3)
