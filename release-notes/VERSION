@@ -19,7 +19,7 @@ No changes since 2.7.2
 
 No changes since 2.6.
 
-2.6.6 (not yet released)
+2.6.6 (05-Apr-2016)
 
 #82: Can't deserialize a serialized DateTimeZone with default typing
  (reported by Chris P)
