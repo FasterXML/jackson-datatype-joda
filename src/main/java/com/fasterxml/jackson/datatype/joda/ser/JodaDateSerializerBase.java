@@ -46,35 +46,33 @@ public abstract class JodaDateSerializerBase<T> extends JodaSerializerBase<T>
     public JsonSerializer<?> createContextual(SerializerProvider prov,
             BeanProperty property) throws JsonMappingException
     {
-        if (property != null) {
-            JsonFormat.Value ann = findFormatOverrides(prov, property, handledType());
-            if (ann != null) {
-                JacksonJodaDateFormat format = _format;
+        JsonFormat.Value ann = findFormatOverrides(prov, property, handledType());
+        if (ann != null) {
+            JacksonJodaDateFormat format = _format;
 
-                Boolean useTimestamp;
+            Boolean useTimestamp;
 
-                // Simple case first: serialize as numeric timestamp?
-                if (ann.getShape().isNumeric()) {
-                    useTimestamp = Boolean.TRUE;
-                } else if (ann.getShape() == JsonFormat.Shape.STRING) {
-                    useTimestamp = Boolean.FALSE;
-                } else if (ann.getShape() == JsonFormat.Shape.ARRAY) {
-                    // 17-Nov-2014, tatu: also, arrays typically contain non-string representation
-                    useTimestamp = Boolean.TRUE;
-                } else  {
-                    useTimestamp = null;
-                }
-                // must not call if flag defined, to rely on defaults:
-                if (useTimestamp != null) {
-                    format = format.withUseTimestamp(useTimestamp);
-                }
-                // for others, safe to call, null/empty just ignored
-                format = format.withFormat(ann.getPattern().trim());
-                format = format.withLocale(ann.getLocale());
-                format = format.withTimeZone(ann.getTimeZone());
-                if (format != _format) {
-                    return withFormat(format);
-                }
+            // Simple case first: serialize as numeric timestamp?
+            if (ann.getShape().isNumeric()) {
+                useTimestamp = Boolean.TRUE;
+            } else if (ann.getShape() == JsonFormat.Shape.STRING) {
+                useTimestamp = Boolean.FALSE;
+            } else if (ann.getShape() == JsonFormat.Shape.ARRAY) {
+                // 17-Nov-2014, tatu: also, arrays typically contain non-string representation
+                useTimestamp = Boolean.TRUE;
+            } else  {
+                useTimestamp = null;
+            }
+            // must not call if flag defined, to rely on defaults:
+            if (useTimestamp != null) {
+                format = format.withUseTimestamp(useTimestamp);
+            }
+            // for others, safe to call, null/empty just ignored
+            format = format.withFormat(ann.getPattern().trim());
+            format = format.withLocale(ann.getLocale());
+            format = format.withTimeZone(ann.getTimeZone());
+            if (format != _format) {
+                return withFormat(format);
             }
         }
         return this;

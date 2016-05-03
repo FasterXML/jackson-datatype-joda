@@ -216,12 +216,16 @@ public class DateTimeTest extends JodaTestBase
             .setFormat(JsonFormat.Value.forPattern("dd.MM.YYYY' 'HH:mm")
                     .withShape(JsonFormat.Shape.STRING));
         DateTimeWrapper input = new DateTimeWrapper(DATE_JAN_1_1970_UTC);
-        final String json = "{\"value\":\"01.01.1970 00:00\"}";
+        final String EXP_DATE = "\"01.01.1970 00:00\"";
+        final String json = "{\"value\":"+EXP_DATE+"}";
         assertEquals(json, mapper.writeValueAsString(input));
+        assertEquals(EXP_DATE, mapper.writeValueAsString(DATE_JAN_1_1970_UTC));
 
         // also read back
         DateTimeWrapper result = mapper.readValue(json, DateTimeWrapper.class);
         assertNotNull(result);
         assertEquals(input.value, result.value);
+        DateTime resultDate = mapper.readValue(EXP_DATE, DateTime.class);
+        assertEquals(DATE_JAN_1_1970_UTC, resultDate);
     }
 }
