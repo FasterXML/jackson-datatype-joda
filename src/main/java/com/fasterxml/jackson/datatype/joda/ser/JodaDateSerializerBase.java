@@ -2,14 +2,9 @@ package com.fasterxml.jackson.datatype.joda.ser;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.core.JsonParser;
+
 import com.fasterxml.jackson.databind.*;
-import com.fasterxml.jackson.databind.introspect.Annotated;
-import com.fasterxml.jackson.databind.jsonFormatVisitors.JsonArrayFormatVisitor;
-import com.fasterxml.jackson.databind.jsonFormatVisitors.JsonFormatTypes;
-import com.fasterxml.jackson.databind.jsonFormatVisitors.JsonFormatVisitorWrapper;
-import com.fasterxml.jackson.databind.jsonFormatVisitors.JsonIntegerFormatVisitor;
-import com.fasterxml.jackson.databind.jsonFormatVisitors.JsonStringFormatVisitor;
-import com.fasterxml.jackson.databind.jsonFormatVisitors.JsonValueFormat;
+import com.fasterxml.jackson.databind.jsonFormatVisitors.*;
 import com.fasterxml.jackson.databind.ser.ContextualSerializer;
 import com.fasterxml.jackson.datatype.joda.cfg.JacksonJodaDateFormat;
 
@@ -43,12 +38,6 @@ public abstract class JodaDateSerializerBase<T> extends JodaSerializerBase<T>
     public abstract JodaDateSerializerBase<T> withFormat(JacksonJodaDateFormat format);
 
     @Override
-    @Deprecated // since 2.5 -- remove from 2.6 or later
-    public final boolean isEmpty(T value) {
-        return isEmpty(null, value);
-    }
-
-    @Override
     public boolean isEmpty(SerializerProvider prov, T value) {
         return value == null;
     }
@@ -58,7 +47,7 @@ public abstract class JodaDateSerializerBase<T> extends JodaSerializerBase<T>
             BeanProperty property) throws JsonMappingException
     {
         if (property != null) {
-            JsonFormat.Value ann = prov.getAnnotationIntrospector().findFormat((Annotated)property.getMember());
+            JsonFormat.Value ann = findFormatOverrides(prov, property, handledType());
             if (ann != null) {
                 JacksonJodaDateFormat format = _format;
 

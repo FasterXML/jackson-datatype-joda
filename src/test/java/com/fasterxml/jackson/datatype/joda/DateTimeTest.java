@@ -23,6 +23,13 @@ public class DateTimeTest extends JodaTestBase
         }
     }
 
+    static class DateTimeWrapper {
+        public DateTime value;
+
+        public DateTimeWrapper(DateTime v) { value = v; }
+        protected DateTimeWrapper() { }
+    }
+
     static class CustomDate {
         // note: 'SS' means 'short representation'
         @JsonFormat(shape=JsonFormat.Shape.STRING, pattern="SS", locale="en")
@@ -180,15 +187,14 @@ public class DateTimeTest extends JodaTestBase
     
     public void testWithTimeZoneOverride() throws Exception
     {
-        ObjectMapper mapper = jodaMapper();
-
-        DateTime date = mapper.readValue(quote("2014-01-20T08:59:01.000-0500"), DateTime.class);
+        DateTime date = MAPPER.readValue(quote("2014-01-20T08:59:01.000-0500"),
+                DateTime.class);
 
         FormattedDateTime input = new FormattedDateTime();
         input.dateTime = date;
-        String json = mapper.writeValueAsString(input);
+        String json = MAPPER.writeValueAsString(input);
 
-        FormattedDateTime result = mapper.readValue(json, FormattedDateTime.class);
+        FormattedDateTime result = MAPPER.readValue(json, FormattedDateTime.class);
         assertNotNull(result);
 
         // Ensure timezone sticks:
@@ -200,5 +206,22 @@ public class DateTimeTest extends JodaTestBase
         DateTimeZone resultTz = resultMidnight.getZone();
         // Is this stable enough for testing?
         assertEquals("America/New_York", resultTz.getID());
+    }
+
+    // since 2.8
+    public void testConfigOverrides() throws Exception
+    {
+        ObjectMapper mapper = jodaMapper();
+        mapper.configOverride(DateTime.class)
+            .setFormat(JsonFormat.Value.forPattern("dd.MM.YYYY' 'HH:mm")
+                    .withShape(JsonFormat.Shape.STRING));
+        DateTimeWrapper input = new DateTimeWrapper(DATE_JAN_1_1970_UTC);
+        final String json = "{\"value\":\"01.01.1970 00:00\"}";
+        assertEquals(json, mapper.writeValueAsString(input));
+
+        // also read back
+        DateTimeWrapper result = mapper.readValue(json, DateTimeWrapper.class);
+        assertNotNull(result);
+        assertEquals(input.value, result.value);
     }
 }

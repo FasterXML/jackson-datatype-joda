@@ -6,7 +6,8 @@ Project: jackson-datatype-joda
 
 2.8.0 (not yet released)
 
-No changes since 2.7
+- Support "config overrides" for `@JsonFormat.Value` added in databind
+- Upgrade joda-time dependency to 2.7
 
 2.7.4 (29-Apr-2016)
 2.7.3 (16-Mar-2016)

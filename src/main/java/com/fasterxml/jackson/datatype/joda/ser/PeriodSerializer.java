@@ -50,7 +50,7 @@ public class PeriodSerializer // non final since 2.6.1
             BeanProperty property) throws JsonMappingException
     {
         if (property != null) {
-            JsonFormat.Value ann = property.findFormatOverrides(prov.getAnnotationIntrospector());
+            JsonFormat.Value ann = findFormatOverrides(prov, property, handledType());
             if (ann != null) {
                 JacksonJodaPeriodFormat format = _format;
 

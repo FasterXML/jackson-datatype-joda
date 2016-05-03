@@ -33,7 +33,7 @@ public abstract class JodaDateDeserializerBase<T>
             BeanProperty prop) throws JsonMappingException
     {
         if (prop != null) {
-            JsonFormat.Value ann = prop.findFormatOverrides(ctxt.getAnnotationIntrospector());
+            JsonFormat.Value ann = findFormatOverrides(ctxt, prop, handledType());
             if (ann != null) {
                 JacksonJodaDateFormat format = _format;
                 Boolean useTimestamp;
