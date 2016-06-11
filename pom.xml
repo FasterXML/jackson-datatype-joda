@@ -22,7 +22,7 @@ Joda (http://joda-time.sourceforge.net/) data types.
     <tag>HEAD</tag>
   </scm>
   <properties>
-    <version.jackson.core>2.7.4</version.jackson.core>
+    <version.jackson.core>2.7.5</version.jackson.core>
 
     <!-- 23-Feb-2016, tatu: Try to keep JDK6 runtime, still -->
     <javac.src.version>1.6</javac.src.version>
