@@ -23,19 +23,19 @@ public class InstantDeserializer
     }
 
     @Override
-    public Instant deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException
+    public Instant deserialize(JsonParser p, DeserializationContext ctxt) throws IOException
     {
-        JsonToken t = jp.getCurrentToken();
+        JsonToken t = p.getCurrentToken();
         if (t == JsonToken.VALUE_NUMBER_INT) {
-            return new Instant(jp.getLongValue());
+            return new Instant(p.getLongValue());
         }
         if (t == JsonToken.VALUE_STRING) {
-            String str = jp.getText().trim();
+            String str = p.getText().trim();
             if (str.length() == 0) { // [JACKSON-360]
                 return null;
             }
             return new Instant(str);
         }
-        throw ctxt.mappingException(Instant.class);
+        return (Instant) ctxt.handleUnexpectedToken(handledType(), p);
     }
 }

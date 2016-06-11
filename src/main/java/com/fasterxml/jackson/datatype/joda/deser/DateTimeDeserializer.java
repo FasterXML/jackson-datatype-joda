@@ -89,6 +89,6 @@ public class DateTimeDeserializer
             // 15-Sep-2015, tatu: impl of 'createParser()' SHOULD handle all timezone/locale setup
             return _format.createParser(ctxt).parseDateTime(str);
         }
-        throw ctxt.mappingException(handledType());
+        return (ReadableDateTime) ctxt.handleUnexpectedToken(handledType(), p);
     }
 }
