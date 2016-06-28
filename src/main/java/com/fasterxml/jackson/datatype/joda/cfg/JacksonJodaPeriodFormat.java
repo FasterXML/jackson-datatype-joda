@@ -14,17 +14,20 @@ public class JacksonJodaPeriodFormat extends JacksonJodaFormatBase
 {
     protected final PeriodFormatter _formatter;
 
+    @Deprecated
     public JacksonJodaPeriodFormat(PeriodFormatter defaultFormatter) {
         super();
         _formatter = defaultFormatter;
     }
 
+    @Deprecated
     public JacksonJodaPeriodFormat(JacksonJodaPeriodFormat base, Boolean useTimestamp)
     {
         super(base, useTimestamp);
         _formatter = base._formatter;
     }
-    
+
+    @Deprecated
     public JacksonJodaPeriodFormat(JacksonJodaPeriodFormat base,
             PeriodFormatter formatter)
     {
@@ -32,10 +35,27 @@ public class JacksonJodaPeriodFormat extends JacksonJodaFormatBase
         _formatter = formatter;
     }
 
+    @Deprecated
     public JacksonJodaPeriodFormat(JacksonJodaPeriodFormat base, Locale locale)
     {
         super(base, locale);
         _formatter = base._formatter.withLocale(locale);
+    }
+
+    public JacksonJodaPeriodFormat(PeriodFormatSetup setup) {
+        super(setup);
+        if(_explicitLocale) {
+            _formatter = setup.getFormatter().withLocale(_locale);
+        } else {
+            _formatter = setup.getFormatter();
+        }
+    }
+
+    @Override
+    protected PeriodFormatSetup getSetup() {
+        PeriodFormatSetup setup = new PeriodFormatSetup(super.getSetup());
+        setup.setFormatter(_formatter);
+        return setup;
     }
 
     /*
@@ -48,7 +68,9 @@ public class JacksonJodaPeriodFormat extends JacksonJodaFormatBase
         if (_useTimestamp != null && _useTimestamp.equals(useTimestamp)) {
             return this;
         }
-        return new JacksonJodaPeriodFormat(this, useTimestamp);
+        PeriodFormatSetup setup = getSetup();
+        setup.setUseTimeStamp(useTimestamp);
+        return new JacksonJodaPeriodFormat(setup);
     }
     
     public JacksonJodaPeriodFormat withFormat(String format) {
@@ -63,7 +85,9 @@ public class JacksonJodaPeriodFormat extends JacksonJodaFormatBase
         if ((locale == null) || (_locale != null && _locale.equals(locale))) {
             return this;
         }
-        return new JacksonJodaPeriodFormat(this, locale);
+        PeriodFormatSetup setup = getSetup();
+        setup.setLocale(locale);
+        return new JacksonJodaPeriodFormat(setup);
     }
 
     /*

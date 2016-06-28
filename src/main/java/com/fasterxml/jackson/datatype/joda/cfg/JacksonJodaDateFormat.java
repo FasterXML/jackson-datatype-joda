@@ -69,6 +69,35 @@ public class JacksonJodaDateFormat extends JacksonJodaFormatBase
         _explicitTimezone = base._explicitTimezone;
     }
 
+    public JacksonJodaDateFormat(DateFormatSetup setup)
+    {
+        super(setup);
+        DateTimeFormatter formatter = setup.getFormatter();
+        if(_explicitLocale) {
+            formatter = formatter.withLocale(getLocale());
+        }
+        if(setup.getTimeZone() == null) {
+            _formatter = formatter;
+            DateTimeZone tz = _formatter.getZone();
+            _jdkTimezone = tz == null ? null  : tz.toTimeZone();
+            _explicitTimezone = false;
+        } else {
+            _formatter = formatter.withZone(DateTimeZone.forTimeZone(setup.getTimeZone()));
+            _jdkTimezone = setup.getTimeZone();
+            _explicitTimezone = true;
+        }
+    }
+
+    @Override
+    protected DateFormatSetup getSetup() {
+        DateFormatSetup setup = new DateFormatSetup(super.getSetup());
+        setup.setFormatter(_formatter);
+        if (_explicitTimezone) {
+            setup.setTimeZone(_jdkTimezone);
+        }
+        return setup;
+    }
+
     /*
     /**********************************************************
     /* Factory methods
@@ -79,7 +108,9 @@ public class JacksonJodaDateFormat extends JacksonJodaFormatBase
         if (_useTimestamp != null && _useTimestamp.equals(useTimestamp)) {
             return this;
         }
-        return new JacksonJodaDateFormat(this, useTimestamp);
+        DateFormatSetup setup = getSetup();
+        setup.setUseTimeStamp(useTimestamp);
+        return new JacksonJodaDateFormat(setup);
     }
     
     public JacksonJodaDateFormat withFormat(String format) {
@@ -98,22 +129,27 @@ public class JacksonJodaDateFormat extends JacksonJodaFormatBase
         }
         // copy TimeZone from previous formatter
         formatter = formatter.withZone(_formatter.getZone());
-        
-        return new JacksonJodaDateFormat(this, formatter);
+        DateFormatSetup setup = getSetup();
+        setup.setFormatter(formatter);
+        return new JacksonJodaDateFormat(setup);
     }
 
     public JacksonJodaDateFormat withTimeZone(TimeZone tz) {
         if ((tz == null) || (_jdkTimezone != null && _jdkTimezone.equals(tz))) {
             return this;
         }
-        return new JacksonJodaDateFormat(this, tz);
+        DateFormatSetup setup = getSetup();
+        setup.setTimeZone(tz);
+        return new JacksonJodaDateFormat(setup);
     }
 
     public JacksonJodaDateFormat withLocale(Locale locale) {
         if ((locale == null) || (_locale != null && _locale.equals(locale))) {
             return this;
         }
-        return new JacksonJodaDateFormat(this, locale);
+        DateFormatSetup setup = getSetup();
+        setup.setLocale(locale);
+        return new JacksonJodaDateFormat(setup);
     }
 
     /*
