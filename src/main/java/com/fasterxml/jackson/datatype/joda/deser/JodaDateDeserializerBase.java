@@ -56,6 +56,8 @@ public abstract class JodaDateDeserializerBase<T>
             format = format.withFormat(ann.getPattern().trim());
             format = format.withLocale(ann.getLocale());
             format = format.withTimeZone(ann.getTimeZone());
+            format = format.withAdjustToContextTZOverride(
+                    ann.getFeature(JsonFormat.Feature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE));
             if (format != _format) {
                 return withFormat(format);
             }

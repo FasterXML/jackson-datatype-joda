@@ -6,6 +6,7 @@ import java.util.GregorianCalendar;
 import java.util.Map;
 import java.util.TimeZone;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import org.joda.time.*;
 import org.joda.time.chrono.ISOChronology;
 
@@ -98,6 +99,37 @@ public class MiscDeserializationTest extends JodaTestBase
         ReadableDateTime date = mapper.readValue(quote("2014-01-20T08:59:01.000-0500"),
                 ReadableDateTime.class);
         assertEquals(DateTimeZone.forOffsetHours(-5), date.getZone());
+    }
+
+    static class ReadableDateTimeWithContextTZOverride {
+        @JsonFormat(with = JsonFormat.Feature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE)
+        public ReadableDateTime time;
+    }
+
+    public void testDeserReadableDateTimeWithContextTZOverride() throws IOException {
+        ObjectMapper mapper = jodaMapper();
+        mapper.disable(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE);
+        mapper.setTimeZone(TimeZone.getTimeZone("UTC"));
+        ReadableDateTimeWithContextTZOverride date = mapper.readValue("{ \"time\" : \"2016-06-20T08:59:00.000+0300\"}",
+                ReadableDateTimeWithContextTZOverride.class);
+        DateTime expected = new DateTime(2016, 6, 20, 5, 59, DateTimeZone.forID("UTC"));
+        assertEquals(expected, date.time);
+    }
+
+    static class ReadableDateTimeWithoutContextTZOverride {
+
+        @JsonFormat(without = JsonFormat.Feature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE)
+        public ReadableDateTime time;
+    }
+
+    public void testDeserReadableDateTimeWithoutContextTZOverride() throws IOException {
+        ObjectMapper mapper = jodaMapper();
+        mapper.enable(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE);
+        mapper.setTimeZone(TimeZone.getTimeZone("UTC"));
+        ReadableDateTimeWithoutContextTZOverride date = mapper.readValue("{ \"time\" : \"2016-06-20T08:59:00.000+0300\"}",
+                ReadableDateTimeWithoutContextTZOverride.class);
+        DateTime expected = new DateTime(2016, 6, 20, 8, 59, DateTimeZone.forOffsetHours(3));
+        assertEquals(expected, date.time);
     }
 
     public void testDeserReadableInstant() throws IOException {
