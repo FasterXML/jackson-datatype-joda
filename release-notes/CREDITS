@@ -62,3 +62,8 @@ Chris Plummer (strmer15@github)
 Jochen Schalanda (joschi@github)
   * Contributed #81: Add key deserializers for `Duration` and `Period` classes
   (2.7.2)
+
+Alexey Bychkov (joxerTMD@github)
+  * Contributed #88: Add support for JsonFormat.Feature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE
+  (2.8.0)
+
