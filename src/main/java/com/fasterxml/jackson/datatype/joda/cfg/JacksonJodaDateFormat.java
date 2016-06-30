@@ -27,6 +27,8 @@ public class JacksonJodaDateFormat extends JacksonJodaFormatBase
     
     protected final boolean _explicitTimezone;
 
+    protected final Boolean _adjustToContextTZOverride;
+
     public JacksonJodaDateFormat(DateTimeFormatter defaultFormatter)
     {
         super();
@@ -34,6 +36,7 @@ public class JacksonJodaDateFormat extends JacksonJodaFormatBase
         DateTimeZone tz = defaultFormatter.getZone();
         _jdkTimezone = (tz == null) ? null : tz.toTimeZone();
         _explicitTimezone = false;
+        _adjustToContextTZOverride = null;
     }
 
     @Deprecated
@@ -43,6 +46,7 @@ public class JacksonJodaDateFormat extends JacksonJodaFormatBase
         _formatter = base._formatter;
         _jdkTimezone = base._jdkTimezone;
         _explicitTimezone = base._explicitTimezone;
+        _adjustToContextTZOverride = base._adjustToContextTZOverride;
     }
 
     @Deprecated
@@ -53,6 +57,7 @@ public class JacksonJodaDateFormat extends JacksonJodaFormatBase
         _formatter = formatter;
         _jdkTimezone = base._jdkTimezone;
         _explicitTimezone = base._explicitTimezone;
+        _adjustToContextTZOverride = base._adjustToContextTZOverride;
     }
 
     @Deprecated
@@ -62,6 +67,7 @@ public class JacksonJodaDateFormat extends JacksonJodaFormatBase
         _formatter = base._formatter.withZone(DateTimeZone.forTimeZone(jdkTimezone));
         _jdkTimezone = jdkTimezone;
         _explicitTimezone = true;
+        _adjustToContextTZOverride = base._adjustToContextTZOverride;
     }
 
     @Deprecated
@@ -71,6 +77,7 @@ public class JacksonJodaDateFormat extends JacksonJodaFormatBase
         _formatter = base._formatter.withLocale(locale);
         _jdkTimezone = base._jdkTimezone;
         _explicitTimezone = base._explicitTimezone;
+        _adjustToContextTZOverride = base._adjustToContextTZOverride;
     }
 
     public JacksonJodaDateFormat(DateFormatSetup setup)
@@ -90,6 +97,7 @@ public class JacksonJodaDateFormat extends JacksonJodaFormatBase
             _jdkTimezone = setup.getTimeZone();
             _explicitTimezone = true;
         }
+        _adjustToContextTZOverride = setup.getAdjustToContextTZOverride();
     }
 
     @Override
@@ -99,6 +107,7 @@ public class JacksonJodaDateFormat extends JacksonJodaFormatBase
         if (_explicitTimezone) {
             setup.setTimeZone(_jdkTimezone);
         }
+        setup.setAdjustToContextTZOverride(_adjustToContextTZOverride);
         return setup;
     }
 
@@ -153,6 +162,16 @@ public class JacksonJodaDateFormat extends JacksonJodaFormatBase
         }
         DateFormatSetup setup = getSetup();
         setup.setLocale(locale);
+        return new JacksonJodaDateFormat(setup);
+    }
+
+    public JacksonJodaDateFormat withAdjustToContextTZOverride(Boolean adjustToContextTZOverride) {
+        if ((adjustToContextTZOverride == null) ||
+                (_adjustToContextTZOverride != null && _adjustToContextTZOverride.equals(adjustToContextTZOverride))) {
+            return this;
+        }
+        DateFormatSetup setup = getSetup();
+        setup.setAdjustToContextTZOverride(adjustToContextTZOverride);
         return new JacksonJodaDateFormat(setup);
     }
 
@@ -228,7 +247,7 @@ public class JacksonJodaDateFormat extends JacksonJodaFormatBase
             }
         }
         if (!_explicitTimezone) {
-            if (ctxt.isEnabled(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE)) {
+            if (isAdjustDatesToContextTimeZone(ctxt)) {
                 TimeZone tz = ctxt.getTimeZone();
                 if (tz != null && !tz.equals(_jdkTimezone)) {
                     formatter = formatter.withZone(DateTimeZone.forTimeZone(tz));
@@ -238,6 +257,11 @@ public class JacksonJodaDateFormat extends JacksonJodaFormatBase
             }
         }
         return formatter;
+    }
+
+    private boolean isAdjustDatesToContextTimeZone(DeserializationContext ctxt) {
+      return _adjustToContextTZOverride != null ? _adjustToContextTZOverride :
+              ctxt.isEnabled(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE);
     }
 
     /**

@@ -16,6 +16,8 @@ public class DateFormatSetup extends BaseFormatSetup {
 
     private TimeZone _timeZone;
 
+    private Boolean adjustToContextTZOverride;
+
     public DateFormatSetup() {
 
     }
@@ -38,5 +40,13 @@ public class DateFormatSetup extends BaseFormatSetup {
 
     public void setTimeZone(TimeZone timeZone) {
         this._timeZone = timeZone;
+    }
+
+    public Boolean getAdjustToContextTZOverride() {
+        return adjustToContextTZOverride;
+    }
+
+    public void setAdjustToContextTZOverride(Boolean adjustToContextTZOverride) {
+        this.adjustToContextTZOverride = adjustToContextTZOverride;
     }
 }
