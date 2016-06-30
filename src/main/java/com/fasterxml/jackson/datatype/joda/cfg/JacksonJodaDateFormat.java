@@ -26,7 +26,7 @@ public class JacksonJodaDateFormat extends JacksonJodaFormatBase
     protected transient DateTimeZone _jodaTimezone;
     
     protected final boolean _explicitTimezone;
-    
+
     public JacksonJodaDateFormat(DateTimeFormatter defaultFormatter)
     {
         super();
@@ -36,6 +36,7 @@ public class JacksonJodaDateFormat extends JacksonJodaFormatBase
         _explicitTimezone = false;
     }
 
+    @Deprecated
     public JacksonJodaDateFormat(JacksonJodaDateFormat base, Boolean useTimestamp)
     {
         super(base, useTimestamp);
@@ -43,7 +44,8 @@ public class JacksonJodaDateFormat extends JacksonJodaFormatBase
         _jdkTimezone = base._jdkTimezone;
         _explicitTimezone = base._explicitTimezone;
     }
-    
+
+    @Deprecated
     public JacksonJodaDateFormat(JacksonJodaDateFormat base,
             DateTimeFormatter formatter)
     {
@@ -53,6 +55,7 @@ public class JacksonJodaDateFormat extends JacksonJodaFormatBase
         _explicitTimezone = base._explicitTimezone;
     }
 
+    @Deprecated
     public JacksonJodaDateFormat(JacksonJodaDateFormat base, TimeZone jdkTimezone)
     {
         super(base, jdkTimezone);
@@ -61,6 +64,7 @@ public class JacksonJodaDateFormat extends JacksonJodaFormatBase
         _explicitTimezone = true;
     }
 
+    @Deprecated
     public JacksonJodaDateFormat(JacksonJodaDateFormat base, Locale locale)
     {
         super(base, locale);

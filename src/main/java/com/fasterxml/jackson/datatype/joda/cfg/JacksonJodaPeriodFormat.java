@@ -14,7 +14,6 @@ public class JacksonJodaPeriodFormat extends JacksonJodaFormatBase
 {
     protected final PeriodFormatter _formatter;
 
-    @Deprecated
     public JacksonJodaPeriodFormat(PeriodFormatter defaultFormatter) {
         super();
         _formatter = defaultFormatter;
