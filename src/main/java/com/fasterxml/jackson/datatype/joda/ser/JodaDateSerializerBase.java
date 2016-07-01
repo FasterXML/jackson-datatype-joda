@@ -67,10 +67,7 @@ public abstract class JodaDateSerializerBase<T> extends JodaSerializerBase<T>
             if (useTimestamp != null) {
                 format = format.withUseTimestamp(useTimestamp);
             }
-            // for others, safe to call, null/empty just ignored
-            format = format.withFormat(ann.getPattern().trim());
-            format = format.withLocale(ann.getLocale());
-            format = format.withTimeZone(ann.getTimeZone());
+            format = format.with(ann);
             if (format != _format) {
                 return withFormat(format);
             }
@@ -124,5 +121,12 @@ public abstract class JodaDateSerializerBase<T> extends JodaSerializerBase<T>
 
     protected boolean _useTimestamp(SerializerProvider provider) {
         return _format.useTimestamp(provider, _featureForNumeric);
+    }
+
+    /**
+     * @since 2.8
+     */
+    protected boolean writeWithZoneId(SerializerProvider provider) {
+        return _format.shouldWriteWithZoneId(provider);
     }
 }

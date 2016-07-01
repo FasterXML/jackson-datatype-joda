@@ -36,7 +36,7 @@ public class DateTimeSerializer // non final since 2.6.1
     public void serialize(DateTime value, JsonGenerator gen, SerializerProvider provider) throws IOException
     {
         // First: simple, non-timezone-included output
-        if (!provider.isEnabled(SerializationFeature.WRITE_DATES_WITH_ZONE_ID)) {
+        if (!writeWithZoneId(provider)) {
             if (_useTimestamp(provider)) {
                 gen.writeNumber(value.getMillis());
             } else {

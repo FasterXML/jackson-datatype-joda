@@ -6,6 +6,8 @@ Project: jackson-datatype-joda
 
 2.8.0 (not yet released)
 
+#83: WRITE_DATES_WITH_ZONE_ID feature not working when applied on @JsonFormat annotation
+ (reported by mandyWW@github)
 #87: Add support for JsonFormat.Feature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE
  (contributed by Alexey B)
 - Support "config overrides" for `@JsonFormat.Value` added in databind

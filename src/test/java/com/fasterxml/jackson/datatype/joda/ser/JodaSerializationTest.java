@@ -1,4 +1,4 @@
-package com.fasterxml.jackson.datatype.joda;
+package com.fasterxml.jackson.datatype.joda.ser;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -11,6 +11,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.joda.JodaTestBase;
 
 public class JodaSerializationTest extends JodaTestBase
 {

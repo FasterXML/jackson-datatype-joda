@@ -7,8 +7,10 @@ import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.SerializerProvider;
 
 /**
@@ -27,8 +29,20 @@ public class JacksonJodaDateFormat extends JacksonJodaFormatBase
     
     protected final boolean _explicitTimezone;
 
+    /**
+     * Flag for <code>JsonFormat.Feature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE</code>
+     *
+     * @since 2.8
+     */
     protected final Boolean _adjustToContextTZOverride;
 
+    /**
+     * Flag for <code>JsonFormat.Feature.WRITE_DATES_WITH_ZONE_ID</code>
+     *
+     * @since 2.8
+     */
+    protected final Boolean _writeZoneId;
+    
     public JacksonJodaDateFormat(DateTimeFormatter defaultFormatter)
     {
         super();
@@ -37,16 +51,29 @@ public class JacksonJodaDateFormat extends JacksonJodaFormatBase
         _jdkTimezone = (tz == null) ? null : tz.toTimeZone();
         _explicitTimezone = false;
         _adjustToContextTZOverride = null;
+        _writeZoneId = null;
     }
 
     public JacksonJodaDateFormat(JacksonJodaDateFormat base,
-            Boolean useTimestamp, Boolean adjustToContextTZOverride)
+            Boolean useTimestamp)
     {
         super(base, useTimestamp);
         _formatter = base._formatter;
         _jdkTimezone = base._jdkTimezone;
         _explicitTimezone = base._explicitTimezone;
+        _adjustToContextTZOverride = base._adjustToContextTZOverride;
+        _writeZoneId = base._writeZoneId;
+    }
+
+    public JacksonJodaDateFormat(JacksonJodaDateFormat base,
+            Boolean adjustToContextTZOverride, Boolean writeZoneId)
+    {
+        super(base);
+        _formatter = base._formatter;
+        _jdkTimezone = base._jdkTimezone;
+        _explicitTimezone = base._explicitTimezone;
         _adjustToContextTZOverride = adjustToContextTZOverride;
+        _writeZoneId = writeZoneId;
     }
 
     public JacksonJodaDateFormat(JacksonJodaDateFormat base,
@@ -57,6 +84,7 @@ public class JacksonJodaDateFormat extends JacksonJodaFormatBase
         _jdkTimezone = base._jdkTimezone;
         _explicitTimezone = base._explicitTimezone;
         _adjustToContextTZOverride = base._adjustToContextTZOverride;
+        _writeZoneId = base._writeZoneId;
     }
 
     public JacksonJodaDateFormat(JacksonJodaDateFormat base, TimeZone jdkTimezone)
@@ -66,6 +94,7 @@ public class JacksonJodaDateFormat extends JacksonJodaFormatBase
         _jdkTimezone = jdkTimezone;
         _explicitTimezone = true;
         _adjustToContextTZOverride = base._adjustToContextTZOverride;
+        _writeZoneId = base._writeZoneId;
     }
 
     public JacksonJodaDateFormat(JacksonJodaDateFormat base, Locale locale)
@@ -75,6 +104,7 @@ public class JacksonJodaDateFormat extends JacksonJodaFormatBase
         _jdkTimezone = base._jdkTimezone;
         _explicitTimezone = base._explicitTimezone;
         _adjustToContextTZOverride = base._adjustToContextTZOverride;
+        _writeZoneId = base._writeZoneId;
     }
 
     /*
@@ -83,11 +113,25 @@ public class JacksonJodaDateFormat extends JacksonJodaFormatBase
     /**********************************************************
      */
 
+    public JacksonJodaDateFormat with(JsonFormat.Value ann) {
+        JacksonJodaDateFormat format = this;
+        format = format.withLocale(ann.getLocale());
+        format = format.withTimeZone(ann.getTimeZone());
+        format = format.withFormat(ann.getPattern().trim());
+        Boolean adjustTZ = ann.getFeature(JsonFormat.Feature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE);
+        Boolean writeZoneId = ann.getFeature(JsonFormat.Feature.WRITE_DATES_WITH_ZONE_ID);
+        if ((adjustTZ != _adjustToContextTZOverride)
+                || (writeZoneId != _writeZoneId)) {
+            format = new JacksonJodaDateFormat(format, adjustTZ, writeZoneId);
+        }
+        return format;
+    }
+
     public JacksonJodaDateFormat withUseTimestamp(Boolean useTimestamp) {
         if ((_useTimestamp != null) && _useTimestamp.equals(useTimestamp)) {
             return this;
         }
-        return new JacksonJodaDateFormat(this, useTimestamp, _adjustToContextTZOverride);
+        return new JacksonJodaDateFormat(this, useTimestamp);
     }
     
     public JacksonJodaDateFormat withFormat(String format) {
@@ -121,12 +165,26 @@ public class JacksonJodaDateFormat extends JacksonJodaFormatBase
         return new JacksonJodaDateFormat(this, locale);
     }
 
+    /**
+     * @since 2.8
+     */
     public JacksonJodaDateFormat withAdjustToContextTZOverride(Boolean adjustToContextTZOverride) {
         // minor efficiency check to avoid recreation if no change:
         if (adjustToContextTZOverride == _adjustToContextTZOverride) {
             return this;
         }
-        return new JacksonJodaDateFormat(this, _useTimestamp, adjustToContextTZOverride);
+        return new JacksonJodaDateFormat(this, adjustToContextTZOverride, _writeZoneId);
+    }
+
+    /**
+     * @since 2.8
+     */
+    public JacksonJodaDateFormat withWriteZoneId(Boolean writeZoneId) {
+        // minor efficiency check to avoid recreation if no change:
+        if (writeZoneId == _writeZoneId) {
+            return this;
+        }
+        return new JacksonJodaDateFormat(this, _adjustToContextTZOverride, writeZoneId);
     }
 
     /*
@@ -201,7 +259,7 @@ public class JacksonJodaDateFormat extends JacksonJodaFormatBase
             }
         }
         if (!_explicitTimezone) {
-            if (isAdjustDatesToContextTimeZone(ctxt)) {
+            if (shouldAdjustToContextTimeZone(ctxt)) {
                 TimeZone tz = ctxt.getTimeZone();
                 if (tz != null && !tz.equals(_jdkTimezone)) {
                     formatter = formatter.withZone(DateTimeZone.forTimeZone(tz));
@@ -213,9 +271,20 @@ public class JacksonJodaDateFormat extends JacksonJodaFormatBase
         return formatter;
     }
 
-    private boolean isAdjustDatesToContextTimeZone(DeserializationContext ctxt) {
-      return (_adjustToContextTZOverride != null) ? _adjustToContextTZOverride :
-              ctxt.isEnabled(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE);
+    /**
+     * @since 2.8
+     */
+    public boolean shouldAdjustToContextTimeZone(DeserializationContext ctxt) {
+        return (_adjustToContextTZOverride != null) ? _adjustToContextTZOverride :
+            ctxt.isEnabled(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE);
+    }
+
+    /**
+     * @since 2.8
+     */
+    public boolean shouldWriteWithZoneId(SerializerProvider ctxt) {
+        return (_writeZoneId != null) ? _writeZoneId :
+            ctxt.isEnabled(SerializationFeature.WRITE_DATES_WITH_ZONE_ID);
     }
 
     /**
