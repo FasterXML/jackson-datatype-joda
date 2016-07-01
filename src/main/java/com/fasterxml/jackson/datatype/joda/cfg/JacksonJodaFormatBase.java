@@ -26,14 +26,19 @@ abstract class JacksonJodaFormatBase
 
     protected final boolean _explicitLocale;
 
-    @Deprecated
+    protected JacksonJodaFormatBase(Boolean useTimestamp,
+            Locale locale, boolean explicitLocale) {
+        _useTimestamp = useTimestamp;
+        _locale = locale;
+        _explicitLocale = explicitLocale;
+    }
+
     protected JacksonJodaFormatBase() {
         _useTimestamp = null;
         _locale = DEFAULT_LOCALE;
         _explicitLocale = false;
     }
 
-    @Deprecated
     protected JacksonJodaFormatBase(JacksonJodaFormatBase base)
     {
         _useTimestamp = base._useTimestamp;
@@ -41,7 +46,6 @@ abstract class JacksonJodaFormatBase
         _explicitLocale = base._explicitLocale;
     }
 
-    @Deprecated
     protected JacksonJodaFormatBase(JacksonJodaFormatBase base, Boolean useTimestamp)
     {
         _useTimestamp = useTimestamp;
@@ -49,7 +53,6 @@ abstract class JacksonJodaFormatBase
         _explicitLocale = base._explicitLocale;
     }
 
-    @Deprecated
     protected JacksonJodaFormatBase(JacksonJodaFormatBase base, TimeZone jdkTimezone)
     {
         _useTimestamp = base._useTimestamp;
@@ -57,32 +60,16 @@ abstract class JacksonJodaFormatBase
         _explicitLocale = base._explicitLocale;
     }
 
-    @Deprecated
     protected JacksonJodaFormatBase(JacksonJodaFormatBase base, Locale locale)
     {
         _useTimestamp = base._useTimestamp;
-        _locale = locale;
-        _explicitLocale = true;
-    }
-
-    protected JacksonJodaFormatBase(BaseFormatSetup setup) {
-        _useTimestamp = setup.isUseTimestamp();
-        if (setup.getLocale() != null) {
-            _locale = setup.getLocale();
-            _explicitLocale = true;
-        } else {
+        if (locale == null) {
             _locale = DEFAULT_LOCALE;
             _explicitLocale = false;
+        } else {
+            _locale = locale;
+            _explicitLocale = true;
         }
-    }
-
-    protected BaseFormatSetup getSetup() {
-        BaseFormatSetup setup = new BaseFormatSetup();
-        setup.setUseTimeStamp(_useTimestamp);
-        if (_explicitLocale) {
-            setup.setLocale(_locale);
-        }
-        return setup;
     }
 
     /*

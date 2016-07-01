@@ -39,17 +39,16 @@ public class JacksonJodaDateFormat extends JacksonJodaFormatBase
         _adjustToContextTZOverride = null;
     }
 
-    @Deprecated
-    public JacksonJodaDateFormat(JacksonJodaDateFormat base, Boolean useTimestamp)
+    public JacksonJodaDateFormat(JacksonJodaDateFormat base,
+            Boolean useTimestamp, Boolean adjustToContextTZOverride)
     {
         super(base, useTimestamp);
         _formatter = base._formatter;
         _jdkTimezone = base._jdkTimezone;
         _explicitTimezone = base._explicitTimezone;
-        _adjustToContextTZOverride = base._adjustToContextTZOverride;
+        _adjustToContextTZOverride = adjustToContextTZOverride;
     }
 
-    @Deprecated
     public JacksonJodaDateFormat(JacksonJodaDateFormat base,
             DateTimeFormatter formatter)
     {
@@ -60,7 +59,6 @@ public class JacksonJodaDateFormat extends JacksonJodaFormatBase
         _adjustToContextTZOverride = base._adjustToContextTZOverride;
     }
 
-    @Deprecated
     public JacksonJodaDateFormat(JacksonJodaDateFormat base, TimeZone jdkTimezone)
     {
         super(base, jdkTimezone);
@@ -70,7 +68,6 @@ public class JacksonJodaDateFormat extends JacksonJodaFormatBase
         _adjustToContextTZOverride = base._adjustToContextTZOverride;
     }
 
-    @Deprecated
     public JacksonJodaDateFormat(JacksonJodaDateFormat base, Locale locale)
     {
         super(base, locale);
@@ -80,37 +77,6 @@ public class JacksonJodaDateFormat extends JacksonJodaFormatBase
         _adjustToContextTZOverride = base._adjustToContextTZOverride;
     }
 
-    public JacksonJodaDateFormat(DateFormatSetup setup)
-    {
-        super(setup);
-        DateTimeFormatter formatter = setup.getFormatter();
-        if(_explicitLocale) {
-            formatter = formatter.withLocale(getLocale());
-        }
-        if(setup.getTimeZone() == null) {
-            _formatter = formatter;
-            DateTimeZone tz = _formatter.getZone();
-            _jdkTimezone = tz == null ? null  : tz.toTimeZone();
-            _explicitTimezone = false;
-        } else {
-            _formatter = formatter.withZone(DateTimeZone.forTimeZone(setup.getTimeZone()));
-            _jdkTimezone = setup.getTimeZone();
-            _explicitTimezone = true;
-        }
-        _adjustToContextTZOverride = setup.getAdjustToContextTZOverride();
-    }
-
-    @Override
-    protected DateFormatSetup getSetup() {
-        DateFormatSetup setup = new DateFormatSetup(super.getSetup());
-        setup.setFormatter(_formatter);
-        if (_explicitTimezone) {
-            setup.setTimeZone(_jdkTimezone);
-        }
-        setup.setAdjustToContextTZOverride(_adjustToContextTZOverride);
-        return setup;
-    }
-
     /*
     /**********************************************************
     /* Factory methods
@@ -118,12 +84,10 @@ public class JacksonJodaDateFormat extends JacksonJodaFormatBase
      */
 
     public JacksonJodaDateFormat withUseTimestamp(Boolean useTimestamp) {
-        if (_useTimestamp != null && _useTimestamp.equals(useTimestamp)) {
+        if ((_useTimestamp != null) && _useTimestamp.equals(useTimestamp)) {
             return this;
         }
-        DateFormatSetup setup = getSetup();
-        setup.setUseTimeStamp(useTimestamp);
-        return new JacksonJodaDateFormat(setup);
+        return new JacksonJodaDateFormat(this, useTimestamp, _adjustToContextTZOverride);
     }
     
     public JacksonJodaDateFormat withFormat(String format) {
@@ -140,39 +104,29 @@ public class JacksonJodaDateFormat extends JacksonJodaFormatBase
         if (_locale != null) {
             formatter = formatter.withLocale(_locale);
         }
-        // copy TimeZone from previous formatter
-        formatter = formatter.withZone(_formatter.getZone());
-        DateFormatSetup setup = getSetup();
-        setup.setFormatter(formatter);
-        return new JacksonJodaDateFormat(setup);
+        return new JacksonJodaDateFormat(this, formatter);
     }
 
     public JacksonJodaDateFormat withTimeZone(TimeZone tz) {
         if ((tz == null) || (_jdkTimezone != null && _jdkTimezone.equals(tz))) {
             return this;
         }
-        DateFormatSetup setup = getSetup();
-        setup.setTimeZone(tz);
-        return new JacksonJodaDateFormat(setup);
+        return new JacksonJodaDateFormat(this, tz);
     }
 
     public JacksonJodaDateFormat withLocale(Locale locale) {
         if ((locale == null) || (_locale != null && _locale.equals(locale))) {
             return this;
         }
-        DateFormatSetup setup = getSetup();
-        setup.setLocale(locale);
-        return new JacksonJodaDateFormat(setup);
+        return new JacksonJodaDateFormat(this, locale);
     }
 
     public JacksonJodaDateFormat withAdjustToContextTZOverride(Boolean adjustToContextTZOverride) {
-        if ((adjustToContextTZOverride == null) ||
-                (_adjustToContextTZOverride != null && _adjustToContextTZOverride.equals(adjustToContextTZOverride))) {
+        // minor efficiency check to avoid recreation if no change:
+        if (adjustToContextTZOverride == _adjustToContextTZOverride) {
             return this;
         }
-        DateFormatSetup setup = getSetup();
-        setup.setAdjustToContextTZOverride(adjustToContextTZOverride);
-        return new JacksonJodaDateFormat(setup);
+        return new JacksonJodaDateFormat(this, _useTimestamp, adjustToContextTZOverride);
     }
 
     /*
@@ -260,7 +214,7 @@ public class JacksonJodaDateFormat extends JacksonJodaFormatBase
     }
 
     private boolean isAdjustDatesToContextTimeZone(DeserializationContext ctxt) {
-      return _adjustToContextTZOverride != null ? _adjustToContextTZOverride :
+      return (_adjustToContextTZOverride != null) ? _adjustToContextTZOverride :
               ctxt.isEnabled(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE);
     }
 
