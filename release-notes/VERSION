@@ -4,7 +4,7 @@ Project: jackson-datatype-joda
 === Releases ===
 ------------------------------------------------------------------------
 
-2.8.0 (not yet released)
+2.8.0 (04-Jul-2016)
 
 #83: WRITE_DATES_WITH_ZONE_ID feature not working when applied on @JsonFormat annotation
  (reported by mandyWW@github)
