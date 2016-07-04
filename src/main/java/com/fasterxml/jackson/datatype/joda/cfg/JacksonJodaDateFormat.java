@@ -66,17 +66,6 @@ public class JacksonJodaDateFormat extends JacksonJodaFormatBase
     }
 
     public JacksonJodaDateFormat(JacksonJodaDateFormat base,
-            Boolean adjustToContextTZOverride, Boolean writeZoneId)
-    {
-        super(base);
-        _formatter = base._formatter;
-        _jdkTimezone = base._jdkTimezone;
-        _explicitTimezone = base._explicitTimezone;
-        _adjustToContextTZOverride = adjustToContextTZOverride;
-        _writeZoneId = writeZoneId;
-    }
-
-    public JacksonJodaDateFormat(JacksonJodaDateFormat base,
             DateTimeFormatter formatter)
     {
         super(base);
@@ -105,6 +94,20 @@ public class JacksonJodaDateFormat extends JacksonJodaFormatBase
         _explicitTimezone = base._explicitTimezone;
         _adjustToContextTZOverride = base._adjustToContextTZOverride;
         _writeZoneId = base._writeZoneId;
+    }
+
+    /**
+     * @since 2.8
+     */
+    protected JacksonJodaDateFormat(JacksonJodaDateFormat base,
+            Boolean adjustToContextTZOverride, Boolean writeZoneId)
+    {
+        super(base);
+        _formatter = base._formatter;
+        _jdkTimezone = base._jdkTimezone;
+        _explicitTimezone = base._explicitTimezone;
+        _adjustToContextTZOverride = adjustToContextTZOverride;
+        _writeZoneId = writeZoneId;
     }
 
     /*
