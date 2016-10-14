@@ -79,9 +79,10 @@ public class LocalDateTimeDeserializer
             if (t == JsonToken.END_ARRAY) {
                 return dt;
             }
-            throw ctxt.wrongTokenException(p, JsonToken.END_ARRAY, "after LocalDateTime ints");
+            throw ctxt.wrongTokenException(p, handledType(), JsonToken.END_ARRAY, "after LocalDateTime ints");
         default:
         }
-        throw ctxt.wrongTokenException(p, JsonToken.START_ARRAY, "expected String, Number or JSON Array");
+        return (LocalDateTime) ctxt.handleUnexpectedToken(handledType(), p.getCurrentToken(), p,
+            "expected String, Number or JSON Array");
     }
 }

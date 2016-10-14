@@ -49,7 +49,7 @@ public class LocalTimeDeserializer
                     p.nextToken(); // END_ARRAY?
                 }
                 if (p.getCurrentToken() != JsonToken.END_ARRAY) {
-                    throw ctxt.wrongTokenException(p, JsonToken.END_ARRAY, "after LocalTime ints");
+                    throw ctxt.wrongTokenException(p, handledType(), JsonToken.END_ARRAY, "after LocalTime ints");
                 }
                 return new LocalTime(hour, minute, second, millis);
             }
@@ -62,6 +62,7 @@ public class LocalTimeDeserializer
                     : _format.createParser(ctxt).parseLocalTime(str);
         default:
         }
-        throw ctxt.wrongTokenException(p, JsonToken.START_ARRAY, "expected JSON Array, String or Number");
+        return (LocalTime) ctxt.handleUnexpectedToken(handledType(), p.getCurrentToken(), p,
+                "expected JSON Array, String or Number");
     }
 }

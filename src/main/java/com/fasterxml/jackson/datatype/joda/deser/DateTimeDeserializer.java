@@ -67,7 +67,8 @@ public class DateTimeDeserializer
                 try {
                     tz = DateTimeZone.forID(tzId);
                 } catch (IllegalArgumentException e) {
-                    throw ctxt.mappingException(String.format("Unknown DateTimeZone id '%s'", tzId));
+                    ctxt.reportInputMismatch(handledType(), "Unknown DateTimeZone id '%s'", tzId);
+                    tz = null; // never gets here
                 }
                 str = str.substring(0, ix);
 

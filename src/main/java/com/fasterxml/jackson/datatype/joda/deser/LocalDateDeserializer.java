@@ -8,6 +8,7 @@ import org.joda.time.LocalDate;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.core.JsonTokenId;
+
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.datatype.joda.cfg.FormatConfig;
 import com.fasterxml.jackson.datatype.joda.cfg.JacksonJodaDateFormat;
@@ -58,10 +59,11 @@ public class LocalDateDeserializer
                 day = _parseIntPrimitive(p, ctxt);
             }
             if (p.nextToken() != JsonToken.END_ARRAY) {
-                throw ctxt.wrongTokenException(p, JsonToken.END_ARRAY, "after LocalDate ints");
+                throw ctxt.wrongTokenException(p, handledType(), JsonToken.END_ARRAY, "after LocalDate ints");
             }
             return new LocalDate(year, month, day);
         }
-        throw ctxt.wrongTokenException(p, JsonToken.START_ARRAY, "expected String, Number or JSON Array");
+        return (LocalDate) ctxt.handleUnexpectedToken(handledType(), p.getCurrentToken(), p,
+                "expected String, Number or JSON Array");
     }
 }

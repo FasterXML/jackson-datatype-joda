@@ -30,61 +30,63 @@ public class PeriodDeserializer
     }
    
     @Override
-    public ReadablePeriod deserialize(JsonParser jp, DeserializationContext ctxt)
+    public ReadablePeriod deserialize(JsonParser p, DeserializationContext ctxt)
         throws IOException
     {
-        JsonToken t = jp.getCurrentToken();
+        JsonToken t = p.getCurrentToken();
         if (t == JsonToken.VALUE_STRING) {
-            String str = jp.getText().trim();
+            String str = p.getText().trim();
             if (str.isEmpty()) {
                 return null;
             }
             return DEFAULT_FORMAT.parsePeriod(str);
         }
         if (t == JsonToken.VALUE_NUMBER_INT) {
-            return new Period(jp.getLongValue());    
+            return new Period(p.getLongValue());    
         }
         if (t != JsonToken.START_OBJECT && t != JsonToken.FIELD_NAME) {
-            throw ctxt.wrongTokenException(jp, JsonToken.START_ARRAY,
+            return (ReadablePeriod) ctxt.handleUnexpectedToken(handledType(), t, p,
                     "expected JSON Number, String or Object");
         }
         
-        JsonNode treeNode = jp.readValueAsTree();
+        JsonNode treeNode = p.readValueAsTree();
         String periodType = treeNode.path("fieldType").path("name").asText();
         String periodName = treeNode.path("periodType").path("name").asText();
         // any "weird" numbers we should worry about?
         int periodValue = treeNode.path(periodType).asInt();
 
-        ReadablePeriod p;
+        ReadablePeriod rp;
         
         if (periodName.equals( "Seconds" )) {
-            p = Seconds.seconds( periodValue );
+            rp = Seconds.seconds( periodValue );
         }
         else if (periodName.equals( "Minutes" )) {
-            p = Minutes.minutes( periodValue );
+            rp = Minutes.minutes( periodValue );
         }
         else if (periodName.equals( "Hours" )) {
-            p = Hours.hours( periodValue );
+            rp = Hours.hours( periodValue );
         }
         else if (periodName.equals( "Days" )) {
-            p = Days.days( periodValue );
+            rp = Days.days( periodValue );
         }
         else if (periodName.equals( "Weeks" )) {
-            p = Weeks.weeks( periodValue );
+            rp = Weeks.weeks( periodValue );
         }
         else if (periodName.equals( "Months" )) {
-            p = Months.months( periodValue );
+            rp = Months.months( periodValue );
         }
         else if (periodName.equals( "Years" )) {
-            p = Years.years( periodValue );
+            rp = Years.years( periodValue );
         } else {
-            throw ctxt.mappingException("Don't know how to deserialize "+handledType().getName()+" using periodName '"
-                +periodName+"'");
+            ctxt.reportInputMismatch(handledType(),
+                    "Don't know how to deserialize %s using periodName '%s'",
+                    handledType().getName(), periodName);
+            rp = null; // never gets here
         }
 
-        if (_requireFullPeriod && !(p instanceof Period)) {
-            p = p.toPeriod();
+        if (_requireFullPeriod && !(rp instanceof Period)) {
+            rp = rp.toPeriod();
         }
-        return p;
+        return rp;
     }
 }
