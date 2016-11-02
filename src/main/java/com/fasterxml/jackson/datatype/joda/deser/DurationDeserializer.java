@@ -5,8 +5,9 @@ import java.io.IOException;
 import org.joda.time.Duration;
 
 import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.JsonTokenId;
 import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.deser.std.StdScalarDeserializer;
 
 /**
@@ -21,17 +22,26 @@ public class DurationDeserializer extends StdScalarDeserializer<Duration>
     public DurationDeserializer() { super(Duration.class); }
 
     @Override
-    public Duration deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws
-        IOException, JsonProcessingException
+    public Duration deserialize(JsonParser p, DeserializationContext ctxt) throws IOException
     {
-        switch (jsonParser.getCurrentToken()) {
-        case VALUE_NUMBER_INT: // assume it's millisecond count
-            return new Duration(jsonParser.getLongValue());
-        case VALUE_STRING:
-            return new Duration(jsonParser.getText());
+        switch (p.getCurrentTokenId()) {
+        case JsonTokenId.ID_NUMBER_INT: // assume it's millisecond count
+            return new Duration(p.getLongValue());
+        case JsonTokenId.ID_STRING:
+            return new Duration(p.getText().trim());
         default:
         }
-        throw deserializationContext.mappingException("expected JSON Number or String");
+        throw ctxt.mappingException("expected JSON Number or String");
+    }
+
+    protected Duration _deserialize(DeserializationContext ctxt, String str)
+            throws IOException
+    {
+        if (str.length() == 0) {
+            if (ctxt.isEnabled(DeserializationFeature.ACCEPT_EMPTY_STRING_AS_NULL_OBJECT)) {
+                return null;
+            }
+        }
+        return Duration.parse(str);
     }
 }
-
