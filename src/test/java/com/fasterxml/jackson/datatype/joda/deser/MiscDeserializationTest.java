@@ -36,6 +36,11 @@ public class MiscDeserializationTest extends JodaTestBase
         public DateTimeZoneWrapper(DateTimeZone tz0) { tz = tz0; }
     }
 
+    static class ReadableDateTimeWithoutContextTZOverride {
+        @JsonFormat(without = JsonFormat.Feature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE)
+        public ReadableDateTime time;
+    }
+
     /*
     /**********************************************************
     /* Tests for DateTime (and closely related)
@@ -116,12 +121,6 @@ public class MiscDeserializationTest extends JodaTestBase
         assertEquals(expected, date.time);
     }
 
-    static class ReadableDateTimeWithoutContextTZOverride {
-
-        @JsonFormat(without = JsonFormat.Feature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE)
-        public ReadableDateTime time;
-    }
-
     public void testDeserReadableDateTimeWithoutContextTZOverride() throws IOException {
         ObjectMapper mapper = jodaMapper();
         mapper.enable(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE);
@@ -132,6 +131,12 @@ public class MiscDeserializationTest extends JodaTestBase
         assertEquals(expected, date.time);
     }
 
+    /*
+    /**********************************************************
+    /* Tests for Instant
+    /**********************************************************
+     */
+    
     public void testDeserReadableInstant() throws IOException {
         ReadableInstant date = MAPPER.readValue(quote("1972-12-28T12:00:01.000+0000"), ReadableInstant.class);
         assertNotNull(date);
@@ -149,6 +154,27 @@ public class MiscDeserializationTest extends JodaTestBase
         assertEquals("1972-12-28T12:00:01.000Z", date.toString());
     }
 
+    public void testDeserInstantFromNumber() throws IOException
+    {
+        Calendar cal = new GregorianCalendar(TimeZone.getTimeZone("UTC"));
+        cal.set(Calendar.YEAR, 1972);
+        long timepoint = cal.getTime().getTime();
+
+        // Ok, first: using JSON number (milliseconds since epoch)
+        Instant instant = MAPPER.readValue(String.valueOf(timepoint), Instant.class);
+        assertEquals(timepoint, instant.getMillis());
+    }
+
+    public void testDeserInstant() throws IOException
+    {
+        Instant date = MAPPER.readValue(quote("1972-12-28T12:00:01.000Z"), Instant.class);
+        assertNotNull(date);
+        assertEquals("1972-12-28T12:00:01.000Z", date.toString());
+
+        // since 1.6.1, for [JACKSON-360]
+        assertNull(MAPPER.readValue(quote(""), Instant.class));
+    }
+    
     /*
     /**********************************************************
     /* Tests for LocalDate type
@@ -432,116 +458,6 @@ public class MiscDeserializationTest extends JodaTestBase
 
     /*
     /**********************************************************
-    /* Tests for Period type
-    /**********************************************************
-     */
-
-    public void testPeriodDeser() throws IOException
-    {
-        Period out = MAPPER.readValue(quote("PT1H2M3.004S"), Period.class);
-        assertEquals(1, out.getHours());
-        assertEquals(2, out.getMinutes());
-        assertEquals(3, out.getSeconds());
-        assertEquals(4, out.getMillis());
-
-        // also, should work as number:
-        String json = String.valueOf(1000 * out.toStandardSeconds().getSeconds());
-        out = MAPPER.readValue(json, Period.class);
-        assertEquals(1, out.getHours());
-        assertEquals(2, out.getMinutes());
-        assertEquals(3, out.getSeconds());
-        // but millis are actually truncated...
-        assertEquals(0, out.getMillis());
-    }
-
-    public void testPeriodDeserWithTypeInfo() throws IOException
-    {
-        ObjectMapper mapper = jodaMapper();
-        mapper.addMixIn(Period.class, ObjectConfiguration.class);
-
-        Period out = mapper.readValue("[\"org.joda.time.Period\",\"PT1H2M3.004S\"]", Period.class);
-        assertEquals(1, out.getHours());
-        assertEquals(2, out.getMinutes());
-        assertEquals(3, out.getSeconds());
-        assertEquals(4, out.getMillis());
-
-        // also, should work as number:
-        String json = "[\"org.joda.time.Period\"," + String.valueOf(1000 * out.toStandardSeconds().getSeconds()) + "]";
-        out = mapper.readValue(json, Period.class);
-        assertEquals(1, out.getHours());
-        assertEquals(2, out.getMinutes());
-        assertEquals(3, out.getSeconds());
-        // but millis are actually truncated...
-        assertEquals(0, out.getMillis());
-    }
-
-    /*
-    /**********************************************************
-    /* Tests for Duration type
-    /**********************************************************
-     */
-
-    public void testDurationDeserFromInt() throws IOException
-    {
-        Duration d = MAPPER.readValue("1234", Duration.class);
-        assertEquals(1234, d.getMillis());
-    }
-
-    public void testDurationDeserFromString() throws IOException
-    {
-        Duration d = MAPPER.readValue(quote("PT1.234S"), Duration.class);
-        assertEquals(1234, d.getMillis());
-    }
-
-    public void testDurationRoundtrip() throws IOException
-    {
-        Duration d = new Duration(5513);
-        assertEquals(d, MAPPER.readValue(MAPPER.writeValueAsString(d), Duration.class));
-    }
-
-    public void testDurationFailsDeserializingUnexpectedType() throws IOException
-    {
-        try {
-            MAPPER.readValue("{\"foo\":1234}", Duration.class);
-            fail();
-        } catch (JsonMappingException e) {
-            // there's location info involving a string object id on the second line, so just use the first line
-            assertEquals("expected JSON Number or String", e.getMessage().split("\n")[0]);
-        }
-    }
-
-    public void testDurationDeserFromIntWithTypeInfo() throws IOException
-    {
-        ObjectMapper mapper = jodaMapper();
-        mapper.addMixIn(Duration.class, ObjectConfiguration.class);
-
-        Duration d = mapper.readValue("[\"org.joda.time.Duration\",1234]", Duration.class);
-        assertEquals(1234, d.getMillis());
-    }
-
-    public void testDeserInstantFromNumber() throws IOException
-    {
-        Calendar cal = new GregorianCalendar(TimeZone.getTimeZone("UTC"));
-        cal.set(Calendar.YEAR, 1972);
-        long timepoint = cal.getTime().getTime();
-
-        // Ok, first: using JSON number (milliseconds since epoch)
-        Instant instant = MAPPER.readValue(String.valueOf(timepoint), Instant.class);
-        assertEquals(timepoint, instant.getMillis());
-    }
-
-    public void testDeserInstant() throws IOException
-    {
-        Instant date = MAPPER.readValue(quote("1972-12-28T12:00:01.000Z"), Instant.class);
-        assertNotNull(date);
-        assertEquals("1972-12-28T12:00:01.000Z", date.toString());
-
-        // since 1.6.1, for [JACKSON-360]
-        assertNull(MAPPER.readValue(quote(""), Instant.class));
-    }
-
-    /*
-    /**********************************************************
     /* Tests for DateTimeZone
     /**********************************************************
      */
@@ -606,20 +522,6 @@ public class MiscDeserializationTest extends JodaTestBase
         final Map<LocalDateTime, Long> map = MAPPER.readValue(json, new TypeReference<Map<LocalDateTime, String>>() { });
         assertNotNull(map);
         assertTrue(map.containsKey(LocalDateTime.parse("2014-05-23T00:00:00.000")));
-    }
-    public void testDurationKeyDeserialize() throws IOException {
-
-        final String json = "{" + quote("PT60s") + ":0}";
-        final Map<Duration, Long> map = MAPPER.readValue(json, new TypeReference<Map<Duration, String>>() { });
-        assertNotNull(map);
-        assertTrue(map.containsKey(Duration.standardMinutes(1L)));
-    }
-    public void testPeriodKeyDeserialize() throws IOException {
-
-        final String json = "{" + quote("PT1H2M3.004S") + ":0}";
-        final Map<Period, Long> map = MAPPER.readValue(json, new TypeReference<Map<Period, String>>() { });
-        assertNotNull(map);
-        assertTrue(map.containsKey(new Period(1, 2, 3, 4)));
     }
 
     public void testDeserMonthDay() throws Exception

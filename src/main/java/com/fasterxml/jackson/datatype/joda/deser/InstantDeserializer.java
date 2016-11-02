@@ -31,11 +31,11 @@ public class InstantDeserializer
         }
         if (t == JsonToken.VALUE_STRING) {
             String str = p.getText().trim();
-            if (str.length() == 0) { // [JACKSON-360]
+            if (str.length() == 0) {
                 return null;
             }
             return new Instant(str);
         }
-        return (Instant) ctxt.handleUnexpectedToken(handledType(), p);
+        return _handleNotNumberOrString(p, ctxt);
     }
 }

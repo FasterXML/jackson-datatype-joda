@@ -41,7 +41,7 @@ public class DateTimeDeserializer
     }
 
     @Override
-    public ReadableDateTime deserialize(JsonParser p, DeserializationContext ctxt)
+    public ReadableInstant deserialize(JsonParser p, DeserializationContext ctxt)
         throws IOException
     {
         JsonToken t = p.getCurrentToken();
@@ -90,6 +90,6 @@ public class DateTimeDeserializer
             // 15-Sep-2015, tatu: impl of 'createParser()' SHOULD handle all timezone/locale setup
             return _format.createParser(ctxt).parseDateTime(str);
         }
-        return (ReadableDateTime) ctxt.handleUnexpectedToken(handledType(), p);
+        return _handleNotNumberOrString(p, ctxt);
     }
 }

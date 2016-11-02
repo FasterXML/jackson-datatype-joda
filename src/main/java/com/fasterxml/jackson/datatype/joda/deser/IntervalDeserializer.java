@@ -6,9 +6,9 @@ import org.joda.time.DateTimeZone;
 import org.joda.time.Interval;
 
 import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.JsonToken;
+
 import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.datatype.joda.cfg.FormatConfig;
 import com.fasterxml.jackson.datatype.joda.cfg.JacksonJodaDateFormat;
 
@@ -31,9 +31,15 @@ public class IntervalDeserializer extends JodaDateDeserializerBase<Interval>
     }
 
     @Override
-    public Interval deserialize(JsonParser jsonParser, DeserializationContext ctxt) throws IOException, JsonProcessingException
+    public Interval deserialize(JsonParser p, DeserializationContext ctxt)
+        throws IOException
     {
-        String v = jsonParser.getText().trim();
+        if (!p.hasToken(JsonToken.VALUE_STRING)) {
+            return (Interval) ctxt.handleUnexpectedToken(handledType(),
+                    p.getCurrentToken(), p, "expected JSON String");
+        }
+
+        String v = p.getText().trim();
 
         /* 17-Nov-2014, tatu: Actually let's start with slash, instead of hyphen, because
          *   that is the separator for standard functionality...
@@ -61,10 +67,11 @@ public class IntervalDeserializer extends JodaDateDeserializerBase<Interval>
                 result = new Interval(start, end);
             }
         } catch (NumberFormatException e) {
-            throw JsonMappingException.from(jsonParser,
-                    "Failed to parse number from '"+str+"' (full source String '"+v+"') to construct "+handledType().getName());
+            return (Interval) ctxt.handleWeirdStringValue(handledType(), str,
+"Failed to parse number from '%s' (full source String '%s')",
+                    str, v);
         }
-        
+
         DateTimeZone tz = _format.isTimezoneExplicit() ? _format.getTimeZone() : DateTimeZone.forTimeZone(ctxt.getTimeZone());
         if (tz != null) {
             if (!tz.equals(result.getStart().getZone())) {

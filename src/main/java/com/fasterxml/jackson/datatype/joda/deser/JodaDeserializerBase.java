@@ -19,7 +19,17 @@ abstract class JodaDeserializerBase<T> extends StdScalarDeserializer<T>
     }
     
     @Override
-    public Object deserializeWithType(JsonParser p, DeserializationContext ctxt, TypeDeserializer typeDeserializer) throws IOException, JsonProcessingException {
+    public Object deserializeWithType(JsonParser p, DeserializationContext ctxt,
+            TypeDeserializer typeDeserializer) throws IOException
+    {
         return typeDeserializer.deserializeTypedFromAny(p, ctxt);
+    }
+
+    @SuppressWarnings("unchecked")
+    public T _handleNotNumberOrString(JsonParser p, DeserializationContext ctxt)
+        throws IOException
+    {
+        return (T) ctxt.handleUnexpectedToken(handledType(),
+                p.getCurrentToken(), p, "expected JSON Number or String");
     }
 }
