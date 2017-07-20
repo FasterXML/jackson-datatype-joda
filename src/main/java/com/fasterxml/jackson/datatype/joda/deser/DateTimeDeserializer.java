@@ -82,9 +82,12 @@ public class DateTimeDeserializer
                     return new DateTime(Long.parseLong(str), tz);
                 }
                 */
-                return _format.createParser(ctxt)
+
+                if (!_format.shouldAdjustToContextTimeZone(ctxt)) {
+                    return _format.createParser(ctxt)
                         .parseDateTime(str)
                         .withZone(tz);
+                }
             }
             // Not sure if it should use timezone or not...
             // 15-Sep-2015, tatu: impl of 'createParser()' SHOULD handle all timezone/locale setup
