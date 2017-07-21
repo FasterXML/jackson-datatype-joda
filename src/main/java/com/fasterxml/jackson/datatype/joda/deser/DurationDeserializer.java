@@ -9,7 +9,6 @@ import com.fasterxml.jackson.core.JsonTokenId;
 
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.deser.std.StdScalarDeserializer;
 
 /**
  * Deserializes a Duration from either an int number of millis or using the {@link Duration#Duration(Object)}
