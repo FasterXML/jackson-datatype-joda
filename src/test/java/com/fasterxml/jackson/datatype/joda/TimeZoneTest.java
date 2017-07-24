@@ -1,5 +1,6 @@
 package com.fasterxml.jackson.datatype.joda;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
@@ -95,14 +96,17 @@ public class TimeZoneTest extends JodaTestBase
         // Time zone id only supported as regular text
         json = w.without(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
                 .writeValueAsString(input);
-        result = MAPPER.readValue(json, DateTime.class);
+
+        ObjectMapper mapper = jodaMapper();
+        mapper.disable(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE);
+        result = mapper.readValue(json, DateTime.class);
         assertEquals("Actual timepoints differ", input.getMillis(), result.getMillis());
         assertEquals("TimeZones differ", input, result);
 
         // Then timestamp: will not currently (2.6) write out timezone id
         json = w.with(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
                 .writeValueAsString(input);
-        result = MAPPER.readValue(json, DateTime.class);
+        result = mapper.readValue(json, DateTime.class);
         assertEquals("Actual timepoints differ", input.getMillis(), result.getMillis());
         
         // .. meaning we can not test this:
@@ -130,8 +134,11 @@ public class TimeZoneTest extends JodaTestBase
         String firstOneAmStr = w.writeValueAsString(firstOneAm);
         String secondOneAmStr = w.writeValueAsString(secondOneAm);
 
-        DateTime firstRoundTrip = MAPPER.readValue(firstOneAmStr, DateTime.class);
-        DateTime secondRoundTrip = MAPPER.readValue(secondOneAmStr, DateTime.class);
+        ObjectMapper mapper = jodaMapper();
+        mapper.disable(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE);
+
+        DateTime firstRoundTrip = mapper.readValue(firstOneAmStr, DateTime.class);
+        DateTime secondRoundTrip = mapper.readValue(secondOneAmStr, DateTime.class);
 
         assertEquals("Actual timepoints differ", firstOneAm.getMillis(), firstRoundTrip.getMillis());
         assertEquals("TimeZones differ", firstOneAm, firstRoundTrip);
@@ -150,5 +157,35 @@ public class TimeZoneTest extends JodaTestBase
         m.addMixIn(DateTime.class, TypeInfoMixIn.class);
         assertEquals("[\"org.joda.time.DateTime\",\"1970-01-01T00:00:00.000Z[UTC]\"]",
                 m.writeValueAsString(DATE_JAN_1_1970_UTC));
+    }
+
+    public static class Foo {
+
+        @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+        private DateTime jodaDateTime;
+
+        public DateTime getJodaDateTime() {
+            return jodaDateTime;
+        }
+
+        public void setJodaDateTime(DateTime jodaDateTime) {
+            this.jodaDateTime = jodaDateTime;
+        }
+    }
+
+    public void test_enable_ADJUST_DATES_TO_CONTEXT_TIME_ZONE() throws Exception
+    {
+        ObjectMapper mapper = jodaMapper();
+        mapper.enable(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE);
+        DateTime result = mapper.readValue("{\"jodaDateTime\":\"2017-01-01 01:01:01[Asia/Shanghai]\"}", Foo.class).getJodaDateTime();
+        assertEquals(new DateTime(2017, 1, 1, 1, 1, 1, DateTimeZone.UTC), result);
+    }
+
+    public void test_disable_ADJUST_DATES_TO_CONTEXT_TIME_ZONE() throws Exception
+    {
+        ObjectMapper mapper = jodaMapper();
+        mapper.disable(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE);
+        DateTime result = mapper.readValue("{\"jodaDateTime\":\"2017-01-01 01:01:01[Asia/Shanghai]\"}", Foo.class).getJodaDateTime();
+        assertEquals(new DateTime(2017, 1, 1, 1, 1, 1, DateTimeZone.forID("Asia/Shanghai")), result);
     }
 }
