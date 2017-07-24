@@ -19,7 +19,7 @@ public class DurationDeserializationTest extends JodaTestBase
 
     /*
     /**********************************************************
-    /* Test methods, value deserialization
+    /* Test methods
     /**********************************************************
      */
 

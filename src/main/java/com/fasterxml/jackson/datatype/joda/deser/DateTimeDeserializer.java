@@ -72,10 +72,10 @@ public class DateTimeDeserializer
                 }
                 str = str.substring(0, ix);
 
-                /* 12-Jul-2015, tatu: Initially planned to support "timestamp[zone-id]"
-                 *    format as well as textual, but since JSR-310 datatype (Java 8 datetime)
-                 *    does not support it, was left out of 2.6.
-                 */
+                // 12-Jul-2015, tatu: Initially planned to support "timestamp[zone-id]"
+                //    format as well as textual, but since JSR-310 datatype (Java 8 datetime)
+                //    does not support it, was left out of 2.6.
+
                 /*
                 // One more thing; do we have plain timestamp?
                 if (_allDigits(str)) {
@@ -83,11 +83,15 @@ public class DateTimeDeserializer
                 }
                 */
 
-                if (!_format.shouldAdjustToContextTimeZone(ctxt)) {
-                    return _format.createParser(ctxt)
+                DateTime result = _format.createParser(ctxt)
+                        .withZone(tz)
                         .parseDateTime(str)
-                        .withZone(tz);
+                        ;
+                // 23-Jul-2017, tatu: As per [datatype-joda#93] only override tz if allowed to
+                if (_format.shouldAdjustToContextTimeZone(ctxt)) {
+                    result = result.withZone(_format.getTimeZone());
                 }
+                return result;
             }
             // Not sure if it should use timezone or not...
             // 15-Sep-2015, tatu: impl of 'createParser()' SHOULD handle all timezone/locale setup

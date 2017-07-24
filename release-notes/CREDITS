@@ -51,19 +51,23 @@ Luke Nezda (nezda@github)
   (2.6.2)
 
 Fabian Buch (fabianbuch@github)
-  * Contributed #73: `SerializationFeature.WRITE_DATES_WITH_ZONE_ID` writes
+ * Contributed #73: `SerializationFeature.WRITE_DATES_WITH_ZONE_ID` writes
    inconsistent Zone Offset
   (2.6.3)
 
 Chris Plummer (strmer15@github)
-  * Reported #82: Can't deserialize a serialized DateTimeZone with default typing
+ * Reported #82: Can't deserialize a serialized DateTimeZone with default typing
   (2.6.6 / 2.7.3)
 
 Jochen Schalanda (joschi@github)
-  * Contributed #81: Add key deserializers for `Duration` and `Period` classes
+ * Contributed #81: Add key deserializers for `Duration` and `Period` classes
   (2.7.2)
 
 Alexey Bychkov (joxerTMD@github)
-  * Contributed #87: Add support for JsonFormat.Feature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE
+ * Contributed #87: Add support for JsonFormat.Feature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE
   (2.8.0)
 
+Daniel Qian (chanjarster@github)
+ * Reported, contributed fix for #93: ADJUST_DATES_TO_CONTEXT_TIME_ZONE got wrong result
+   when parse string contains zone id
+  (2.9.0)
