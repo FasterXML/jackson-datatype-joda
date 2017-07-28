@@ -5,6 +5,7 @@ import java.io.IOException;
 import org.joda.time.Duration;
 
 import com.fasterxml.jackson.core.JsonGenerator;
+
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.datatype.joda.cfg.FormatConfig;
@@ -22,19 +23,21 @@ public class DurationSerializer // non final since 2.6.1
     // NOTE: formatter is not really used directly for printing, but we do need
     // it as container for numeric/textual distinction
     
-    public DurationSerializer() { this(FormatConfig.DEFAULT_DATEONLY_FORMAT); }
-    public DurationSerializer(JacksonJodaDateFormat formatter) {
+    public DurationSerializer() { this(FormatConfig.DEFAULT_DATEONLY_FORMAT, 0); }
+    public DurationSerializer(JacksonJodaDateFormat formatter,
+            int shapeOverride) {
         // false -> no arrays (numbers)
-        super(Duration.class, formatter, false,
-                SerializationFeature.WRITE_DURATIONS_AS_TIMESTAMPS);
+        super(Duration.class, formatter,
+                SerializationFeature.WRITE_DURATIONS_AS_TIMESTAMPS,
+                FORMAT_TIMESTAMP, shapeOverride);
     }
 
     @Override
-    public DurationSerializer withFormat(JacksonJodaDateFormat formatter) {
-        return (_format == formatter) ? this : new DurationSerializer(formatter);
+    public DurationSerializer withFormat(JacksonJodaDateFormat formatter,
+            int shapeOverride) {
+        return new DurationSerializer(formatter, shapeOverride);
     }
 
-    // @since 2.5
     @Override
     public boolean isEmpty(SerializerProvider prov, Duration value) {
         return (value.getMillis() == 0L);
@@ -43,10 +46,10 @@ public class DurationSerializer // non final since 2.6.1
     @Override
     public void serialize(Duration value, JsonGenerator gen, SerializerProvider provider) throws IOException
     {
-        if (_useTimestamp(provider)) {
-            gen.writeNumber(value.getMillis());
-        } else {
+        if (_serializationShape(provider) == FORMAT_STRING) {
             gen.writeString(value.toString());
+        } else {
+            gen.writeNumber(value.getMillis());
         }
     }
 }

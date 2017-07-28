@@ -5,6 +5,7 @@ import java.io.IOException;
 import org.joda.time.LocalTime;
 
 import com.fasterxml.jackson.core.JsonGenerator;
+
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.datatype.joda.cfg.FormatConfig;
@@ -15,15 +16,19 @@ public class LocalTimeSerializer // non final since 2.6.1
 {
     private static final long serialVersionUID = 1L;
 
-    public LocalTimeSerializer() { this(FormatConfig.DEFAULT_LOCAL_TIMEONLY_PRINTER); }
-    public LocalTimeSerializer(JacksonJodaDateFormat format) {
-        super(LocalTime.class, format, true,
-                SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+    public LocalTimeSerializer() {
+        this(FormatConfig.DEFAULT_LOCAL_TIMEONLY_PRINTER, 0);
+    }
+    public LocalTimeSerializer(JacksonJodaDateFormat format,
+            int shapeOverride) {
+        super(LocalTime.class, format, SerializationFeature.WRITE_DATES_AS_TIMESTAMPS,
+                FORMAT_ARRAY, shapeOverride);
     }
 
     @Override
-    public LocalTimeSerializer withFormat(JacksonJodaDateFormat formatter) {
-        return (_format == formatter) ? this : new LocalTimeSerializer(formatter);
+    public LocalTimeSerializer withFormat(JacksonJodaDateFormat formatter,
+            int shapeOverride) {
+        return new LocalTimeSerializer(formatter, shapeOverride);
     }
 
     // is there a natural "empty" value to check against?
@@ -37,16 +42,16 @@ public class LocalTimeSerializer // non final since 2.6.1
     @Override
     public void serialize(LocalTime value, JsonGenerator gen, SerializerProvider provider) throws IOException
     {
-        if (_useTimestamp(provider)) {
-            // Timestamp here actually means an array of values
-            gen.writeStartArray();
-            gen.writeNumber(value.hourOfDay().get());
-            gen.writeNumber(value.minuteOfHour().get());
-            gen.writeNumber(value.secondOfMinute().get());
-            gen.writeNumber(value.millisOfSecond().get());
-            gen.writeEndArray();
-        } else {
+        if (_serializationShape(provider) == FORMAT_STRING) {
             gen.writeString(_format.createFormatter(provider).print(value));
+            return;
         }
+        // Timestamp here actually means an array of values
+        gen.writeStartArray();
+        gen.writeNumber(value.hourOfDay().get());
+        gen.writeNumber(value.minuteOfHour().get());
+        gen.writeNumber(value.secondOfMinute().get());
+        gen.writeNumber(value.millisOfSecond().get());
+        gen.writeEndArray();
     }
 }

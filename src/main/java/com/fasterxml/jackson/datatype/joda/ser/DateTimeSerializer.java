@@ -10,21 +10,27 @@ import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.datatype.joda.cfg.FormatConfig;
 import com.fasterxml.jackson.datatype.joda.cfg.JacksonJodaDateFormat;
 
-public class DateTimeSerializer // non final since 2.6.1
+public class DateTimeSerializer
     extends JodaDateSerializerBase<DateTime>
 {
     private static final long serialVersionUID = 1L;
 
-    public DateTimeSerializer() { this(FormatConfig.DEFAULT_DATETIME_PRINTER); }
-    public DateTimeSerializer(JacksonJodaDateFormat format) {
+    public DateTimeSerializer() {
+        this(FormatConfig.DEFAULT_DATETIME_PRINTER, 0);
+    }
+
+    public DateTimeSerializer(JacksonJodaDateFormat format,
+            int shapeOverride) {
         // false -> no arrays (numbers)
-        super(DateTime.class, format, false,
-                SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+        super(DateTime.class, format,
+                SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, FORMAT_TIMESTAMP,
+                shapeOverride);
     }
 
     @Override
-    public DateTimeSerializer withFormat(JacksonJodaDateFormat formatter) {
-        return (_format == formatter) ? this : new DateTimeSerializer(formatter);
+    public DateTimeSerializer withFormat(JacksonJodaDateFormat formatter,
+            int shapeOverride) {
+        return new DateTimeSerializer(formatter, shapeOverride);
     }
 
     @Override
@@ -35,16 +41,18 @@ public class DateTimeSerializer // non final since 2.6.1
     @Override
     public void serialize(DateTime value, JsonGenerator gen, SerializerProvider provider) throws IOException
     {
+        boolean numeric = (_serializationShape(provider) != FORMAT_STRING);
+
         // First: simple, non-timezone-included output
         if (!writeWithZoneId(provider)) {
-            if (_useTimestamp(provider)) {
+            if (numeric) {
                 gen.writeNumber(value.getMillis());
             } else {
                 gen.writeString(_format.createFormatter(provider).print(value));
             }
         } else {
             // and then as per [datatype-joda#44], optional TimeZone inclusion
-            if (_useTimestamp(provider)) {
+            if (numeric) {
                 /* 12-Jul-2015, tatu: Initially planned to support "timestamp[zone-id]"
                  *    format as well as textual, but since JSR-310 datatype (Java 8 datetime)
                  *    does not support it, was left out of 2.6.

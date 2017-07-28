@@ -16,15 +16,17 @@ public class IntervalSerializer extends JodaDateSerializerBase<Interval>
 {
     private static final long serialVersionUID = 1L;
 
-    public IntervalSerializer() { this(FormatConfig.DEFAULT_DATETIME_PRINTER); }
-    public IntervalSerializer(JacksonJodaDateFormat format) {
-        super(Interval.class, format, false,
-                SerializationFeature.WRITE_DURATIONS_AS_TIMESTAMPS);
+    public IntervalSerializer() { this(FormatConfig.DEFAULT_DATETIME_PRINTER, 0); }
+    public IntervalSerializer(JacksonJodaDateFormat format,
+            int shapeOverride) {
+        super(Interval.class, format, SerializationFeature.WRITE_DURATIONS_AS_TIMESTAMPS,
+                FORMAT_TIMESTAMP, shapeOverride);
     }
 
     @Override
-    public IntervalSerializer withFormat(JacksonJodaDateFormat formatter) {
-        return (_format == formatter) ? this : new IntervalSerializer(formatter);
+    public IntervalSerializer withFormat(JacksonJodaDateFormat formatter,
+            int shapeOverride) {
+        return new IntervalSerializer(formatter, shapeOverride);
     }
 
     @Override
@@ -38,12 +40,13 @@ public class IntervalSerializer extends JodaDateSerializerBase<Interval>
         // 19-Nov-2014, tatu: Support textual representation similar to what Joda uses
         //   (and why not exact one? In future we'll make it configurable)
         String repr;
-        if (_useTimestamp(provider)) {
-            // !!! TODO: maybe allow textual format too?
-            repr = interval.getStartMillis() + "-" + interval.getEndMillis();
-        } else {
+
+        if (_serializationShape(provider) == FORMAT_STRING) {
             DateTimeFormatter f = _format.createFormatter(provider);
             repr = f.print(interval.getStart()) + "/" + f.print(interval.getEnd());
+        } else {
+            // !!! TODO: maybe allow textual format too?
+            repr = interval.getStartMillis() + "-" + interval.getEndMillis();
         }
         gen.writeString(repr);
     }

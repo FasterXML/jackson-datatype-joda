@@ -35,7 +35,17 @@ public class DateMidnightTest extends JodaTestBase
         @JsonFormat(timezone="EST")
         public DateMidnight dateMidnight;
     }
-    
+
+    static class FormattedDateAsTimestamp {
+        @JsonFormat(shape=JsonFormat.Shape.NUMBER)
+        public DateMidnight value;
+
+        protected FormattedDateAsTimestamp() { }
+        public FormattedDateAsTimestamp(DateMidnight d) {
+            value = d;
+        }
+    }
+
     /*
     /**********************************************************
     /* Test methods
@@ -44,7 +54,7 @@ public class DateMidnightTest extends JodaTestBase
 
     public void testDateMidnightDeserWithTimeZone() throws IOException
     {
-    	MAPPER.setTimeZone(TimeZone.getTimeZone("Europe/Paris"));
+        MAPPER.setTimeZone(TimeZone.getTimeZone("Europe/Paris"));
         // couple of acceptable formats, so:
         DateMidnight date = MAPPER.readValue("[2001,5,25]", DateMidnight.class);
         assertEquals(2001, date.getYear());
@@ -59,8 +69,7 @@ public class DateMidnightTest extends JodaTestBase
         // since 1.6.1, for [JACKSON-360]
         assertNull(MAPPER.readValue(quote(""), DateMidnight.class));
 
-        
-    	MAPPER.setTimeZone(TimeZone.getTimeZone("America/Los_Angeles"));
+            MAPPER.setTimeZone(TimeZone.getTimeZone("America/Los_Angeles"));
         // couple of acceptable formats, so:
         date = MAPPER.readValue("[2001,5,25]", DateMidnight.class);
         assertEquals(2001, date.getYear());
@@ -148,5 +157,12 @@ public class DateMidnightTest extends JodaTestBase
         DateTimeZone resultTz = resultMidnight.getZone();
         // Is this stable enough for testing?
         assertEquals("America/New_York", resultTz.getID());
+    }
+
+    public void testSerializeAsTimestamp() throws Exception
+    {
+        assertEquals(aposToQuotes("{'value':0}"),
+                MAPPER.writeValueAsString(new FormattedDateAsTimestamp(
+                        new DateMidnight(0, DateTimeZone.UTC))));
     }
 }

@@ -31,6 +31,5 @@ public class DateTimeZoneSerializer extends JodaSerializerBase<DateTimeZone>
                 typeSer.typeId(value, DateTimeZone.class, JsonToken.VALUE_STRING));
         serialize(value, g, provider);
         typeSer.writeTypeSuffix(g, typeIdDef);
-    
     }
 }

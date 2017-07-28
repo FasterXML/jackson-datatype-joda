@@ -16,15 +16,17 @@ public class InstantSerializer // non final since 2.6.1
     private static final long serialVersionUID = 1L;
 
     // NOTE: formatter not used for printing at all, hence choice doesn't matter
-    public InstantSerializer() { this(FormatConfig.DEFAULT_TIMEONLY_FORMAT); }
-    public InstantSerializer(JacksonJodaDateFormat format) {
-        super(Instant.class, format, false,
-                SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+    public InstantSerializer() { this(FormatConfig.DEFAULT_TIMEONLY_FORMAT, 0); }
+    public InstantSerializer(JacksonJodaDateFormat format,
+            int shapeOverride) {
+        super(Instant.class, format, SerializationFeature.WRITE_DATES_AS_TIMESTAMPS,
+                FORMAT_TIMESTAMP, shapeOverride);
     }
 
     @Override
-    public InstantSerializer withFormat(JacksonJodaDateFormat formatter) {
-        return (_format == formatter) ? this : new InstantSerializer(formatter);
+    public InstantSerializer withFormat(JacksonJodaDateFormat formatter,
+            int shapeOverride) {
+        return new InstantSerializer(formatter, shapeOverride);
     }
 
     // @since 2.5
@@ -37,10 +39,10 @@ public class InstantSerializer // non final since 2.6.1
     public void serialize(Instant value, JsonGenerator gen, SerializerProvider provider)
         throws IOException
     {
-        if (_useTimestamp(provider)) {
-            gen.writeNumber(value.getMillis());
-        } else {
+        if (_serializationShape(provider) == FORMAT_STRING) {
             gen.writeString(value.toString());
+        } else {
+            gen.writeNumber(value.getMillis());
         }
     }
 }

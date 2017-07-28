@@ -16,15 +16,17 @@ public class LocalDateSerializer // non final since 2.6.1
 {
     private static final long serialVersionUID = 1L;
 
-    public LocalDateSerializer() { this(FormatConfig.DEFAULT_LOCAL_DATEONLY_FORMAT); }
-    public LocalDateSerializer(JacksonJodaDateFormat format) {
-        super(LocalDate.class, format, true,
-                SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+    public LocalDateSerializer() { this(FormatConfig.DEFAULT_LOCAL_DATEONLY_FORMAT, 0); }
+    public LocalDateSerializer(JacksonJodaDateFormat format,
+            int shapeOverride) {
+        super(LocalDate.class, format, SerializationFeature.WRITE_DATES_AS_TIMESTAMPS,
+                FORMAT_ARRAY, shapeOverride);
     }
 
     @Override
-    public LocalDateSerializer withFormat(JacksonJodaDateFormat formatter) {
-        return (_format == formatter) ? this : new LocalDateSerializer(formatter);
+    public LocalDateSerializer withFormat(JacksonJodaDateFormat formatter,
+            int shapeOverride) {
+        return new LocalDateSerializer(formatter, shapeOverride);
     }
 
     // is there a natural "empty" value to check against?
@@ -38,15 +40,17 @@ public class LocalDateSerializer // non final since 2.6.1
     @Override
     public void serialize(LocalDate value, JsonGenerator gen, SerializerProvider provider) throws IOException
     {
-        if (_useTimestamp(provider)) {
-            // Timestamp here actually means an array of values
-            gen.writeStartArray();
-            gen.writeNumber(value.year().get());
-            gen.writeNumber(value.monthOfYear().get());
-            gen.writeNumber(value.dayOfMonth().get());
-            gen.writeEndArray();
-        } else {
+        if (_serializationShape(provider) == FORMAT_STRING) {
             gen.writeString(_format.createFormatter(provider).print(value));
+            return;
         }
+        // 28-Jul-2017, tatu: Wrt [dataformat-joda#39]... we could perhaps support timestamps,
+        //   but only by specifying what to do with time (`LocalTime`) AND timezone. For now,
+        //   seems like asking for trouble really... so only use array notation.
+        gen.writeStartArray();
+        gen.writeNumber(value.year().get());
+        gen.writeNumber(value.monthOfYear().get());
+        gen.writeNumber(value.dayOfMonth().get());
+        gen.writeEndArray();
     }
 }
