@@ -1,9 +1,12 @@
 package com.fasterxml.jackson.datatype.joda.cfg;
 
+import java.io.IOException;
 import java.util.Locale;
 
+import org.joda.time.Period;
 import org.joda.time.format.PeriodFormatter;
 
+import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.SerializerProvider;
 
 /**
@@ -34,6 +37,13 @@ public class JacksonJodaPeriodFormat extends JacksonJodaFormatBase
     {
         super(base, useTimestamp);
         _formatter = base._formatter;
+    }
+
+    /**
+     * @since 2.9
+     */
+    public PeriodFormatter nativeFormatter() {
+        return _formatter;
     }
 
     /*
@@ -82,5 +92,14 @@ public class JacksonJodaPeriodFormat extends JacksonJodaFormatBase
             }
         }
         return formatter;
+    }
+
+
+    /**
+     * @since 2.9
+     */
+    public Period parsePeriod(DeserializationContext ctxt, String str) throws IOException
+    {
+        return _formatter.parsePeriod(str);
     }
 }

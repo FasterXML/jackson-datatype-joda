@@ -86,8 +86,7 @@ public class DurationDeserializationTest extends JodaTestBase
 
     // [datatype-joda#90]: Possibly support wider set of representations
 
-    /*
-    public void testDurationFromStringAlt() throws IOException
+    public void testDurationAltFromString() throws IOException
     {
         Duration d = MAPPER.readValue(quote("PT1H"), Duration.class);
         assertEquals(60, d.getStandardMinutes());
@@ -104,5 +103,4 @@ public class DurationDeserializationTest extends JodaTestBase
         assertNotNull(map);
         assertTrue(map.containsKey(Duration.standardMinutes(4 * 60 + 30)));
     }
-    */
 }

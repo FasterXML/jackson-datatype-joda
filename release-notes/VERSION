@@ -6,6 +6,8 @@ Project: jackson-datatype-joda
 
 2.9.0 (xx-Jul-2017)
 
+#90: `DurationDeserializer` does not accept valid ISO8601 duration values
+ (requested by bpelakh@github)
 #93: ADJUST_DATES_TO_CONTEXT_TIME_ZONE got wrong result when parse string contains zone id
  (contributed by Daniel Q)
 
