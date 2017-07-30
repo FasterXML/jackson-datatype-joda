@@ -4,7 +4,7 @@ Project: jackson-datatype-joda
 === Releases ===
 ------------------------------------------------------------------------
 
-2.9.0 (xx-Jul-2017)
+2.9.0 (30-Jul-2017)
 
 #90: `DurationDeserializer` does not accept valid ISO8601 duration values
  (requested by bpelakh@github)
