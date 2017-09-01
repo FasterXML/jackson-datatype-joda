@@ -245,7 +245,7 @@ public class JodaSerializationTest extends JodaTestBase
         mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
         mapper.setDateFormat(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'"));
 
-        // Create an instant and serialize and additonally serialize the instant as DateTime to demonstrate the difference
+        // Create an instant and serialize and additionally serialize the instant as DateTime to demonstrate the difference
         org.joda.time.Instant now = new DateTime(1431498572205L).toInstant();
         
         String instantString = mapper.writeValueAsString(now);
