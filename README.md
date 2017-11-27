@@ -6,7 +6,7 @@ to support JSON serialization and deserialization of
 
 [![Build Status](https://travis-ci.org/FasterXML/jackson-datatype-joda.svg)](https://travis-ci.org/FasterXML/jackson-datatype-joda)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.fasterxml.jackson.datatype/jackson-datatype-joda/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.fasterxml.jackson.datatype/jackson-datatype-joda/)
-[![Javadoc](https://javadoc-emblem.rhcloud.com/doc/com.fasterxml.jackson.datatype/jackson-datatype-joda/badge.svg)](http://www.javadoc.io/doc/com.fasterxml.jackson.datatype/jackson-datatype-joda)
+[![Javadoc](https://javadoc.io/badge/com.fasterxml.jackson.datatype/jackson-datatype-joda.svg)](http://www.javadoc.io/doc/com.fasterxml.jackson.datatype/jackson-datatype-joda)
 
 Module has been production-ready since version 2.0, and offers relatively extensive support for Joda datatypes.
 Contributions are always welcome -- not all types are yet supported; and we may want to support even wider alternative
