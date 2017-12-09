@@ -25,7 +25,7 @@ public class MonthDayDeserializer extends JodaDeserializerBase<MonthDay>
     @Override
     public MonthDay deserialize(final JsonParser p, final DeserializationContext ctxt) throws IOException
     {
-        JsonToken t = p.getCurrentToken();
+        JsonToken t = p.currentToken();
         if (t == JsonToken.VALUE_STRING)
         {
             String str = p.getText().trim();
@@ -34,7 +34,7 @@ public class MonthDayDeserializer extends JodaDeserializerBase<MonthDay>
             }
             return MonthDay.parse(str);
         }
-        return (MonthDay) ctxt.handleUnexpectedToken(handledType(), p.getCurrentToken(), p,
+        return (MonthDay) ctxt.handleUnexpectedToken(handledType(), p.currentToken(), p,
                 "expected JSON String");
     }
 }

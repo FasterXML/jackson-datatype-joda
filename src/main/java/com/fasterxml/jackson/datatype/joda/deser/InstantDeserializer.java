@@ -25,7 +25,7 @@ public class InstantDeserializer
     @Override
     public Instant deserialize(JsonParser p, DeserializationContext ctxt) throws IOException
     {
-        JsonToken t = p.getCurrentToken();
+        JsonToken t = p.currentToken();
         if (t == JsonToken.VALUE_NUMBER_INT) {
             return new Instant(p.getLongValue());
         }

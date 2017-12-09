@@ -101,19 +101,6 @@ public abstract class JodaDateSerializerBase<T> extends JodaSerializerBase<T>
     }
 
     @Override
-    public JsonNode getSchema(SerializerProvider provider, java.lang.reflect.Type typeHint) {
-        switch (_serializationShape(provider)) {
-        case FORMAT_TIMESTAMP:
-            return createSchemaNode("array", true);
-        case FORMAT_ARRAY:
-            return createSchemaNode("number", true);
-        case FORMAT_STRING:
-        default:
-            return createSchemaNode("string", true);
-        }
-    }
-
-    @Override
     public void acceptJsonFormatVisitor(JsonFormatVisitorWrapper visitor, JavaType typeHint)
             throws JsonMappingException
     {

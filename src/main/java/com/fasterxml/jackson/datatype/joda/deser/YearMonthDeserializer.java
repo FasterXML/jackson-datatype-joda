@@ -25,7 +25,7 @@ public class YearMonthDeserializer extends JodaDeserializerBase<YearMonth>
     @Override
     public YearMonth deserialize(final JsonParser p, final DeserializationContext ctxt) throws IOException
     {
-        JsonToken t = p.getCurrentToken();
+        JsonToken t = p.currentToken();
         if (t == JsonToken.VALUE_STRING) {
             String str = p.getText().trim();
             if (str.isEmpty()) {
@@ -33,7 +33,7 @@ public class YearMonthDeserializer extends JodaDeserializerBase<YearMonth>
             }
             return YearMonth.parse(str);
         }
-        return (YearMonth) ctxt.handleUnexpectedToken(handledType(), p.getCurrentToken(), p,
+        return (YearMonth) ctxt.handleUnexpectedToken(handledType(), p.currentToken(), p,
                 "expected JSON String");
     }
 }

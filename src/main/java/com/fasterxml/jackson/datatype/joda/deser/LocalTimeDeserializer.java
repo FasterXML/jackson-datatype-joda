@@ -32,7 +32,7 @@ public class LocalTimeDeserializer
     public LocalTime deserialize(JsonParser p, DeserializationContext ctxt)
         throws IOException
     {
-        switch (p.getCurrentToken()) {
+        switch (p.currentToken()) {
         case START_ARRAY:
             // [HH,MM,ss,ms?]
             if (p.isExpectedStartArrayToken()) {
@@ -44,11 +44,11 @@ public class LocalTimeDeserializer
                 int second = p.getIntValue();
                 p.nextToken(); // VALUE_NUMBER_INT | END_ARRAY
                 int millis = 0;
-                if (p.getCurrentToken() != JsonToken.END_ARRAY) {
+                if (p.currentToken() != JsonToken.END_ARRAY) {
                     millis = p.getIntValue();
                     p.nextToken(); // END_ARRAY?
                 }
-                if (p.getCurrentToken() != JsonToken.END_ARRAY) {
+                if (p.currentToken() != JsonToken.END_ARRAY) {
                     throw ctxt.wrongTokenException(p, handledType(), JsonToken.END_ARRAY, "after LocalTime ints");
                 }
                 return new LocalTime(hour, minute, second, millis);
@@ -62,7 +62,7 @@ public class LocalTimeDeserializer
                     : _format.createParser(ctxt).parseLocalTime(str);
         default:
         }
-        return (LocalTime) ctxt.handleUnexpectedToken(handledType(), p.getCurrentToken(), p,
+        return (LocalTime) ctxt.handleUnexpectedToken(handledType(), p.currentToken(), p,
                 "expected JSON Array, String or Number");
     }
 }

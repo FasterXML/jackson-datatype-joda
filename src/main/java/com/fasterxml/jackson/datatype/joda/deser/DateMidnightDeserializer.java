@@ -54,14 +54,14 @@ public class DateMidnightDeserializer
             p.nextToken(); // VALUE_NUMBER_INT
             int day = p.getIntValue();
             if (p.nextToken() != JsonToken.END_ARRAY) {
-                throw ctxt.wrongTokenException(p, JsonToken.END_ARRAY,
+                ctxt.reportWrongTokenException(this, JsonToken.END_ARRAY,
                         "after DateMidnight ints");
             }
             DateTimeZone tz = _format.isTimezoneExplicit() ? _format.getTimeZone() : DateTimeZone.forTimeZone(ctxt.getTimeZone());
 
             return new DateMidnight(year, month, day, tz);
         }
-        switch (p.getCurrentToken()) {
+        switch (p.currentToken()) {
         case VALUE_NUMBER_INT:
             return new DateMidnight(p.getLongValue());
         case VALUE_STRING:
@@ -75,8 +75,9 @@ public class DateMidnightDeserializer
             }
             return local.toDateMidnight();
         default:
+            ctxt.reportWrongTokenException(this, JsonToken.START_ARRAY,
+                    "expected JSON Array, Number or String");
         }
-        throw ctxt.wrongTokenException(p, JsonToken.START_ARRAY,
-                "expected JSON Array, Number or String");
+        return null;
     }
 }

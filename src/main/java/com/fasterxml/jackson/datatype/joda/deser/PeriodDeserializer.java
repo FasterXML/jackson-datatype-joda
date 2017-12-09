@@ -33,7 +33,7 @@ public class PeriodDeserializer
     public ReadablePeriod deserialize(JsonParser p, DeserializationContext ctxt)
         throws IOException
     {
-        JsonToken t = p.getCurrentToken();
+        JsonToken t = p.currentToken();
         if (t == JsonToken.VALUE_STRING) {
             String str = p.getText().trim();
             if (str.isEmpty()) {

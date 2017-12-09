@@ -34,7 +34,7 @@ public class LocalDateDeserializer
     @Override
     public LocalDate deserialize(JsonParser p, DeserializationContext ctxt) throws IOException
     {
-        switch (p.getCurrentTokenId()) {
+        switch (p.currentTokenId()) {
         case JsonTokenId.ID_STRING:
             String str = p.getText().trim();
             return (str.length() == 0) ? null
@@ -63,7 +63,7 @@ public class LocalDateDeserializer
             }
             return new LocalDate(year, month, day);
         }
-        return (LocalDate) ctxt.handleUnexpectedToken(handledType(), p.getCurrentToken(), p,
+        return (LocalDate) ctxt.handleUnexpectedToken(handledType(), p.currentToken(), p,
                 "expected String, Number or JSON Array");
     }
 }

@@ -33,7 +33,7 @@ public class LocalDateTimeDeserializer
     public LocalDateTime deserialize(JsonParser p, DeserializationContext ctxt)
         throws IOException
     {
-        switch (p.getCurrentTokenId()) {
+        switch (p.currentTokenId()) {
         case JsonTokenId.ID_STRING:
             {
                 String str = p.getText().trim();
@@ -82,7 +82,7 @@ public class LocalDateTimeDeserializer
             throw ctxt.wrongTokenException(p, handledType(), JsonToken.END_ARRAY, "after LocalDateTime ints");
         default:
         }
-        return (LocalDateTime) ctxt.handleUnexpectedToken(handledType(), p.getCurrentToken(), p,
+        return (LocalDateTime) ctxt.handleUnexpectedToken(handledType(), p.currentToken(), p,
             "expected String, Number or JSON Array");
     }
 }

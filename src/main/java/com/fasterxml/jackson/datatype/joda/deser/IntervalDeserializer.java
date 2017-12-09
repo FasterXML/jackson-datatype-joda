@@ -36,7 +36,7 @@ public class IntervalDeserializer extends JodaDateDeserializerBase<Interval>
     {
         if (!p.hasToken(JsonToken.VALUE_STRING)) {
             return (Interval) ctxt.handleUnexpectedToken(handledType(),
-                    p.getCurrentToken(), p, "expected JSON String");
+                    p.currentToken(), p, "expected JSON String");
         }
 
         String v = p.getText().trim();

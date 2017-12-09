@@ -81,16 +81,11 @@ public class PeriodSerializer // non final since 2.6.1
         }
         return this;
     }
-    
+
     @Override
     public void serialize(ReadablePeriod value, JsonGenerator gen, SerializerProvider provider) throws IOException
     {
         gen.writeString(_format.createFormatter(provider).print(value));
-    }
-
-    @Override
-    public JsonNode getSchema(SerializerProvider provider, java.lang.reflect.Type typeHint) {
-        return createSchemaNode("string", true);
     }
 
     @Override

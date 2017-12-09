@@ -44,7 +44,7 @@ public class DateTimeDeserializer
     public ReadableInstant deserialize(JsonParser p, DeserializationContext ctxt)
         throws IOException
     {
-        JsonToken t = p.getCurrentToken();
+        JsonToken t = p.currentToken();
         
         if (t == JsonToken.VALUE_NUMBER_INT) {
             DateTimeZone tz = _format.isTimezoneExplicit() ? _format.getTimeZone() : DateTimeZone.forTimeZone(ctxt.getTimeZone());
