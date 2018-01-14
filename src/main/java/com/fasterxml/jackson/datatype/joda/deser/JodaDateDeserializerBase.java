@@ -2,19 +2,14 @@ package com.fasterxml.jackson.datatype.joda.deser;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.*;
-import com.fasterxml.jackson.databind.deser.ContextualDeserializer;
 import com.fasterxml.jackson.datatype.joda.cfg.JacksonJodaDateFormat;
 
 /**
  * Intermediate base class used by deserializers that allow configuration
  * via <code>JsonFormat</code> annotation
- *
- * @since 2.6
  */
 public abstract class JodaDateDeserializerBase<T>
     extends JodaDeserializerBase<T>
-//need contextualization to read per-property annotations
-    implements ContextualDeserializer
 {
     private static final long serialVersionUID = 1L;
 

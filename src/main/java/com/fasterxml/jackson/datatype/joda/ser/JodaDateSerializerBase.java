@@ -5,12 +5,9 @@ import com.fasterxml.jackson.core.JsonParser;
 
 import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.jsonFormatVisitors.*;
-import com.fasterxml.jackson.databind.ser.ContextualSerializer;
 import com.fasterxml.jackson.datatype.joda.cfg.JacksonJodaDateFormat;
 
 public abstract class JodaDateSerializerBase<T> extends JodaSerializerBase<T>
-// need contextualization to read per-property annotations
-    implements ContextualSerializer
 {
     private static final long serialVersionUID = 1L;
 
@@ -27,15 +24,11 @@ public abstract class JodaDateSerializerBase<T> extends JodaSerializerBase<T>
     /**
      * Shape to use for generic "use numeric" feature (instead of more specific
      * JsonFormat.shape).
-     *
-     * @since 2.9
      */
     protected final int _defaultNumericShape;
 
     /**
      * Marker set to non-0 if (and only if) property or type override exists.
-     *
-     * @since 2.9
      */
     protected final int _shapeOverride;
 
@@ -139,9 +132,6 @@ public abstract class JodaDateSerializerBase<T> extends JodaSerializerBase<T>
     /**********************************************************
      */
 
-    /**
-     * @since 2.8
-     */
     protected boolean writeWithZoneId(SerializerProvider provider) {
         return _format.shouldWriteWithZoneId(provider);
     }
