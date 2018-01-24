@@ -1,11 +1,11 @@
 language: java
 
+# Jackson 3.x requires Java8
 jdk:
-  - openjdk7
   - openjdk8
 
 # no need to build all branches
 branches:
   only:
     - master
-    - "2.9"
+    - "3.0"
