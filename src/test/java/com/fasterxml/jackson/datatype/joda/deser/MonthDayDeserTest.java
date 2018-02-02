@@ -18,21 +18,20 @@ public class MonthDayDeserTest extends JodaTestBase
     /**********************************************************
      */
 
-    private final ObjectMapper MAPPER = jodaMapper();
-
     public void testDeserMonthDay() throws Exception
     {
         String monthDayString = new MonthDay(7, 23).toString();
-        MonthDay monthDay = MAPPER.readValue(quote(monthDayString), MonthDay.class);
+        final ObjectMapper mapper = jodaMapper();
+        MonthDay monthDay = mapper.readValue(quote(monthDayString), MonthDay.class);
         assertEquals(new MonthDay(7, 23), monthDay);
     }
 
     public void testDeserMonthDayWithTimeZone() throws Exception
     {
-        MAPPER.setTimeZone(TimeZone.getTimeZone("Europe/Paris"));
+        final ObjectMapper mapper = jodaMapper(TimeZone.getTimeZone("Europe/Paris"));
         
         String monthDayString = new MonthDay(7, 23).toString();
-        MonthDay monthDay = MAPPER.readValue(quote(monthDayString), MonthDay.class);
+        MonthDay monthDay = mapper.readValue(quote(monthDayString), MonthDay.class);
         assertEquals(new MonthDay(7, 23), monthDay);
         
         assertEquals(ISOChronology.getInstanceUTC(), monthDay.getChronology());
@@ -40,18 +39,19 @@ public class MonthDayDeserTest extends JodaTestBase
     
     public void testDeserMonthDayFromEmptyString() throws Exception
     {
-        MonthDay monthDay = MAPPER.readValue(quote(""), MonthDay.class);
+        final ObjectMapper mapper = jodaMapper();
+        MonthDay monthDay = mapper.readValue(quote(""), MonthDay.class);
         assertNull(monthDay);
     }
 
     public void testDeserMonthDayFailsForUnexpectedType() throws IOException
     {
+        final ObjectMapper mapper = jodaMapper();
         try
         {
-            MAPPER.readValue("{\"month\":8}", MonthDay.class);
+            mapper.readValue("{\"month\":8}", MonthDay.class);
             fail();
-        } catch (JsonMappingException e)
-        {
+        } catch (JsonMappingException e) {
             assertTrue(e.getMessage().contains("expected JSON String"));
         }
     }

@@ -4,15 +4,31 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import junit.framework.TestCase;
 
 import java.io.IOException;
+import java.text.DateFormat;
 import java.util.Arrays;
+import java.util.TimeZone;
 
 import static org.junit.Assert.*;
 
 public abstract class JodaTestBase extends TestCase
 {
-    protected static ObjectMapper jodaMapper()
-    {
-        return new JodaMapper();
+    protected static ObjectMapper jodaMapper() {
+        return new ObjectMapper()
+                .registerModule(new JodaModule());
+    }
+
+    protected static ObjectMapper jodaMapper(DateFormat df) {
+        return ObjectMapper.builder()
+                .defaultDateFormat(df)
+                .build()
+                .registerModule(new JodaModule());
+    }
+
+    protected static ObjectMapper jodaMapper(TimeZone tz) {
+        return ObjectMapper.builder()
+                .defaultTimeZone(tz)
+                .build()
+                .registerModule(new JodaModule());
     }
 
     /*

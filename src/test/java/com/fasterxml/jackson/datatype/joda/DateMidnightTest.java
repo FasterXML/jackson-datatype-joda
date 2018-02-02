@@ -13,10 +13,6 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 @SuppressWarnings("deprecation") // because DateMidnight deprecated by Joda
 public class DateMidnightTest extends JodaTestBase
 {
-    // let's default to String serialization
-    private final ObjectMapper MAPPER = jodaMapper()
-            .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-
     @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.WRAPPER_ARRAY, property = "@class")
     private static interface MixInForTypeId {
     }
@@ -54,52 +50,54 @@ public class DateMidnightTest extends JodaTestBase
 
     public void testDateMidnightDeserWithTimeZone() throws IOException
     {
-        MAPPER.setTimeZone(TimeZone.getTimeZone("Europe/Paris"));
+        ObjectMapper mapper = jodaMapper(TimeZone.getTimeZone("Europe/Paris"));
         // couple of acceptable formats, so:
-        DateMidnight date = MAPPER.readValue("[2001,5,25]", DateMidnight.class);
+        DateMidnight date = mapper.readValue("[2001,5,25]", DateMidnight.class);
         assertEquals(2001, date.getYear());
         assertEquals(5, date.getMonthOfYear());
         assertEquals(25, date.getDayOfMonth());
 
-        DateMidnight date2 = MAPPER.readValue(quote("2005-07-13"), DateMidnight.class);
+        DateMidnight date2 = mapper.readValue(quote("2005-07-13"), DateMidnight.class);
         assertEquals(2005, date2.getYear());
         assertEquals(7, date2.getMonthOfYear());
         assertEquals(13, date2.getDayOfMonth());
 
         // since 1.6.1, for [JACKSON-360]
-        assertNull(MAPPER.readValue(quote(""), DateMidnight.class));
+        assertNull(mapper.readValue(quote(""), DateMidnight.class));
 
-            MAPPER.setTimeZone(TimeZone.getTimeZone("America/Los_Angeles"));
+        mapper = jodaMapper(TimeZone.getTimeZone("America/Los_Angeles"));
         // couple of acceptable formats, so:
-        date = MAPPER.readValue("[2001,5,25]", DateMidnight.class);
+        date = mapper.readValue("[2001,5,25]", DateMidnight.class);
         assertEquals(2001, date.getYear());
         assertEquals(5, date.getMonthOfYear());
         assertEquals(25, date.getDayOfMonth());
 
-        date2 = MAPPER.readValue(quote("2005-07-13"), DateMidnight.class);
+        date2 = mapper.readValue(quote("2005-07-13"), DateMidnight.class);
         assertEquals(2005, date2.getYear());
         assertEquals(7, date2.getMonthOfYear());
         assertEquals(13, date2.getDayOfMonth());
 
         // since 1.6.1, for [JACKSON-360]
-        assertNull(MAPPER.readValue(quote(""), DateMidnight.class));
+        assertNull(mapper.readValue(quote(""), DateMidnight.class));
     }
     
     public void testDateMidnightDeser() throws IOException
     {
+        ObjectMapper mapper = jodaMapper();
+        
         // couple of acceptable formats, so:
-        DateMidnight date = MAPPER.readValue("[2001,5,25]", DateMidnight.class);
+        DateMidnight date = mapper.readValue("[2001,5,25]", DateMidnight.class);
         assertEquals(2001, date.getYear());
         assertEquals(5, date.getMonthOfYear());
         assertEquals(25, date.getDayOfMonth());
 
-        DateMidnight date2 = MAPPER.readValue(quote("2005-07-13"), DateMidnight.class);
+        DateMidnight date2 = mapper.readValue(quote("2005-07-13"), DateMidnight.class);
         assertEquals(2005, date2.getYear());
         assertEquals(7, date2.getMonthOfYear());
         assertEquals(13, date2.getDayOfMonth());
 
         // since 1.6.1, for [JACKSON-360]
-        assertNull(MAPPER.readValue(quote(""), DateMidnight.class));
+        assertNull(mapper.readValue(quote(""), DateMidnight.class));
     }
 
     public void testDateMidnightDeserWithTypeInfo() throws IOException
@@ -121,17 +119,20 @@ public class DateMidnightTest extends JodaTestBase
 
     public void testCustomFormat() throws Exception
     {
+        ObjectMapper mapper = jodaMapper()
+                .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+
         String STR = "2015-06-19";
         String ALT = "19.06.2015";
 
         final DateMidnight inputDate = new DateMidnight(STR);
         AlternateFormat input = new AlternateFormat(inputDate);
-        String json = MAPPER.writeValueAsString(input);
+        String json = mapper.writeValueAsString(input);
 
         if (!json.contains(ALT)) {
             fail("Should contain '"+ALT+"', did not: "+json);
         }
-        AlternateFormat output = MAPPER.readValue(json, AlternateFormat.class);
+        AlternateFormat output = mapper.readValue(json, AlternateFormat.class);
         assertNotNull(output.value);
         assertEquals(inputDate, output.value);
     }
@@ -161,8 +162,9 @@ public class DateMidnightTest extends JodaTestBase
 
     public void testSerializeAsTimestamp() throws Exception
     {
+        ObjectMapper mapper = jodaMapper();
         assertEquals(aposToQuotes("{'value':0}"),
-                MAPPER.writeValueAsString(new FormattedDateAsTimestamp(
+                mapper.writeValueAsString(new FormattedDateAsTimestamp(
                         new DateMidnight(0, DateTimeZone.UTC))));
     }
 }

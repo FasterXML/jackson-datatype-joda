@@ -59,69 +59,69 @@ public class DateTimeDeserTest extends JodaTestBase
     /**********************************************************
      */
 
-    private final ObjectMapper MAPPER = jodaMapper();
-
     /**
      * Ok, then: should be able to convert from JSON String or Number,
      * with standard deserializer we provide.
      */
     public void testDeserFromNumber() throws IOException
     {
+        final ObjectMapper mapper = jodaMapper();
+        
         Calendar cal = new GregorianCalendar(TimeZone.getTimeZone("GMT"));
         // use some arbitrary but non-default time point (after 1.1.1970)
         cal.set(Calendar.YEAR, 1972);
         long timepoint = cal.getTime().getTime();
 
         // Ok, first: using JSON number (milliseconds since epoch)
-        DateTime dt = MAPPER.readValue(String.valueOf(timepoint), DateTime.class);
+        DateTime dt = mapper.readValue(String.valueOf(timepoint), DateTime.class);
         assertEquals(timepoint, dt.getMillis());
 
         // And then ISO-8601 String
-        dt = MAPPER.readValue(quote("1972-12-28T12:00:01.000+0000"), DateTime.class);
+        dt = mapper.readValue(quote("1972-12-28T12:00:01.000+0000"), DateTime.class);
         assertEquals("1972-12-28T12:00:01.000Z", dt.toString());
     }
 
     public void testDeserReadableDateTime() throws IOException
     {
-        ReadableDateTime date = MAPPER.readValue(quote("1972-12-28T12:00:01.000+0000"), ReadableDateTime.class);
+        final ObjectMapper mapper = jodaMapper();
+
+        ReadableDateTime date = mapper.readValue(quote("1972-12-28T12:00:01.000+0000"), ReadableDateTime.class);
         assertNotNull(date);
         assertEquals("1972-12-28T12:00:01.000Z", date.toString());
 
-        assertNull(MAPPER.readValue(quote(""), ReadableDateTime.class));
+        assertNull(mapper.readValue(quote(""), ReadableDateTime.class));
     }
 
     // [datatype-joda#8]
     public void testDeserReadableDateTimeWithTimeZoneInfo() throws IOException
     {
         TimeZone timeZone = TimeZone.getTimeZone("GMT-6");
+        final ObjectMapper mapper = jodaMapper(timeZone);
         DateTimeZone dateTimeZone = DateTimeZone.forTimeZone(timeZone);
-        MAPPER.setTimeZone(timeZone);
-        ReadableDateTime date = MAPPER.readValue(quote("1972-12-28T12:00:01.000-0600"),
+        ReadableDateTime date = mapper.readValue(quote("1972-12-28T12:00:01.000-0600"),
                 ReadableDateTime.class);
         assertNotNull(date);
         assertEquals("1972-12-28T12:00:01.000-06:00", date.toString());
         assertEquals(dateTimeZone, date.getZone());
 
         // default behavior is to ignore the timezone in serialized data
-        ReadableDateTime otherTzDate = MAPPER.readValue(quote("1972-12-28T12:00:01.000-0700"), ReadableDateTime.class);
+        ReadableDateTime otherTzDate = mapper.readValue(quote("1972-12-28T12:00:01.000-0700"), ReadableDateTime.class);
         assertEquals(dateTimeZone, otherTzDate.getZone());
 
-        assertNull(MAPPER.readValue(quote(""), ReadableDateTime.class));
+        assertNull(mapper.readValue(quote(""), ReadableDateTime.class));
     }
 
     public void testDeserReadableDateTimeWithTimeZoneFromData() throws IOException {
-        ObjectMapper mapper = jodaMapper();
+        ObjectMapper mapper = jodaMapper(TimeZone.getTimeZone("GMT-6"));
         mapper.disable(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE);
-        mapper.setTimeZone(TimeZone.getTimeZone("GMT-6"));
         ReadableDateTime date = mapper.readValue(quote("2014-01-20T08:59:01.000-0500"),
                 ReadableDateTime.class);
         assertEquals(DateTimeZone.forOffsetHours(-5), date.getZone());
     }
 
     public void testDeserReadableDateTimeWithContextTZOverride() throws IOException {
-        ObjectMapper mapper = jodaMapper();
+        ObjectMapper mapper = jodaMapper(TimeZone.getTimeZone("UTC"));
         mapper.disable(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE);
-        mapper.setTimeZone(TimeZone.getTimeZone("UTC"));
         ReadableDateTimeWithContextTZOverride date = mapper.readValue("{ \"time\" : \"2016-06-20T08:59:00.000+0300\"}",
                 ReadableDateTimeWithContextTZOverride.class);
         DateTime expected = new DateTime(2016, 6, 20, 5, 59, DateTimeZone.forID("UTC"));
@@ -129,9 +129,8 @@ public class DateTimeDeserTest extends JodaTestBase
     }
 
     public void testDeserReadableDateTimeWithoutContextTZOverride() throws IOException {
-        ObjectMapper mapper = jodaMapper();
+        ObjectMapper mapper = jodaMapper(TimeZone.getTimeZone("UTC"));
         mapper.enable(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE);
-        mapper.setTimeZone(TimeZone.getTimeZone("UTC"));
         ReadableDateTimeWithoutContextTZOverride date = mapper.readValue("{ \"time\" : \"2016-06-20T08:59:00.000+0300\"}",
                 ReadableDateTimeWithoutContextTZOverride.class);
         DateTime expected = new DateTime(2016, 6, 20, 8, 59, DateTimeZone.forOffsetHours(3));

@@ -239,11 +239,10 @@ public class JodaSerializationTest extends JodaTestBase
     // [datatype-joda#60]
     public void testInstantConversion() throws Exception
     {
-        final ObjectMapper mapper = jodaMapper();
+        final ObjectMapper mapper = jodaMapper(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'"));
 
         // Configure Date Formatting
         mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-        mapper.setDateFormat(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'"));
 
         // Create an instant and serialize and additionally serialize the instant as DateTime to demonstrate the difference
         org.joda.time.Instant now = new DateTime(1431498572205L).toInstant();
@@ -268,5 +267,4 @@ public class JodaSerializationTest extends JodaTestBase
         String json = mapper.writeValueAsString(yearMonth);
         assertEquals(quote("2013-08"), json);
     }
-
 }

@@ -18,36 +18,37 @@ public class YearMonthDeserTest extends JodaTestBase
     /**********************************************************
      */
 
-    private final ObjectMapper MAPPER = jodaMapper();
-
     public void testDeserYearMonth() throws Exception
     {
+        final ObjectMapper mapper = jodaMapper();
         String yearMonthString = new YearMonth(2013, 8).toString();
-        YearMonth yearMonth = MAPPER.readValue(quote(yearMonthString), YearMonth.class);
+        YearMonth yearMonth = mapper.readValue(quote(yearMonthString), YearMonth.class);
         assertEquals(new YearMonth(2013, 8), yearMonth);
     }
 
     public void testDeserYearMonthWithTimeZone() throws Exception
     {
-        MAPPER.setTimeZone(TimeZone.getTimeZone("America/Los_Angeles"));
+        final ObjectMapper mapper = jodaMapper(TimeZone.getTimeZone("America/Los_Angeles"));
         
         String yearMonthString = new YearMonth(2013, 8).toString();
-        YearMonth yearMonth = MAPPER.readValue(quote(yearMonthString), YearMonth.class);
+        YearMonth yearMonth = mapper.readValue(quote(yearMonthString), YearMonth.class);
         assertEquals(new YearMonth(2013, 8), yearMonth);
         assertEquals(ISOChronology.getInstanceUTC(), yearMonth.getChronology());
     }
 
     public void testDeserYearMonthFromEmptyString() throws Exception
     {
-        YearMonth yearMonth = MAPPER.readValue(quote(""), YearMonth.class);
+        final ObjectMapper mapper = jodaMapper();
+        YearMonth yearMonth = mapper.readValue(quote(""), YearMonth.class);
         assertNull(yearMonth);
     }
 
     public void testDeserYearMonthFailsForUnexpectedType() throws IOException
     {
+        final ObjectMapper mapper = jodaMapper();
         try
         {
-            MAPPER.readValue("{\"year\":2013}", YearMonth.class);
+            mapper.readValue("{\"year\":2013}", YearMonth.class);
             fail();
         } catch (JsonMappingException e) {
             verifyException(e, "expected JSON String");
