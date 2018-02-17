@@ -1,6 +1,8 @@
 package com.fasterxml.jackson.datatype.joda;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.cfg.MapperBuilder;
+
 import junit.framework.TestCase;
 
 import java.io.IOException;
@@ -12,23 +14,33 @@ import static org.junit.Assert.*;
 
 public abstract class JodaTestBase extends TestCase
 {
+    protected static MapperBuilder<?,?> jodaMapperBuilder() {
+        return ObjectMapper.builder()
+                .addModule(new JodaModule());
+    }
+
+    protected static MapperBuilder<?,?> jodaMapperBuilder(DateFormat df) {
+        return jodaMapperBuilder()
+                .defaultDateFormat(df);
+    }
+    
+    protected static MapperBuilder<?,?> jodaMapperBuilder(TimeZone tz) {
+        return jodaMapperBuilder()
+                .defaultTimeZone(tz);
+    }
+
     protected static ObjectMapper jodaMapper() {
-        return new ObjectMapper()
-                .registerModule(new JodaModule());
+        return jodaMapperBuilder().build();
     }
 
     protected static ObjectMapper jodaMapper(DateFormat df) {
-        return ObjectMapper.builder()
-                .defaultDateFormat(df)
-                .build()
-                .registerModule(new JodaModule());
+        return jodaMapperBuilder(df)
+                .build();
     }
 
     protected static ObjectMapper jodaMapper(TimeZone tz) {
-        return ObjectMapper.builder()
-                .defaultTimeZone(tz)
-                .build()
-                .registerModule(new JodaModule());
+        return jodaMapperBuilder(tz)
+                .build();
     }
 
     /*

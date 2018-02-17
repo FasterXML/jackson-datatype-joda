@@ -78,10 +78,9 @@ public class DateTimeTest extends JodaTestBase
     
     private final ObjectMapper MAPPER = jodaMapper();
 
-    private final static ObjectMapper STRING_MAPPER = jodaMapper();
-    static {
-        STRING_MAPPER.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
-    }
+    private final static ObjectMapper STRING_MAPPER = jodaMapperBuilder()
+            .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
+            .build();
 
     private final DateTime DATE_JAN_1_1970_UTC = new DateTime(0L, DateTimeZone.UTC);
     
@@ -106,8 +105,9 @@ public class DateTimeTest extends JodaTestBase
 
     public void testAnnotationAsText() throws IOException
     {
-        ObjectMapper m = jodaMapper();
-        m.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+        ObjectMapper m = jodaMapperBuilder()
+                .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
+                .build();
         // with annotations, doesn't matter if mapper configured to use timestamps
         assertEquals(aposToQuotes("{'date':'1970-01-01T00:00:00.000Z'}"),
                 m.writeValueAsString(new DateAsText(DATE_JAN_1_1970_UTC)));
@@ -135,17 +135,18 @@ public class DateTimeTest extends JodaTestBase
         assertEquals("0", MAPPER.writeValueAsString(dt));
 
         // but if re-configured, as regular ISO-8601 string
-        ObjectMapper m = jodaMapper();
-        m.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+        ObjectMapper m = jodaMapperBuilder()
+                .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
+                .build();
         m.addMixIn(DateTime.class, TypeInfoMixIn.class);
         assertEquals("[\"org.joda.time.DateTime\",\"1970-01-01T00:00:00.000Z\"]",
                 m.writeValueAsString(dt));
     }
 
     public void testIso8601ThroughJoda() throws Exception {
-        ObjectMapper mapper = new ObjectMapper()
-            .registerModule(new JodaModule())
-            .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+        ObjectMapper mapper = jodaMapperBuilder()
+                .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+                .build();
 
         java.text.DateFormat df = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss zzz");
         java.util.Date targetDate = df.parse("2000-01-01 00:00:00 UTC");
@@ -211,10 +212,11 @@ public class DateTimeTest extends JodaTestBase
     // since 2.8
     public void testConfigOverrides() throws Exception
     {
-        ObjectMapper mapper = jodaMapper();
-        mapper.configOverride(DateTime.class)
-            .setFormat(JsonFormat.Value.forPattern("dd.MM.YYYY' 'HH:mm")
-                    .withShape(JsonFormat.Shape.STRING));
+        ObjectMapper mapper = jodaMapperBuilder()
+                .withConfigOverride(DateTime.class,
+                        o -> o.setFormat(JsonFormat.Value.forPattern("dd.MM.YYYY' 'HH:mm")
+                                .withShape(JsonFormat.Shape.STRING)))
+                .build();
         DateTimeWrapper input = new DateTimeWrapper(DATE_JAN_1_1970_UTC);
         final String EXP_DATE = "\"01.01.1970 00:00\"";
         final String json = "{\"value\":"+EXP_DATE+"}";

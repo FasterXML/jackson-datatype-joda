@@ -112,16 +112,18 @@ public class DateTimeDeserTest extends JodaTestBase
     }
 
     public void testDeserReadableDateTimeWithTimeZoneFromData() throws IOException {
-        ObjectMapper mapper = jodaMapper(TimeZone.getTimeZone("GMT-6"));
-        mapper.disable(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE);
+        ObjectMapper mapper = jodaMapperBuilder(TimeZone.getTimeZone("GMT-6"))
+            .disable(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE)
+            .build();
         ReadableDateTime date = mapper.readValue(quote("2014-01-20T08:59:01.000-0500"),
                 ReadableDateTime.class);
         assertEquals(DateTimeZone.forOffsetHours(-5), date.getZone());
     }
 
     public void testDeserReadableDateTimeWithContextTZOverride() throws IOException {
-        ObjectMapper mapper = jodaMapper(TimeZone.getTimeZone("UTC"));
-        mapper.disable(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE);
+        ObjectMapper mapper = jodaMapperBuilder(TimeZone.getTimeZone("UTC"))
+            .disable(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE)
+            .build();
         ReadableDateTimeWithContextTZOverride date = mapper.readValue("{ \"time\" : \"2016-06-20T08:59:00.000+0300\"}",
                 ReadableDateTimeWithContextTZOverride.class);
         DateTime expected = new DateTime(2016, 6, 20, 5, 59, DateTimeZone.forID("UTC"));
@@ -129,8 +131,9 @@ public class DateTimeDeserTest extends JodaTestBase
     }
 
     public void testDeserReadableDateTimeWithoutContextTZOverride() throws IOException {
-        ObjectMapper mapper = jodaMapper(TimeZone.getTimeZone("UTC"));
-        mapper.enable(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE);
+        ObjectMapper mapper = jodaMapperBuilder(TimeZone.getTimeZone("UTC"))
+            .enable(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE)
+            .build();
         ReadableDateTimeWithoutContextTZOverride date = mapper.readValue("{ \"time\" : \"2016-06-20T08:59:00.000+0300\"}",
                 ReadableDateTimeWithoutContextTZOverride.class);
         DateTime expected = new DateTime(2016, 6, 20, 8, 59, DateTimeZone.forOffsetHours(3));
@@ -139,8 +142,9 @@ public class DateTimeDeserTest extends JodaTestBase
 
     public void test_enable_ADJUST_DATES_TO_CONTEXT_TIME_ZONE() throws Exception
     {
-        ObjectMapper mapper = jodaMapper();
-        mapper.enable(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE);
+        ObjectMapper mapper = jodaMapperBuilder()
+            .enable(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE)
+            .build();
         DateTime result = mapper.readValue("{\"jodaDateTime\":\"2017-01-01 01:01:01[Asia/Shanghai]\"}",
                 Issue93Bean.class).getJodaDateTime();
         assertEquals(new DateTime(2016, 12, 31, 17, 1, 1, DateTimeZone.UTC), result);
@@ -148,8 +152,9 @@ public class DateTimeDeserTest extends JodaTestBase
 
     public void test_disable_ADJUST_DATES_TO_CONTEXT_TIME_ZONE() throws Exception
     {
-        ObjectMapper mapper = jodaMapper();
-        mapper.disable(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE);
+        ObjectMapper mapper = jodaMapperBuilder()
+                .disable(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE)
+                .build();
         DateTime result = mapper.readValue("{\"jodaDateTime\":\"2017-01-01 01:01:01[Asia/Shanghai]\"}",
                 Issue93Bean.class).getJodaDateTime();
 

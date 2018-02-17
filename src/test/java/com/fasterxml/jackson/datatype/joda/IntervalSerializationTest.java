@@ -27,11 +27,11 @@ public class IntervalSerializationTest extends JodaTestBase
     /**********************************************************
      */
     
-    private final ObjectMapper MAPPER = jodaMapper();
-    {
-        MAPPER.enable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-        MAPPER.enable(SerializationFeature.WRITE_DURATIONS_AS_TIMESTAMPS);
-    }
+    private final ObjectMapper MAPPER = jodaMapperBuilder()
+            .enable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS,
+                    SerializationFeature.WRITE_DURATIONS_AS_TIMESTAMPS)
+            .build();
+
     private final ObjectWriter WRITER = MAPPER.writer();
 
     public void testIntervalSerBasic() throws IOException

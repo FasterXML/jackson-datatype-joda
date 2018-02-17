@@ -96,8 +96,9 @@ public class TimeZoneTest extends JodaTestBase
         json = w.without(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
                 .writeValueAsString(input);
 
-        ObjectMapper mapper = jodaMapper();
-        mapper.disable(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE);
+        ObjectMapper mapper = jodaMapperBuilder()
+                .disable(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE)
+                .build();
         result = mapper.readValue(json, DateTime.class);
         assertEquals("Actual timepoints differ", input.getMillis(), result.getMillis());
         assertEquals("TimeZones differ", input, result);
@@ -133,8 +134,9 @@ public class TimeZoneTest extends JodaTestBase
         String firstOneAmStr = w.writeValueAsString(firstOneAm);
         String secondOneAmStr = w.writeValueAsString(secondOneAm);
 
-        ObjectMapper mapper = jodaMapper();
-        mapper.disable(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE);
+        ObjectMapper mapper = jodaMapperBuilder()
+                .disable(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE)
+                .build();
 
         DateTime firstRoundTrip = mapper.readValue(firstOneAmStr, DateTime.class);
         DateTime secondRoundTrip = mapper.readValue(secondOneAmStr, DateTime.class);
@@ -149,9 +151,10 @@ public class TimeZoneTest extends JodaTestBase
     public void testSerializationWithTypeInfo() throws Exception
     {
         // but if re-configured to include the time zone
-        ObjectMapper m = jodaMapper();
-        m.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-        m.enable(SerializationFeature.WRITE_DATES_WITH_ZONE_ID);
+        ObjectMapper m = jodaMapperBuilder()
+                .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+                .enable(SerializationFeature.WRITE_DATES_WITH_ZONE_ID)
+                .build();
         
         m.addMixIn(DateTime.class, TypeInfoMixIn.class);
         assertEquals("[\"org.joda.time.DateTime\",\"1970-01-01T00:00:00.000Z[UTC]\"]",

@@ -31,11 +31,10 @@ public class JodaSerializationTest extends JodaTestBase
         }
     }
 
-    private final ObjectMapper MAPPER = jodaMapper();
-    {
-        MAPPER.enable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-        MAPPER.enable(SerializationFeature.WRITE_DURATIONS_AS_TIMESTAMPS);
-    }
+    private final ObjectMapper MAPPER = jodaMapperBuilder()
+            .enable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS,
+                    SerializationFeature.WRITE_DURATIONS_AS_TIMESTAMPS)
+            .build();
 
     private final ObjectWriter WRITER = MAPPER.writer();
 
@@ -88,7 +87,7 @@ public class JodaSerializationTest extends JodaTestBase
         // We can also configure beans to not include empty values. In this case,
         // JodaDateSerializerBase#isEmpty is called to check if the value is empty.
         ObjectMapper mapper = jodaMapper();
-        mapper.setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
+        mapper.setDefaultPropertyInclusion(JsonInclude.Include.NON_EMPTY);
         assertEquals("{\"contents\":[2001,5,25]}", mapper.writeValueAsString(new Container<LocalDate>(date)));
 
         // also verify pruning by NON_EMPTY
@@ -103,13 +102,13 @@ public class JodaSerializationTest extends JodaTestBase
 
         // but we can force it to be a String as well (note: here we assume this is
         // dynamically changeable)
-        ObjectMapper mapper = jodaMapper();
-        mapper.addMixIn(LocalDate.class, ObjectConfiguration.class);
-        mapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);        
+        ObjectMapper mapper = jodaMapperBuilder()
+                .addMixIn(LocalDate.class, ObjectConfiguration.class)
+                .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
+                .build();
         assertEquals("[\"org.joda.time.LocalDate\",\"2001-05-25\"]", mapper.writeValueAsString(date));
     }
 
-    
     /*
     /**********************************************************
     /* Tests for LocalTime type
@@ -124,8 +123,9 @@ public class JodaSerializationTest extends JodaTestBase
 
         // but we can force it to be a String as well (note: here we assume this is
         // dynamically changeable)
-        ObjectMapper mapper = jodaMapper();
-        mapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);        
+        ObjectMapper mapper = jodaMapperBuilder()
+                .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
+                .build();
         assertEquals(quote("13:20:54.000"), mapper.writeValueAsString(date));
     }
     
@@ -137,9 +137,10 @@ public class JodaSerializationTest extends JodaTestBase
 
         // but we can force it to be a String as well (note: here we assume this is
         // dynamically changeable)
-        ObjectMapper mapper = jodaMapper();
-        mapper.addMixIn(LocalTime.class, ObjectConfiguration.class);
-        mapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);        
+        ObjectMapper mapper = jodaMapperBuilder()
+                .addMixIn(LocalTime.class, ObjectConfiguration.class)
+                .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
+                .build();
         assertEquals("[\"org.joda.time.LocalTime\",\"13:20:54.000\"]",
                 mapper.writeValueAsString(date));
     }
@@ -158,8 +159,9 @@ public class JodaSerializationTest extends JodaTestBase
         assertEquals("[2001,5,25,10,15,30,37]", MAPPER.writeValueAsString(date));
         // but we can force it to be a String as well (note: here we assume this is
         // dynamically changeable)
-        ObjectMapper mapper = jodaMapper();
-        mapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);        
+        ObjectMapper mapper = jodaMapperBuilder()
+                .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
+                .build();
         assertEquals(quote("2001-05-25T10:15:30.037"), mapper.writeValueAsString(date));
     }
     
@@ -171,9 +173,10 @@ public class JodaSerializationTest extends JodaTestBase
         assertEquals("[2001,5,25,10,15,30,37]", MAPPER.writeValueAsString(date));
         // but we can force it to be a String as well (note: here we assume this is
         // dynamically changeable)
-        ObjectMapper mapper = jodaMapper();
-        mapper.addMixIn(LocalDateTime.class, ObjectConfiguration.class);
-        mapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);        
+        ObjectMapper mapper = jodaMapperBuilder()
+                .addMixIn(LocalDateTime.class, ObjectConfiguration.class)
+                .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
+                .build();
         assertEquals("[\"org.joda.time.LocalDateTime\",\"2001-05-25T10:15:30.037\"]", mapper.writeValueAsString(date));
     }
 
@@ -217,9 +220,10 @@ public class JodaSerializationTest extends JodaTestBase
     public void testDurationSerWithTypeInfo() throws IOException
     {
         Duration d = new Duration(3123422);
-        ObjectMapper mapper = jodaMapper();
-        mapper.enable(SerializationFeature.WRITE_DURATIONS_AS_TIMESTAMPS);
-        mapper.addMixIn(Duration.class, ObjectConfiguration.class);
+        ObjectMapper mapper = jodaMapperBuilder()
+                .enable(SerializationFeature.WRITE_DURATIONS_AS_TIMESTAMPS)
+                .addMixIn(Duration.class, ObjectConfiguration.class)
+                .build();
         String json = mapper.writeValueAsString(d);
         assertEquals("[\"org.joda.time.Duration\",3123422]", json);
     }
@@ -239,10 +243,10 @@ public class JodaSerializationTest extends JodaTestBase
     // [datatype-joda#60]
     public void testInstantConversion() throws Exception
     {
-        final ObjectMapper mapper = jodaMapper(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'"));
-
-        // Configure Date Formatting
-        mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+        final ObjectMapper mapper = jodaMapperBuilder(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'"))
+                // Configure Date Formatting
+                .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+                .build();
 
         // Create an instant and serialize and additionally serialize the instant as DateTime to demonstrate the difference
         org.joda.time.Instant now = new DateTime(1431498572205L).toInstant();
