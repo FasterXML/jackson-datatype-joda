@@ -49,8 +49,9 @@ public class IntervalSerializationTest extends JodaTestBase
     {
         Interval interval = new Interval(1396439982, 1396440001);
 
-        ObjectMapper mapper = jodaMapper();
-        mapper.addMixIn(Interval.class, ObjectConfiguration.class);
+        ObjectMapper mapper = jodaMapperBuilder()
+            .addMixIn(Interval.class, ObjectConfiguration.class)
+            .build();
         assertEquals("[\"org.joda.time.Interval\"," + quote("1396439982-1396440001") + "]",
                 mapper.writeValueAsString(interval));
     }

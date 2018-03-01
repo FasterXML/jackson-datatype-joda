@@ -137,8 +137,8 @@ public class DateTimeTest extends JodaTestBase
         // but if re-configured, as regular ISO-8601 string
         ObjectMapper m = jodaMapperBuilder()
                 .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
+                .addMixIn(DateTime.class, TypeInfoMixIn.class)
                 .build();
-        m.addMixIn(DateTime.class, TypeInfoMixIn.class);
         assertEquals("[\"org.joda.time.DateTime\",\"1970-01-01T00:00:00.000Z\"]",
                 m.writeValueAsString(dt));
     }

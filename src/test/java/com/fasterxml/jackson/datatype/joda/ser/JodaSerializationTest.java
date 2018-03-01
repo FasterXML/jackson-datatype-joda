@@ -61,12 +61,13 @@ public class JodaSerializationTest extends JodaTestBase
         assertEquals("[2001,5,25]", WRITER.writeValueAsString(date));
         // but we can force it to be a String as well (note: here we assume this is
         // dynamically changeable)
-        ObjectMapper mapper = jodaMapper();
-        mapper.addMixIn(DateMidnight.class, ObjectConfiguration.class);
-        mapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);        
+        ObjectMapper mapper = MAPPER.rebuild()
+                .addMixIn(DateMidnight.class, ObjectConfiguration.class)
+                .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
+                .build();
         assertEquals("[\"org.joda.time.DateMidnight\",\"2001-05-25\"]", mapper.writeValueAsString(date));
     }
-    
+
     /*
     /**********************************************************
     /* Tests for LocalDate type
@@ -86,8 +87,9 @@ public class JodaSerializationTest extends JodaTestBase
 
         // We can also configure beans to not include empty values. In this case,
         // JodaDateSerializerBase#isEmpty is called to check if the value is empty.
-        ObjectMapper mapper = jodaMapper();
-        mapper.setDefaultPropertyInclusion(JsonInclude.Include.NON_EMPTY);
+        ObjectMapper mapper = MAPPER.rebuild()
+                .changeDefaultPropertyInclusion(incl -> incl.withValueInclusion(JsonInclude.Include.NON_EMPTY))
+                .build();
         assertEquals("{\"contents\":[2001,5,25]}", mapper.writeValueAsString(new Container<LocalDate>(date)));
 
         // also verify pruning by NON_EMPTY
@@ -195,8 +197,9 @@ public class JodaSerializationTest extends JodaTestBase
     public void testPeriodSerWithTypeInfo() throws IOException
     {
         Period in = new Period(1, 2, 3, 4);
-        ObjectMapper mapper = jodaMapper();
-        mapper.addMixIn(Period.class, ObjectConfiguration.class);
+        ObjectMapper mapper = MAPPER.rebuild()
+                .addMixIn(Period.class, ObjectConfiguration.class)
+                .build();
         assertEquals("[\"org.joda.time.Period\",\"PT1H2M3.004S\"]", mapper.writeValueAsString(in));
     }
 

@@ -58,9 +58,9 @@ public class IntervalDeserTest extends JodaTestBase
     
     public void testIntervalDeserWithTypeInfo() throws IOException
     {
-        ObjectMapper mapper = jodaMapper();
-        mapper.addMixIn(Interval.class, ObjectConfiguration.class);
-
+        ObjectMapper mapper = jodaMapperBuilder()
+                .addMixIn(Interval.class, ObjectConfiguration.class)
+                .build();
         Interval interval= mapper.readValue("[\"org.joda.time.Interval\",\"1396439982-1396440001\"]", Interval.class);
         assertEquals(1396439982, interval.getStartMillis());
         assertEquals(1396440001, interval.getEndMillis());

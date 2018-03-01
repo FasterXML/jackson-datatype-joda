@@ -56,9 +56,9 @@ public class DurationDeserializationTest extends JodaTestBase
 
     public void testDurationDeserFromIntWithTypeInfo() throws IOException
     {
-        ObjectMapper mapper = jodaMapper();
-        mapper.addMixIn(Duration.class, ObjectConfiguration.class);
-
+        ObjectMapper mapper = jodaMapperBuilder()
+                .addMixIn(Duration.class, ObjectConfiguration.class)
+                .build();
         Duration d = mapper.readValue("[\"org.joda.time.Duration\",1234]", Duration.class);
         assertEquals(1234, d.getMillis());
     }

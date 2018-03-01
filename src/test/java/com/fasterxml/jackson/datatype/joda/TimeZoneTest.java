@@ -154,9 +154,8 @@ public class TimeZoneTest extends JodaTestBase
         ObjectMapper m = jodaMapperBuilder()
                 .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
                 .enable(SerializationFeature.WRITE_DATES_WITH_ZONE_ID)
+                .addMixIn(DateTime.class, TypeInfoMixIn.class)
                 .build();
-        
-        m.addMixIn(DateTime.class, TypeInfoMixIn.class);
         assertEquals("[\"org.joda.time.DateTime\",\"1970-01-01T00:00:00.000Z[UTC]\"]",
                 m.writeValueAsString(DATE_JAN_1_1970_UTC));
     }

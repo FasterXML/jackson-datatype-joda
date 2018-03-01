@@ -44,8 +44,9 @@ public class PeriodDeserializationTest extends JodaTestBase
 
     public void testPeriodDeserWithTypeInfo() throws IOException
     {
-        ObjectMapper mapper = jodaMapper();
-        mapper.addMixIn(Period.class, ObjectConfiguration.class);
+        ObjectMapper mapper = jodaMapperBuilder()
+                .addMixIn(Period.class, ObjectConfiguration.class)
+                .build();
 
         Period out = mapper.readValue("[\"org.joda.time.Period\",\"PT1H2M3.004S\"]", Period.class);
         assertEquals(1, out.getHours());

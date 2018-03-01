@@ -37,8 +37,9 @@ public class InstantDeserTest extends JodaTestBase
 
     public void testDeserDateTimeWithTypeInfo() throws IOException
     {
-        ObjectMapper mapper = jodaMapper();
-        mapper.addMixIn(DateTime.class, ObjectConfiguration.class);
+        ObjectMapper mapper = jodaMapperBuilder()
+                .addMixIn(DateTime.class, ObjectConfiguration.class)
+                .build();
         DateTime date = mapper.readValue("[\"org.joda.time.DateTime\",\"1972-12-28T12:00:01.000+0000\"]", DateTime.class);
         assertNotNull(date);
         assertEquals("1972-12-28T12:00:01.000Z", date.toString());

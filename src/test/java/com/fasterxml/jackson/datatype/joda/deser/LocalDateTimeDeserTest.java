@@ -95,8 +95,9 @@ public class LocalDateTimeDeserTest extends JodaTestBase
     
     public void testLocalDateTimeDeserWithTypeInfo() throws IOException
     {
-        ObjectMapper mapper = jodaMapper();
-        mapper.addMixIn(LocalDateTime.class, ObjectConfiguration.class);
+        ObjectMapper mapper = jodaMapperBuilder()
+                .addMixIn(LocalDateTime.class, ObjectConfiguration.class)
+                .build();
 
         // couple of acceptable formats again:
         LocalDateTime date = mapper.readValue("[\"org.joda.time.LocalDateTime\",[2001,5,25,10,15,30,37]]",

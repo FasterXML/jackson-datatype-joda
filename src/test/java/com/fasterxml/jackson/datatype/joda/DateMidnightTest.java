@@ -102,9 +102,9 @@ public class DateMidnightTest extends JodaTestBase
 
     public void testDateMidnightDeserWithTypeInfo() throws IOException
     {
-        ObjectMapper mapper = jodaMapper();
-        mapper.addMixIn(DateMidnight.class, MixInForTypeId.class);
-
+        ObjectMapper mapper = jodaMapperBuilder()
+                .addMixIn(DateMidnight.class, MixInForTypeId.class)
+                .build();
         // couple of acceptable formats, so:
         DateMidnight date = mapper.readValue("[\"org.joda.time.DateMidnight\",[2001,5,25]]", DateMidnight.class);
         assertEquals(2001, date.getYear());
@@ -119,9 +119,9 @@ public class DateMidnightTest extends JodaTestBase
 
     public void testCustomFormat() throws Exception
     {
-        ObjectMapper mapper = jodaMapper()
-                .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-
+        ObjectMapper mapper = jodaMapperBuilder()
+                .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+                .build();
         String STR = "2015-06-19";
         String ALT = "19.06.2015";
 

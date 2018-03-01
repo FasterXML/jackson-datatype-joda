@@ -82,9 +82,9 @@ public class LocalDateDeserTest extends JodaTestBase
 
     public void testLocalDateDeserWithTypeInfo() throws IOException
     {
-        ObjectMapper mapper = jodaMapper();
-        mapper.addMixIn(LocalDate.class, ObjectConfiguration.class);
-
+        ObjectMapper mapper = jodaMapperBuilder()
+                .addMixIn(LocalDate.class, ObjectConfiguration.class)
+                .build();
         // couple of acceptable formats, so:
         LocalDate date = mapper.readValue("[\"org.joda.time.LocalDate\",[2001,5,25]]", LocalDate.class);
         assertEquals(2001, date.getYear());
