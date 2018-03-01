@@ -14,31 +14,31 @@ import static org.junit.Assert.*;
 
 public abstract class JodaTestBase extends TestCase
 {
-    protected static MapperBuilder<?,?> jodaMapperBuilder() {
+    protected static MapperBuilder<?,?> mapperWithModuleBuilder() {
         return ObjectMapper.builder()
                 .addModule(new JodaModule());
     }
 
     protected static MapperBuilder<?,?> jodaMapperBuilder(DateFormat df) {
-        return jodaMapperBuilder()
+        return mapperWithModuleBuilder()
                 .defaultDateFormat(df);
     }
     
     protected static MapperBuilder<?,?> jodaMapperBuilder(TimeZone tz) {
-        return jodaMapperBuilder()
+        return mapperWithModuleBuilder()
                 .defaultTimeZone(tz);
     }
 
-    protected static ObjectMapper jodaMapper() {
-        return jodaMapperBuilder().build();
+    protected static ObjectMapper mapperWithModule() {
+        return mapperWithModuleBuilder().build();
     }
 
-    protected static ObjectMapper jodaMapper(DateFormat df) {
+    protected static ObjectMapper mapperWithModule(DateFormat df) {
         return jodaMapperBuilder(df)
                 .build();
     }
 
-    protected static ObjectMapper jodaMapper(TimeZone tz) {
+    protected static ObjectMapper mapperWithModule(TimeZone tz) {
         return jodaMapperBuilder(tz)
                 .build();
     }

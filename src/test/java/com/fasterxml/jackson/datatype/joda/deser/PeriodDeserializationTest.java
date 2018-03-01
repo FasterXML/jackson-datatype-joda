@@ -16,7 +16,7 @@ public class PeriodDeserializationTest extends JodaTestBase
     private static interface ObjectConfiguration {
     }
 
-    private final ObjectMapper MAPPER = jodaMapper();
+    private final ObjectMapper MAPPER = mapperWithModule();
 
     /*
     /**********************************************************
@@ -44,7 +44,7 @@ public class PeriodDeserializationTest extends JodaTestBase
 
     public void testPeriodDeserWithTypeInfo() throws IOException
     {
-        ObjectMapper mapper = jodaMapperBuilder()
+        ObjectMapper mapper = mapperWithModuleBuilder()
                 .addMixIn(Period.class, ObjectConfiguration.class)
                 .build();
 

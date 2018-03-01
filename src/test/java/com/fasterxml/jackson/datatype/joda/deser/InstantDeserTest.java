@@ -25,7 +25,7 @@ public class InstantDeserTest extends JodaTestBase
     /**********************************************************
      */
 
-    private final ObjectMapper MAPPER = jodaMapper();
+    private final ObjectMapper MAPPER = mapperWithModule();
 
     public void testDeserReadableInstant() throws IOException {
         ReadableInstant date = MAPPER.readValue(quote("1972-12-28T12:00:01.000+0000"), ReadableInstant.class);
@@ -37,7 +37,7 @@ public class InstantDeserTest extends JodaTestBase
 
     public void testDeserDateTimeWithTypeInfo() throws IOException
     {
-        ObjectMapper mapper = jodaMapperBuilder()
+        ObjectMapper mapper = mapperWithModuleBuilder()
                 .addMixIn(DateTime.class, ObjectConfiguration.class)
                 .build();
         DateTime date = mapper.readValue("[\"org.joda.time.DateTime\",\"1972-12-28T12:00:01.000+0000\"]", DateTime.class);

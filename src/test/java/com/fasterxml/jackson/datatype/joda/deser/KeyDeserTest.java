@@ -20,7 +20,7 @@ public class KeyDeserTest extends JodaTestBase
     /**********************************************************
      */
 
-    private final ObjectMapper MAPPER = jodaMapper();
+    private final ObjectMapper MAPPER = mapperWithModule();
 
     /*
     /**********************************************************

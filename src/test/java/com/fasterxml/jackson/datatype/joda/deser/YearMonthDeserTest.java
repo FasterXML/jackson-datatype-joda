@@ -20,7 +20,7 @@ public class YearMonthDeserTest extends JodaTestBase
 
     public void testDeserYearMonth() throws Exception
     {
-        final ObjectMapper mapper = jodaMapper();
+        final ObjectMapper mapper = mapperWithModule();
         String yearMonthString = new YearMonth(2013, 8).toString();
         YearMonth yearMonth = mapper.readValue(quote(yearMonthString), YearMonth.class);
         assertEquals(new YearMonth(2013, 8), yearMonth);
@@ -28,7 +28,7 @@ public class YearMonthDeserTest extends JodaTestBase
 
     public void testDeserYearMonthWithTimeZone() throws Exception
     {
-        final ObjectMapper mapper = jodaMapper(TimeZone.getTimeZone("America/Los_Angeles"));
+        final ObjectMapper mapper = mapperWithModule(TimeZone.getTimeZone("America/Los_Angeles"));
         
         String yearMonthString = new YearMonth(2013, 8).toString();
         YearMonth yearMonth = mapper.readValue(quote(yearMonthString), YearMonth.class);
@@ -38,14 +38,14 @@ public class YearMonthDeserTest extends JodaTestBase
 
     public void testDeserYearMonthFromEmptyString() throws Exception
     {
-        final ObjectMapper mapper = jodaMapper();
+        final ObjectMapper mapper = mapperWithModule();
         YearMonth yearMonth = mapper.readValue(quote(""), YearMonth.class);
         assertNull(yearMonth);
     }
 
     public void testDeserYearMonthFailsForUnexpectedType() throws IOException
     {
-        final ObjectMapper mapper = jodaMapper();
+        final ObjectMapper mapper = mapperWithModule();
         try
         {
             mapper.readValue("{\"year\":2013}", YearMonth.class);

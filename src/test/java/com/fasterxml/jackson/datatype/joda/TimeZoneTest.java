@@ -37,7 +37,7 @@ public class TimeZoneTest extends JodaTestBase
     /**********************************************************
      */
 
-    private final ObjectMapper MAPPER = jodaMapper();
+    private final ObjectMapper MAPPER = mapperWithModule();
 
     public void testSimple() throws Exception
     {
@@ -96,7 +96,7 @@ public class TimeZoneTest extends JodaTestBase
         json = w.without(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
                 .writeValueAsString(input);
 
-        ObjectMapper mapper = jodaMapperBuilder()
+        ObjectMapper mapper = mapperWithModuleBuilder()
                 .disable(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE)
                 .build();
         result = mapper.readValue(json, DateTime.class);
@@ -134,7 +134,7 @@ public class TimeZoneTest extends JodaTestBase
         String firstOneAmStr = w.writeValueAsString(firstOneAm);
         String secondOneAmStr = w.writeValueAsString(secondOneAm);
 
-        ObjectMapper mapper = jodaMapperBuilder()
+        ObjectMapper mapper = mapperWithModuleBuilder()
                 .disable(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE)
                 .build();
 
@@ -151,7 +151,7 @@ public class TimeZoneTest extends JodaTestBase
     public void testSerializationWithTypeInfo() throws Exception
     {
         // but if re-configured to include the time zone
-        ObjectMapper m = jodaMapperBuilder()
+        ObjectMapper m = mapperWithModuleBuilder()
                 .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
                 .enable(SerializationFeature.WRITE_DATES_WITH_ZONE_ID)
                 .addMixIn(DateTime.class, TypeInfoMixIn.class)

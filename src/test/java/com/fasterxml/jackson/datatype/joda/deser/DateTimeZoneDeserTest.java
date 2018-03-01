@@ -15,7 +15,7 @@ public class DateTimeZoneDeserTest extends JodaTestBase
     private static interface ObjectConfiguration {
     }
 
-    private final ObjectMapper MAPPER = jodaMapper();
+    private final ObjectMapper MAPPER = mapperWithModule();
 
     /*
     /**********************************************************

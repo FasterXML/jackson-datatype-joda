@@ -65,7 +65,7 @@ public class DateTimeDeserTest extends JodaTestBase
      */
     public void testDeserFromNumber() throws IOException
     {
-        final ObjectMapper mapper = jodaMapper();
+        final ObjectMapper mapper = mapperWithModule();
         
         Calendar cal = new GregorianCalendar(TimeZone.getTimeZone("GMT"));
         // use some arbitrary but non-default time point (after 1.1.1970)
@@ -83,7 +83,7 @@ public class DateTimeDeserTest extends JodaTestBase
 
     public void testDeserReadableDateTime() throws IOException
     {
-        final ObjectMapper mapper = jodaMapper();
+        final ObjectMapper mapper = mapperWithModule();
 
         ReadableDateTime date = mapper.readValue(quote("1972-12-28T12:00:01.000+0000"), ReadableDateTime.class);
         assertNotNull(date);
@@ -96,7 +96,7 @@ public class DateTimeDeserTest extends JodaTestBase
     public void testDeserReadableDateTimeWithTimeZoneInfo() throws IOException
     {
         TimeZone timeZone = TimeZone.getTimeZone("GMT-6");
-        final ObjectMapper mapper = jodaMapper(timeZone);
+        final ObjectMapper mapper = mapperWithModule(timeZone);
         DateTimeZone dateTimeZone = DateTimeZone.forTimeZone(timeZone);
         ReadableDateTime date = mapper.readValue(quote("1972-12-28T12:00:01.000-0600"),
                 ReadableDateTime.class);
@@ -142,7 +142,7 @@ public class DateTimeDeserTest extends JodaTestBase
 
     public void test_enable_ADJUST_DATES_TO_CONTEXT_TIME_ZONE() throws Exception
     {
-        ObjectMapper mapper = jodaMapperBuilder()
+        ObjectMapper mapper = mapperWithModuleBuilder()
             .enable(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE)
             .build();
         DateTime result = mapper.readValue("{\"jodaDateTime\":\"2017-01-01 01:01:01[Asia/Shanghai]\"}",
@@ -152,7 +152,7 @@ public class DateTimeDeserTest extends JodaTestBase
 
     public void test_disable_ADJUST_DATES_TO_CONTEXT_TIME_ZONE() throws Exception
     {
-        ObjectMapper mapper = jodaMapperBuilder()
+        ObjectMapper mapper = mapperWithModuleBuilder()
                 .disable(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE)
                 .build();
         DateTime result = mapper.readValue("{\"jodaDateTime\":\"2017-01-01 01:01:01[Asia/Shanghai]\"}",

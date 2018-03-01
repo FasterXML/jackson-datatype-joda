@@ -24,7 +24,7 @@ public class LocalDateTimeDeserTest extends JodaTestBase
 
     public void testLocalDateTimeDeser() throws IOException
     {
-        ObjectMapper mapper = jodaMapper();
+        ObjectMapper mapper = mapperWithModule();
         // couple of acceptable formats again:
         LocalDateTime date = mapper.readValue("[2001,5,25,10,15,30,37]", LocalDateTime.class);
         assertEquals(2001, date.getYear());
@@ -63,7 +63,7 @@ public class LocalDateTimeDeserTest extends JodaTestBase
 
     public void testLocalDateTimeDeserWithTimeZone() throws IOException
     {
-        ObjectMapper mapper = jodaMapper(TimeZone.getTimeZone("America/Los_Angeles"));
+        ObjectMapper mapper = mapperWithModule(TimeZone.getTimeZone("America/Los_Angeles"));
         
         // couple of acceptable formats again:
         LocalDateTime date = mapper.readValue("[2001,5,25,10,15,30,37]", LocalDateTime.class);
@@ -77,7 +77,7 @@ public class LocalDateTimeDeserTest extends JodaTestBase
         assertEquals(37, date.getMillisOfSecond());
         assertEquals(ISOChronology.getInstanceUTC(), date.getChronology());
 
-        mapper = jodaMapper(TimeZone.getTimeZone("Asia/Taipei"));
+        mapper = mapperWithModule(TimeZone.getTimeZone("Asia/Taipei"));
         LocalDateTime date2 = mapper.readValue(quote("2007-06-30T08:34:09.001"), LocalDateTime.class);
         assertEquals(2007, date2.getYear());
         assertEquals(6, date2.getMonthOfYear());
@@ -95,7 +95,7 @@ public class LocalDateTimeDeserTest extends JodaTestBase
     
     public void testLocalDateTimeDeserWithTypeInfo() throws IOException
     {
-        ObjectMapper mapper = jodaMapperBuilder()
+        ObjectMapper mapper = mapperWithModuleBuilder()
                 .addMixIn(LocalDateTime.class, ObjectConfiguration.class)
                 .build();
 

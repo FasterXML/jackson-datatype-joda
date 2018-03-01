@@ -50,7 +50,7 @@ public class DateMidnightTest extends JodaTestBase
 
     public void testDateMidnightDeserWithTimeZone() throws IOException
     {
-        ObjectMapper mapper = jodaMapper(TimeZone.getTimeZone("Europe/Paris"));
+        ObjectMapper mapper = mapperWithModule(TimeZone.getTimeZone("Europe/Paris"));
         // couple of acceptable formats, so:
         DateMidnight date = mapper.readValue("[2001,5,25]", DateMidnight.class);
         assertEquals(2001, date.getYear());
@@ -65,7 +65,7 @@ public class DateMidnightTest extends JodaTestBase
         // since 1.6.1, for [JACKSON-360]
         assertNull(mapper.readValue(quote(""), DateMidnight.class));
 
-        mapper = jodaMapper(TimeZone.getTimeZone("America/Los_Angeles"));
+        mapper = mapperWithModule(TimeZone.getTimeZone("America/Los_Angeles"));
         // couple of acceptable formats, so:
         date = mapper.readValue("[2001,5,25]", DateMidnight.class);
         assertEquals(2001, date.getYear());
@@ -83,7 +83,7 @@ public class DateMidnightTest extends JodaTestBase
     
     public void testDateMidnightDeser() throws IOException
     {
-        ObjectMapper mapper = jodaMapper();
+        ObjectMapper mapper = mapperWithModule();
         
         // couple of acceptable formats, so:
         DateMidnight date = mapper.readValue("[2001,5,25]", DateMidnight.class);
@@ -102,7 +102,7 @@ public class DateMidnightTest extends JodaTestBase
 
     public void testDateMidnightDeserWithTypeInfo() throws IOException
     {
-        ObjectMapper mapper = jodaMapperBuilder()
+        ObjectMapper mapper = mapperWithModuleBuilder()
                 .addMixIn(DateMidnight.class, MixInForTypeId.class)
                 .build();
         // couple of acceptable formats, so:
@@ -119,7 +119,7 @@ public class DateMidnightTest extends JodaTestBase
 
     public void testCustomFormat() throws Exception
     {
-        ObjectMapper mapper = jodaMapperBuilder()
+        ObjectMapper mapper = mapperWithModuleBuilder()
                 .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
                 .build();
         String STR = "2015-06-19";
@@ -139,7 +139,7 @@ public class DateMidnightTest extends JodaTestBase
     
     public void testWithTimeZoneOverride() throws Exception
     {
-        ObjectMapper mapper = jodaMapper();
+        ObjectMapper mapper = mapperWithModule();
 
         DateMidnight date = mapper.readValue("[2001,5,25]", DateMidnight.class);
         FormattedDateMidnight input = new FormattedDateMidnight();
@@ -162,7 +162,7 @@ public class DateMidnightTest extends JodaTestBase
 
     public void testSerializeAsTimestamp() throws Exception
     {
-        ObjectMapper mapper = jodaMapper();
+        ObjectMapper mapper = mapperWithModule();
         assertEquals(aposToQuotes("{'value':0}"),
                 mapper.writeValueAsString(new FormattedDateAsTimestamp(
                         new DateMidnight(0, DateTimeZone.UTC))));

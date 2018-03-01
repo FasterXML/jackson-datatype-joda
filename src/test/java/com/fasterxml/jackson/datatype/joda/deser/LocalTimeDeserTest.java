@@ -20,7 +20,7 @@ public class LocalTimeDeserTest extends JodaTestBase
     /**********************************************************
      */
 
-    private final ObjectMapper MAPPER = jodaMapper();
+    private final ObjectMapper MAPPER = mapperWithModule();
 
     /*
     /**********************************************************
@@ -49,7 +49,7 @@ public class LocalTimeDeserTest extends JodaTestBase
 
     public void testLocalTimeDeserWithTypeInfo() throws IOException
     {
-        ObjectMapper mapper = jodaMapperBuilder()
+        ObjectMapper mapper = mapperWithModuleBuilder()
                 .addMixIn(LocalTime.class, ObjectConfiguration.class)
                 .build();
 

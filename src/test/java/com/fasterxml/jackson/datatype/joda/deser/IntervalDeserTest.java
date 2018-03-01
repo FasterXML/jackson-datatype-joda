@@ -25,7 +25,7 @@ public class IntervalDeserTest extends JodaTestBase
 
     public void testIntervalDeser() throws IOException
     {
-        final ObjectMapper mapper = jodaMapper();
+        final ObjectMapper mapper = mapperWithModule();
 
         Interval interval = mapper.readValue(quote("1396439982-1396440001"), Interval.class);
         assertEquals(1396439982, interval.getStartMillis());
@@ -40,14 +40,14 @@ public class IntervalDeserTest extends JodaTestBase
 
     public void testIntervalDeserWithTimeZone() throws IOException
     {
-        ObjectMapper mapper = jodaMapper(TimeZone.getTimeZone("Europe/Paris"));
+        ObjectMapper mapper = mapperWithModule(TimeZone.getTimeZone("Europe/Paris"));
 
         Interval interval = mapper.readValue(quote("1396439982-1396440001"), Interval.class);
         assertEquals(1396439982, interval.getStartMillis());
         assertEquals(1396440001, interval.getEndMillis());
         assertEquals(ISOChronology.getInstance(DateTimeZone.forID("Europe/Paris")), interval.getChronology());
 
-        mapper = jodaMapper(TimeZone.getTimeZone("America/Los_Angeles"));
+        mapper = mapperWithModule(TimeZone.getTimeZone("America/Los_Angeles"));
 
         interval = mapper.readValue(quote("-100-1396440001"), Interval.class);
         assertEquals(-100, interval.getStartMillis());
@@ -58,7 +58,7 @@ public class IntervalDeserTest extends JodaTestBase
     
     public void testIntervalDeserWithTypeInfo() throws IOException
     {
-        ObjectMapper mapper = jodaMapperBuilder()
+        ObjectMapper mapper = mapperWithModuleBuilder()
                 .addMixIn(Interval.class, ObjectConfiguration.class)
                 .build();
         Interval interval= mapper.readValue("[\"org.joda.time.Interval\",\"1396439982-1396440001\"]", Interval.class);

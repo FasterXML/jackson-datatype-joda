@@ -76,9 +76,9 @@ public class DateTimeTest extends JodaTestBase
     /**********************************************************
      */
     
-    private final ObjectMapper MAPPER = jodaMapper();
+    private final ObjectMapper MAPPER = mapperWithModule();
 
-    private final static ObjectMapper STRING_MAPPER = jodaMapperBuilder()
+    private final static ObjectMapper STRING_MAPPER = mapperWithModuleBuilder()
             .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
             .build();
 
@@ -105,7 +105,7 @@ public class DateTimeTest extends JodaTestBase
 
     public void testAnnotationAsText() throws IOException
     {
-        ObjectMapper m = jodaMapperBuilder()
+        ObjectMapper m = mapperWithModuleBuilder()
                 .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
                 .build();
         // with annotations, doesn't matter if mapper configured to use timestamps
@@ -135,7 +135,7 @@ public class DateTimeTest extends JodaTestBase
         assertEquals("0", MAPPER.writeValueAsString(dt));
 
         // but if re-configured, as regular ISO-8601 string
-        ObjectMapper m = jodaMapperBuilder()
+        ObjectMapper m = mapperWithModuleBuilder()
                 .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
                 .addMixIn(DateTime.class, TypeInfoMixIn.class)
                 .build();
@@ -144,7 +144,7 @@ public class DateTimeTest extends JodaTestBase
     }
 
     public void testIso8601ThroughJoda() throws Exception {
-        ObjectMapper mapper = jodaMapperBuilder()
+        ObjectMapper mapper = mapperWithModuleBuilder()
                 .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
                 .build();
 
@@ -212,7 +212,7 @@ public class DateTimeTest extends JodaTestBase
     // since 2.8
     public void testConfigOverrides() throws Exception
     {
-        ObjectMapper mapper = jodaMapperBuilder()
+        ObjectMapper mapper = mapperWithModuleBuilder()
                 .withConfigOverride(DateTime.class,
                         o -> o.setFormat(JsonFormat.Value.forPattern("dd.MM.YYYY' 'HH:mm")
                                 .withShape(JsonFormat.Shape.STRING)))

@@ -24,7 +24,7 @@ public class LocalDateDeserTest extends JodaTestBase
 
     public void testLocalDateDeser() throws IOException
     {
-        ObjectMapper mapper = jodaMapper();
+        ObjectMapper mapper = mapperWithModule();
 
         // couple of acceptable formats, so:
         LocalDate date = mapper.readValue("[2001,5,25]", LocalDate.class);
@@ -45,14 +45,14 @@ public class LocalDateDeserTest extends JodaTestBase
         final String trickyInstant = "1238558582001";
 
         // MAPPER is using default TimeZone (GMT)
-        ObjectMapper mapper = jodaMapper();
+        ObjectMapper mapper = mapperWithModule();
         LocalDate date3 = mapper.readValue(trickyInstant, LocalDate.class);
         assertEquals(2009, date3.getYear());
         assertEquals(4, date3.getMonthOfYear());
         assertEquals(1, date3.getDayOfMonth());
         assertEquals(ISOChronology.getInstanceUTC(), date3.getChronology());
 
-        mapper = jodaMapper(TimeZone.getTimeZone("America/Los_Angeles"));
+        mapper = mapperWithModule(TimeZone.getTimeZone("America/Los_Angeles"));
 
         // couple of acceptable formats, so:
         LocalDate date = mapper.readValue("[2001,5,25]", LocalDate.class);
@@ -61,7 +61,7 @@ public class LocalDateDeserTest extends JodaTestBase
         assertEquals(25, date.getDayOfMonth());
         assertEquals(ISOChronology.getInstanceUTC(), date.getChronology());
 
-        mapper = jodaMapper(TimeZone.getTimeZone("Asia/Taipei"));
+        mapper = mapperWithModule(TimeZone.getTimeZone("Asia/Taipei"));
         LocalDate date2 = mapper
                 .readValue(quote("2005-07-13"), LocalDate.class);
         assertEquals(2005, date2.getYear());
@@ -71,7 +71,7 @@ public class LocalDateDeserTest extends JodaTestBase
 
         assertNull(mapper.readValue(quote(""), LocalDate.class));
 
-        mapper = jodaMapper(TimeZone.getTimeZone("America/Los_Angeles"));
+        mapper = mapperWithModule(TimeZone.getTimeZone("America/Los_Angeles"));
 
         LocalDate date4 = mapper.readValue(trickyInstant, LocalDate.class);
         assertEquals(2009, date4.getYear());
@@ -82,7 +82,7 @@ public class LocalDateDeserTest extends JodaTestBase
 
     public void testLocalDateDeserWithTypeInfo() throws IOException
     {
-        ObjectMapper mapper = jodaMapperBuilder()
+        ObjectMapper mapper = mapperWithModuleBuilder()
                 .addMixIn(LocalDate.class, ObjectConfiguration.class)
                 .build();
         // couple of acceptable formats, so:
@@ -100,7 +100,7 @@ public class LocalDateDeserTest extends JodaTestBase
     public void testLocalDateDeserWithPartsAsString() throws IOException
     {
         // couple of acceptable formats, so:
-        ObjectMapper mapper = jodaMapper();
+        ObjectMapper mapper = mapperWithModule();
         LocalDate date = mapper.readValue("[\"2001\",\"5\",\"25\"]", LocalDate.class);
         assertEquals(2001, date.getYear());
         assertEquals(5, date.getMonthOfYear());
