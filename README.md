@@ -1,6 +1,7 @@
-[Jackson](http://jackson.codehaus.org) module (jar)
-to support JSON serialization and deserialization of
-[Joda](http://joda-time.sourceforge.net/) data types.
+[Jackson](../../../jackson) datatype module (jar)
+to support JSON serialization (writing JSON) and deserialization (reading from JSON)
+of
+[Joda](http://joda-time.sourceforge.net/) data types, such as `DateTime`.
 
 ## Status
 
@@ -29,7 +30,7 @@ To use module on Maven-based projects, use following dependency:
 <dependency>
   <groupId>com.fasterxml.jackson.datatype</groupId>
   <artifactId>jackson-datatype-joda</artifactId>
-  <version>2.9.0</version>
+  <version>2.9.5</version>
 </dependency>    
 ```
 
