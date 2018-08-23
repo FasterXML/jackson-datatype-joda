@@ -24,6 +24,11 @@ public class DurationSerializer // non final since 2.6.1
     // it as container for numeric/textual distinction
     
     public DurationSerializer() { this(FormatConfig.DEFAULT_DATEONLY_FORMAT, 0); }
+
+    public DurationSerializer(JacksonJodaDateFormat format) {
+        this(format, 0);
+    }
+    
     public DurationSerializer(JacksonJodaDateFormat formatter,
             int shapeOverride) {
         // false -> no arrays (numbers)

@@ -17,6 +17,9 @@ public class InstantSerializer // non final since 2.6.1
 
     // NOTE: formatter not used for printing at all, hence choice doesn't matter
     public InstantSerializer() { this(FormatConfig.DEFAULT_TIMEONLY_FORMAT, 0); }
+    public InstantSerializer(JacksonJodaDateFormat format) {
+        this(format, 0);
+    }
     public InstantSerializer(JacksonJodaDateFormat format,
             int shapeOverride) {
         super(Instant.class, format, SerializationFeature.WRITE_DATES_AS_TIMESTAMPS,

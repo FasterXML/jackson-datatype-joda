@@ -19,6 +19,11 @@ public class LocalTimeSerializer // non final since 2.6.1
     public LocalTimeSerializer() {
         this(FormatConfig.DEFAULT_LOCAL_TIMEONLY_PRINTER, 0);
     }
+
+    public LocalTimeSerializer(JacksonJodaDateFormat format) {
+        this(format, 0);
+    }
+
     public LocalTimeSerializer(JacksonJodaDateFormat format,
             int shapeOverride) {
         super(LocalTime.class, format, SerializationFeature.WRITE_DATES_AS_TIMESTAMPS,
