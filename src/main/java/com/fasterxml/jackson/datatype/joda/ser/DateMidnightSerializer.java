@@ -25,6 +25,10 @@ public class DateMidnightSerializer
         this(FormatConfig.DEFAULT_LOCAL_DATEONLY_FORMAT, 0);
     }
 
+    public DateMidnightSerializer(JacksonJodaDateFormat format) {
+        this(format, 0);
+    }
+
     public DateMidnightSerializer(JacksonJodaDateFormat format,
             int shapeOverride) {
         // true -> use arrays
