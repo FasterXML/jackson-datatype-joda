@@ -19,6 +19,10 @@ public class DateTimeSerializer
         this(FormatConfig.DEFAULT_DATETIME_PRINTER, 0);
     }
 
+    public DateTimeSerializer(JacksonJodaDateFormat format) {
+        this(format, 0);
+    }
+
     public DateTimeSerializer(JacksonJodaDateFormat format,
             int shapeOverride) {
         // false -> no arrays (numbers)

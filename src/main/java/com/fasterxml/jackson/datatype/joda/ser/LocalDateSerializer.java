@@ -17,11 +17,16 @@ public class LocalDateSerializer // non final since 2.6.1
     private static final long serialVersionUID = 1L;
 
     public LocalDateSerializer() { this(FormatConfig.DEFAULT_LOCAL_DATEONLY_FORMAT, 0); }
+    public LocalDateSerializer(JacksonJodaDateFormat format) {
+        this(format, 0);
+    }
     public LocalDateSerializer(JacksonJodaDateFormat format,
             int shapeOverride) {
         super(LocalDate.class, format, SerializationFeature.WRITE_DATES_AS_TIMESTAMPS,
                 FORMAT_ARRAY, shapeOverride);
     }
+
+
 
     @Override
     public LocalDateSerializer withFormat(JacksonJodaDateFormat formatter,
