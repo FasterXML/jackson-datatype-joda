@@ -1,4 +1,4 @@
-package com.fasterxml.jackson.datatype.joda;
+package com.fasterxml.jackson.datatype.joda.ser;
 
 import java.io.IOException;
 
@@ -8,6 +8,7 @@ import org.joda.time.Interval;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.*;
+import com.fasterxml.jackson.datatype.joda.JodaTestBase;
 
 public class IntervalSerializationTest extends JodaTestBase
 {

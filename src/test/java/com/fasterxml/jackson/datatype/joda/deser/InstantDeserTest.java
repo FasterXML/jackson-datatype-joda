@@ -9,16 +9,11 @@ import org.joda.time.DateTime;
 import org.joda.time.Instant;
 import org.joda.time.ReadableInstant;
 
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.joda.JodaTestBase;
 
 public class InstantDeserTest extends JodaTestBase
 {
-    @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.WRAPPER_ARRAY)
-    private static interface ObjectConfiguration {
-    }
-
     /*
     /**********************************************************
     /* Test methods
@@ -35,12 +30,13 @@ public class InstantDeserTest extends JodaTestBase
         assertNull(MAPPER.readValue(quote(""), ReadableInstant.class));
     }
 
-    public void testDeserDateTimeWithTypeInfo() throws IOException
+    public void testDeserInstantWithTypeInfo() throws IOException
     {
         ObjectMapper mapper = mapperWithModuleBuilder()
-                .addMixIn(DateTime.class, ObjectConfiguration.class)
+                .addMixIn(Instant.class, MixinForPolymorphism.class)
                 .build();
-        DateTime date = mapper.readValue("[\"org.joda.time.DateTime\",\"1972-12-28T12:00:01.000+0000\"]", DateTime.class);
+        Instant date = mapper.readValue("[\"org.joda.time.Instant\",\"1972-12-28T12:00:01.000+0000\"]",
+                Instant.class);
         assertNotNull(date);
         assertEquals("1972-12-28T12:00:01.000Z", date.toString());
     }
@@ -62,7 +58,16 @@ public class InstantDeserTest extends JodaTestBase
         assertNotNull(date);
         assertEquals("1972-12-28T12:00:01.000Z", date.toString());
 
-        // since 1.6.1, for [JACKSON-360]
         assertNull(MAPPER.readValue(quote(""), Instant.class));
+    }
+
+    public void testDeserInstantCustomFormat() throws IOException
+    {
+        FormattedInstant input = MAPPER.readValue(aposToQuotes(
+                "{'value':'28/12/1972 12_34_56_789'}"),
+                FormattedInstant.class);
+        DateTime date = input.value.toDateTime();
+        assertEquals(1972, date.getYear());
+        assertEquals(789, date.getMillisOfSecond());
     }
 }

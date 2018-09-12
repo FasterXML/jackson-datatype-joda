@@ -1,5 +1,7 @@
 package com.fasterxml.jackson.datatype.joda;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.cfg.MapperBuilder;
 
@@ -10,10 +12,31 @@ import java.text.DateFormat;
 import java.util.Arrays;
 import java.util.TimeZone;
 
+import org.joda.time.Instant;
+
 import static org.junit.Assert.*;
 
 public abstract class JodaTestBase extends TestCase
 {
+    protected static class FormattedInstant {
+        @JsonFormat(pattern = "dd/MM/yyyy HH_mm_ss_SSS")
+        public Instant value;
+
+        public FormattedInstant(Instant v) { value = v; }
+        protected FormattedInstant() { }
+    }
+
+    // Mix-in class for forcing polymorphic handling
+    @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.WRAPPER_ARRAY)
+    protected static interface MixinForPolymorphism {
+    }
+
+    /*
+    /**********************************************************
+    /* Factory methods
+    /**********************************************************
+     */
+
     protected static MapperBuilder<?,?> mapperWithModuleBuilder() {
         return ObjectMapper.builder()
                 .addModule(new JodaModule());

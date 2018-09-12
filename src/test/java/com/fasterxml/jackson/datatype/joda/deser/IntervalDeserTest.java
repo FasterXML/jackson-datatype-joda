@@ -19,7 +19,7 @@ public class IntervalDeserTest extends JodaTestBase
 
     /*
     /**********************************************************
-    /* Test methods
+    /* Tests for Interval type
     /**********************************************************
      */
 
@@ -53,7 +53,6 @@ public class IntervalDeserTest extends JodaTestBase
         assertEquals(-100, interval.getStartMillis());
         assertEquals(1396440001, interval.getEndMillis());
         assertEquals(ISOChronology.getInstance(DateTimeZone.forID("America/Los_Angeles")), interval.getChronology());
-
     }
     
     public void testIntervalDeserWithTypeInfo() throws IOException

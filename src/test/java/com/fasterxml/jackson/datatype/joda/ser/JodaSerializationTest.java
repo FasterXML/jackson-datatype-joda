@@ -1,7 +1,6 @@
 package com.fasterxml.jackson.datatype.joda.ser;
 
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 
@@ -37,36 +36,6 @@ public class JodaSerializationTest extends JodaTestBase
             .build();
 
     private final ObjectWriter WRITER = MAPPER.writer();
-
-    /*
-    /**********************************************************
-    /* Tests for DateMidnight type
-    /**********************************************************
-     */
-
-    @SuppressWarnings("deprecation") // since Jackson 2.7 / Joda 2.4
-    public void testDateMidnightSer() throws IOException
-    {
-        DateMidnight date = new DateMidnight(2001, 5, 25);
-        // default format is that of JSON array...
-        assertEquals("[2001,5,25]", WRITER.writeValueAsString(date));
-        // but we can force it to be a String as well (note: here we assume this is
-        // dynamically changeable)
-        assertEquals(quote("2001-05-25"),
-                WRITER.without(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
-                .writeValueAsString(date));
-
-        date = new DateMidnight(2001, 5, 25);
-        // default format is that of JSON array...
-        assertEquals("[2001,5,25]", WRITER.writeValueAsString(date));
-        // but we can force it to be a String as well (note: here we assume this is
-        // dynamically changeable)
-        ObjectMapper mapper = MAPPER.rebuild()
-                .addMixIn(DateMidnight.class, ObjectConfiguration.class)
-                .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
-                .build();
-        assertEquals("[\"org.joda.time.DateMidnight\",\"2001-05-25\"]", mapper.writeValueAsString(date));
-    }
 
     /*
     /**********************************************************
@@ -230,34 +199,6 @@ public class JodaSerializationTest extends JodaTestBase
         String json = mapper.writeValueAsString(d);
         assertEquals("[\"org.joda.time.Duration\",3123422]", json);
     }
-
-    public void testInstantSer() throws IOException {
-        Instant instant = new Instant(0L);
-
-        // by default, dates use timestamp, so:
-        assertEquals("0", MAPPER.writeValueAsString(instant));
-
-        // but if re-configured, as regular ISO-8601 string
-        assertEquals(quote("1970-01-01T00:00:00.000Z"), MAPPER.writer()
-                .without(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
-                .writeValueAsString(instant));
-    }
-
-    // [datatype-joda#60]
-    public void testInstantConversion() throws Exception
-    {
-        final ObjectMapper mapper = jodaMapperBuilder(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'"))
-                // Configure Date Formatting
-                .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
-                .build();
-
-        // Create an instant and serialize and additionally serialize the instant as DateTime to demonstrate the difference
-        org.joda.time.Instant now = new DateTime(1431498572205L).toInstant();
-        
-        String instantString = mapper.writeValueAsString(now);
-
-        assertEquals("\"2015-05-13T06:29:32.205Z\"", instantString);
-    }    
 
     public void testMonthDaySer() throws Exception
     {
