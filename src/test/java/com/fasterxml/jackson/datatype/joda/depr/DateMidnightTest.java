@@ -1,4 +1,4 @@
-package com.fasterxml.jackson.datatype.joda;
+package com.fasterxml.jackson.datatype.joda.depr;
 
 import java.io.IOException;
 import java.util.TimeZone;
@@ -8,7 +8,9 @@ import org.joda.time.*;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.joda.JodaTestBase;
 
 @SuppressWarnings("deprecation") // because DateMidnight deprecated by Joda
 public class DateMidnightTest extends JodaTestBase
@@ -48,7 +50,7 @@ public class DateMidnightTest extends JodaTestBase
 
     /*
     /**********************************************************
-    /* Test methods
+    /* Test methods, deserialization
     /**********************************************************
      */
 
@@ -119,7 +121,48 @@ public class DateMidnightTest extends JodaTestBase
         assertEquals(13, date2.getDayOfMonth());
     }
 
-    public void testCustomFormat() throws Exception
+    /*
+    /**********************************************************
+    /* Test methods, serialization
+    /**********************************************************
+     */
+
+    public void testSerializeAsTimestamp() throws Exception
+    {
+        assertEquals(aposToQuotes("{'value':0}"),
+                MAPPER.writeValueAsString(new FormattedDateAsTimestamp(
+                        new DateMidnight(0, DateTimeZone.UTC))));
+    }
+
+    public void testDateMidnightSer() throws IOException
+    {
+        ObjectMapper mapper = jodaMapper()
+            .enable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+            .enable(SerializationFeature.WRITE_DURATIONS_AS_TIMESTAMPS);
+        final ObjectWriter writer = mapper.writer();
+
+        DateMidnight date = new DateMidnight(2001, 5, 25);
+        // default format is that of JSON array...
+        assertEquals("[2001,5,25]", writer.writeValueAsString(date));
+        // but we can force it to be a String as well (note: here we assume this is
+        // dynamically changeable)
+        assertEquals(quote("2001-05-25"),
+                writer.without(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+                .writeValueAsString(date));
+
+        mapper = jodaMapper();
+        mapper.addMixIn(DateMidnight.class, MixInForTypeId.class);
+        mapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);        
+        assertEquals("[\"org.joda.time.DateMidnight\",\"2001-05-25\"]", mapper.writeValueAsString(date));
+    }
+
+    /*
+    /**********************************************************
+    /* Test methods, custom format
+    /**********************************************************
+     */
+
+    public void testDeserWithCustomFormat() throws Exception
     {
         String STR = "2015-06-19";
         String ALT = "19.06.2015";
@@ -159,10 +202,4 @@ public class DateMidnightTest extends JodaTestBase
         assertEquals("America/New_York", resultTz.getID());
     }
 
-    public void testSerializeAsTimestamp() throws Exception
-    {
-        assertEquals(aposToQuotes("{'value':0}"),
-                MAPPER.writeValueAsString(new FormattedDateAsTimestamp(
-                        new DateMidnight(0, DateTimeZone.UTC))));
-    }
 }

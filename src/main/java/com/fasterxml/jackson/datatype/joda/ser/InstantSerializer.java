@@ -15,11 +15,11 @@ public class InstantSerializer // non final since 2.6.1
 {
     private static final long serialVersionUID = 1L;
 
-    // NOTE: formatter not used for printing at all, hence choice doesn't matter
-    public InstantSerializer() { this(FormatConfig.DEFAULT_TIMEONLY_FORMAT, 0); }
+    public InstantSerializer() { this(FormatConfig.DEFAULT_DATETIME_PRINTER, 0); }
     public InstantSerializer(JacksonJodaDateFormat format) {
         this(format, 0);
     }
+
     public InstantSerializer(JacksonJodaDateFormat format,
             int shapeOverride) {
         super(Instant.class, format, SerializationFeature.WRITE_DATES_AS_TIMESTAMPS,
@@ -43,7 +43,7 @@ public class InstantSerializer // non final since 2.6.1
         throws IOException
     {
         if (_serializationShape(provider) == FORMAT_STRING) {
-            gen.writeString(value.toString());
+            gen.writeString(_format.createFormatter(provider).print(value));
         } else {
             gen.writeNumber(value.getMillis());
         }

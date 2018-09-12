@@ -7,6 +7,8 @@ import org.joda.time.Instant;
 import com.fasterxml.jackson.core.*;
 
 import com.fasterxml.jackson.databind.*;
+import com.fasterxml.jackson.datatype.joda.cfg.FormatConfig;
+import com.fasterxml.jackson.datatype.joda.cfg.JacksonJodaDateFormat;
 
 /**
  * Basic deserializer for {@link org.joda.time.ReadableDateTime} and its subtypes.
@@ -14,12 +16,21 @@ import com.fasterxml.jackson.databind.*;
  * Does not (yet?) support JSON object; support can be added if desired.
  */
 public class InstantDeserializer
-    extends JodaDeserializerBase<Instant>
+    extends JodaDateDeserializerBase<Instant>
 {
     private static final long serialVersionUID = 1L;
 
     public InstantDeserializer() {
-        super(Instant.class);
+        this(FormatConfig.DEFAULT_DATETIME_PARSER);
+    }
+
+    public InstantDeserializer(JacksonJodaDateFormat format) {
+        super(Instant.class, format);
+    }
+
+    @Override
+    public JodaDateDeserializerBase<?> withFormat(JacksonJodaDateFormat format) {
+        return new InstantDeserializer(format);
     }
 
     @Override
@@ -34,7 +45,9 @@ public class InstantDeserializer
             if (str.length() == 0) {
                 return null;
             }
-            return new Instant(str);
+            // 11-Sep-2018, tatu: `DateTimeDeserializer` allows timezone inclusion in brackets;
+            //    should that be checked here too?
+            return Instant.parse(str, _format.createParser(ctxt));
         }
         return _handleNotNumberOrString(p, ctxt);
     }

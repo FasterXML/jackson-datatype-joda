@@ -21,12 +21,6 @@ public class IntervalDeserTest extends JodaTestBase
 
     /*
     /**********************************************************
-    /* Test methods
-    /**********************************************************
-     */
-
-    /*
-    /**********************************************************
     /* Tests for Interval type
     /**********************************************************
      */
@@ -46,20 +40,19 @@ public class IntervalDeserTest extends JodaTestBase
 
     public void testIntervalDeserWithTimeZone() throws IOException
     {
-     MAPPER.setTimeZone(TimeZone.getTimeZone("Europe/Paris"));
+        MAPPER.setTimeZone(TimeZone.getTimeZone("Europe/Paris"));
 
         Interval interval = MAPPER.readValue(quote("1396439982-1396440001"), Interval.class);
         assertEquals(1396439982, interval.getStartMillis());
         assertEquals(1396440001, interval.getEndMillis());
         assertEquals(ISOChronology.getInstance(DateTimeZone.forID("Europe/Paris")), interval.getChronology());
 
-     MAPPER.setTimeZone(TimeZone.getTimeZone("America/Los_Angeles"));
+        MAPPER.setTimeZone(TimeZone.getTimeZone("America/Los_Angeles"));
 
         interval = MAPPER.readValue(quote("-100-1396440001"), Interval.class);
         assertEquals(-100, interval.getStartMillis());
         assertEquals(1396440001, interval.getEndMillis());
         assertEquals(ISOChronology.getInstance(DateTimeZone.forID("America/Los_Angeles")), interval.getChronology());
-
     }
     
     public void testIntervalDeserWithTypeInfo() throws IOException

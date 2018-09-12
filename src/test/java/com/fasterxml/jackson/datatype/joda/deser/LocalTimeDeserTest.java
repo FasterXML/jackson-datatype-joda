@@ -14,12 +14,6 @@ public class LocalTimeDeserTest extends JodaTestBase
     private static interface ObjectConfiguration {
     }
 
-    /*
-    /**********************************************************
-    /* Test methods
-    /**********************************************************
-     */
-
     private final ObjectMapper MAPPER = jodaMapper();
 
     /*
