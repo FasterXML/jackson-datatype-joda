@@ -55,4 +55,14 @@ public class MonthDayDeserTest extends JodaTestBase
             assertTrue(e.getMessage().contains("expected JSON String"));
         }
     }
+
+    public void testDeserMonthDayCustomFormat() throws IOException
+    {
+        FormattedMonthDay input = MAPPER.readValue(aposToQuotes(
+                "{'value':'12:20'}"),
+                FormattedMonthDay.class);
+        MonthDay monthDay = input.value;
+        assertEquals(12, monthDay.getMonthOfYear());
+        assertEquals(20, monthDay.getDayOfMonth());
+    }
 }

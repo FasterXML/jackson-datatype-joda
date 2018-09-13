@@ -54,4 +54,13 @@ public class YearMonthDeserTest extends JodaTestBase
         }
     }
 
+    public void testDeserYearMonthCustomFormat() throws IOException
+    {
+        FormattedYearMonth input = MAPPER.readValue(aposToQuotes(
+                "{'value':'2013/8'}"),
+                FormattedYearMonth.class);
+        YearMonth yearMonth = input.value;
+        assertEquals(2013, yearMonth.getYear());
+        assertEquals(8, yearMonth.getMonthOfYear());
+    }
 }

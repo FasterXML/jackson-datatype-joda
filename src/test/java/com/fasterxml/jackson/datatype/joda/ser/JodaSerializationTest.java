@@ -201,6 +201,14 @@ public class JodaSerializationTest extends JodaTestBase
         assertEquals(quote("--07-23"), json);
     }
 
+    public void testCustomMonthDaySer() throws Exception
+    {
+        MonthDay monthDay = new MonthDay(7, 23);
+        ObjectMapper mapper = jodaMapper();
+        String json = mapper.writeValueAsString(new FormattedMonthDay(monthDay));
+        assertEquals(aposToQuotes("{'value':'07:23'}"), json);
+    }
+
     public void testYearMonthSer() throws Exception
     {
         YearMonth yearMonth = new YearMonth(2013, 8);
@@ -209,4 +217,11 @@ public class JodaSerializationTest extends JodaTestBase
         assertEquals(quote("2013-08"), json);
     }
 
+    public void testCustomYearMonthSer() throws Exception
+    {
+        YearMonth yearMonth = new YearMonth(2013, 8);
+        ObjectMapper mapper = jodaMapper();
+        String json = mapper.writeValueAsString(new FormattedYearMonth(yearMonth));
+        assertEquals(aposToQuotes("{'value':'2013/08'}"), json);
+    }
 }
