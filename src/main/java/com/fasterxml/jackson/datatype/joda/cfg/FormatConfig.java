@@ -1,6 +1,9 @@
 package com.fasterxml.jackson.datatype.joda.cfg;
 
+import java.util.Arrays;
+
 import org.joda.time.DateTimeZone;
+import org.joda.time.DateTimeFieldType;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
 import org.joda.time.format.ISOPeriodFormat;
@@ -62,19 +65,28 @@ public class FormatConfig
     public final static JacksonJodaPeriodFormat DEFAULT_PERIOD_FORMAT
         = new JacksonJodaPeriodFormat(ISOPeriodFormat.standard());
 
+    public final static JacksonJodaDateFormat DEFAULT_YEAR_MONTH_FORMAT
+            = new JacksonJodaDateFormat(ISODateTimeFormat.yearMonth());
+
+    public final static JacksonJodaDateFormat DEFAULT_MONTH_DAY_FORMAT
+            = createMonthDayFormat();
+
     // // // And then some wrapper methods for improved diagnostics, and possible
     // // // default settings for things like "withOffsetParsed()" (see
     // // // [dataformat-joda#75] for more information)
     
-    private final static JacksonJodaDateFormat createUTC(DateTimeFormatter f)
-    {
-        f = f.withZoneUTC();
-        return new JacksonJodaDateFormat(f);
+    private final static JacksonJodaDateFormat createUTC(DateTimeFormatter f) {
+        return new JacksonJodaDateFormat(f.withZoneUTC());
     }
 
-    private final static JacksonJodaDateFormat createDefaultTZ(DateTimeFormatter f)
+    private final static JacksonJodaDateFormat createDefaultTZ(DateTimeFormatter f) {
+        return new JacksonJodaDateFormat(f.withZone(DEFAULT_TZ));
+    }
+
+    private final static JacksonJodaDateFormat createMonthDayFormat()
     {
-        f = f.withZone(DEFAULT_TZ);
-        return new JacksonJodaDateFormat(f);
+        return new JacksonJodaDateFormat(ISODateTimeFormat.forFields(
+                Arrays.asList(DateTimeFieldType.monthOfYear(), DateTimeFieldType.dayOfMonth()),
+                true, true));
     }
 }

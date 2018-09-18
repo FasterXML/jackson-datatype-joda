@@ -71,3 +71,8 @@ Daniel Qian (chanjarster@github)
  * Reported, contributed fix for #93: ADJUST_DATES_TO_CONTEXT_TIME_ZONE got wrong result
    when parse string contains zone id
   (2.9.0)
+
+Adrian Palanques (devdevx@github)
+ * Reported, contributed fix for #101: Instant, YearMonth and MonthDay not use
+   pattern in @JsonFormat
+  (2.9.7)

@@ -2,6 +2,8 @@ package com.fasterxml.jackson.datatype.joda.deser;
 
 import java.io.IOException;
 
+import com.fasterxml.jackson.datatype.joda.cfg.FormatConfig;
+import com.fasterxml.jackson.datatype.joda.cfg.JacksonJodaDateFormat;
 import org.joda.time.MonthDay;
 
 import com.fasterxml.jackson.core.JsonParser;
@@ -13,13 +15,21 @@ import com.fasterxml.jackson.databind.DeserializationContext;
  * <p>
  * Expects a string value compatible with MonthDay's parse operation.
  */
-public class MonthDayDeserializer extends JodaDeserializerBase<MonthDay>
+public class MonthDayDeserializer extends JodaDateDeserializerBase<MonthDay>
 {
     private static final long serialVersionUID = 1L;
 
-    public MonthDayDeserializer()
-    {
-        super(MonthDay.class);
+    public MonthDayDeserializer() {
+        this(FormatConfig.DEFAULT_MONTH_DAY_FORMAT);
+    }
+
+    public MonthDayDeserializer(JacksonJodaDateFormat format) {
+        super(MonthDay.class, format);
+    }
+
+    @Override
+    public JodaDateDeserializerBase<?> withFormat(JacksonJodaDateFormat format) {
+        return new MonthDayDeserializer(format);
     }
 
     @Override
@@ -32,7 +42,7 @@ public class MonthDayDeserializer extends JodaDeserializerBase<MonthDay>
             if (str.isEmpty()) {
                 return getNullValue(ctxt);
             }
-            return MonthDay.parse(str);
+            return MonthDay.parse(str, this._format.createParser(ctxt));
         }
         return (MonthDay) ctxt.handleUnexpectedToken(handledType(), p.currentToken(), p,
                 "expected JSON String");

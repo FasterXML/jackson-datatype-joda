@@ -3,12 +3,10 @@ package com.fasterxml.jackson.datatype.joda;
 import com.fasterxml.jackson.core.Version;
 
 import com.fasterxml.jackson.databind.JsonDeserializer;
-import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.Module;
 import com.fasterxml.jackson.databind.module.SimpleDeserializers;
 import com.fasterxml.jackson.databind.module.SimpleKeyDeserializers;
 import com.fasterxml.jackson.databind.module.SimpleSerializers;
-import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 
 import com.fasterxml.jackson.datatype.joda.deser.*;
 import com.fasterxml.jackson.datatype.joda.deser.key.*;
@@ -62,7 +60,6 @@ public class JodaModule extends Module
         }
         context.addDeserializers(desers);
 
-        final JsonSerializer<Object> stringSer = ToStringSerializer.instance;
         SimpleSerializers sers = new SimpleSerializers()
                 .addSerializer(DateTime.class, new DateTimeSerializer())
                 .addSerializer(DateTimeZone.class, new DateTimeZoneSerializer())
@@ -73,8 +70,8 @@ public class JodaModule extends Module
                 .addSerializer(LocalTime.class, new LocalTimeSerializer())
                 .addSerializer(Period.class, new PeriodSerializer())
                 .addSerializer(Interval.class, new IntervalSerializer())
-                .addSerializer(MonthDay.class, stringSer)
-                .addSerializer(YearMonth.class, stringSer)
+                .addSerializer(MonthDay.class, new MonthDaySerializer())
+                .addSerializer(YearMonth.class, new YearMonthSerializer())
                 // DateMidnight deprecated since at least Joda 2.4, but not removed
                 .addSerializer(DateMidnight.class, new DateMidnightSerializer())
                 ;

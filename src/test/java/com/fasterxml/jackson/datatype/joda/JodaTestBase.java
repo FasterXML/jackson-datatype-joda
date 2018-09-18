@@ -13,6 +13,8 @@ import java.util.Arrays;
 import java.util.TimeZone;
 
 import org.joda.time.Instant;
+import org.joda.time.YearMonth;
+import org.joda.time.MonthDay;
 
 import static org.junit.Assert.*;
 
@@ -24,6 +26,22 @@ public abstract class JodaTestBase extends TestCase
 
         public FormattedInstant(Instant v) { value = v; }
         protected FormattedInstant() { }
+    }
+
+    protected static class FormattedYearMonth {
+        @JsonFormat(pattern = "yyyy/MM")
+        public YearMonth value;
+
+        public FormattedYearMonth(YearMonth v) { value = v; }
+        protected FormattedYearMonth() { }
+    }
+
+    protected static class FormattedMonthDay {
+        @JsonFormat(pattern = "MM:dd")
+        public MonthDay value;
+
+        public FormattedMonthDay(MonthDay v) { value = v; }
+        protected FormattedMonthDay() { }
     }
 
     // Mix-in class for forcing polymorphic handling

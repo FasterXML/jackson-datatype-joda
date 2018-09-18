@@ -6,8 +6,8 @@ import java.util.TimeZone;
 import org.joda.time.YearMonth;
 import org.joda.time.chrono.ISOChronology;
 
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.exc.MismatchedInputException;
 import com.fasterxml.jackson.datatype.joda.JodaTestBase;
 
 public class YearMonthDeserTest extends JodaTestBase
@@ -18,11 +18,12 @@ public class YearMonthDeserTest extends JodaTestBase
     /**********************************************************
      */
 
+    final ObjectMapper MAPPER = mapperWithModule();
+    
     public void testDeserYearMonth() throws Exception
     {
-        final ObjectMapper mapper = mapperWithModule();
         String yearMonthString = new YearMonth(2013, 8).toString();
-        YearMonth yearMonth = mapper.readValue(quote(yearMonthString), YearMonth.class);
+        YearMonth yearMonth = MAPPER.readValue(quote(yearMonthString), YearMonth.class);
         assertEquals(new YearMonth(2013, 8), yearMonth);
     }
 
@@ -38,21 +39,27 @@ public class YearMonthDeserTest extends JodaTestBase
 
     public void testDeserYearMonthFromEmptyString() throws Exception
     {
-        final ObjectMapper mapper = mapperWithModule();
-        YearMonth yearMonth = mapper.readValue(quote(""), YearMonth.class);
+        YearMonth yearMonth = MAPPER.readValue(quote(""), YearMonth.class);
         assertNull(yearMonth);
     }
 
     public void testDeserYearMonthFailsForUnexpectedType() throws IOException
     {
-        final ObjectMapper mapper = mapperWithModule();
-        try
-        {
-            mapper.readValue("{\"year\":2013}", YearMonth.class);
+        try {
+            MAPPER.readValue("{\"year\":2013}", YearMonth.class);
             fail();
-        } catch (JsonMappingException e) {
+        } catch (MismatchedInputException e) {
             verifyException(e, "expected JSON String");
         }
     }
 
+    public void testDeserYearMonthCustomFormat() throws IOException
+    {
+        FormattedYearMonth input = MAPPER.readValue(aposToQuotes(
+                "{'value':'2013/8'}"),
+                FormattedYearMonth.class);
+        YearMonth yearMonth = input.value;
+        assertEquals(2013, yearMonth.getYear());
+        assertEquals(8, yearMonth.getMonthOfYear());
+    }
 }

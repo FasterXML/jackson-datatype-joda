@@ -203,16 +203,25 @@ public class JodaSerializationTest extends JodaTestBase
     public void testMonthDaySer() throws Exception
     {
         MonthDay monthDay = new MonthDay(7, 23);
-        ObjectMapper mapper = mapperWithModule();
-        String json = mapper.writeValueAsString(monthDay);
+        String json = MAPPER.writeValueAsString(monthDay);
         assertEquals(quote("--07-23"), json);
+    }
+
+    public void testCustomMonthDaySer() throws Exception
+    {
+        String json = MAPPER.writeValueAsString(new FormattedMonthDay(new MonthDay(7, 23)));
+        assertEquals(aposToQuotes("{'value':'07:23'}"), json);
     }
 
     public void testYearMonthSer() throws Exception
     {
-        YearMonth yearMonth = new YearMonth(2013, 8);
-        ObjectMapper mapper = mapperWithModule();
-        String json = mapper.writeValueAsString(yearMonth);
+        String json = MAPPER.writeValueAsString(new YearMonth(2013, 8));
         assertEquals(quote("2013-08"), json);
+    }
+
+    public void testCustomYearMonthSer() throws Exception
+    {
+        String json = MAPPER.writeValueAsString(new FormattedYearMonth(new YearMonth(2013, 8)));
+        assertEquals(aposToQuotes("{'value':'2013/08'}"), json);
     }
 }
