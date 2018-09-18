@@ -8,6 +8,8 @@ Project: jackson-datatype-joda
 
 #99: Binary compatibility broken in 2.9.x in `DateTimeSerializer`
  (reported, fixed by andrewl102@github)
+#101: Instant, YearMonth and MonthDay not use pattern in @JsonFormat
+ (reported, fixed by Adrian P)
 
 2.9.6 (12-Jun-2018)
 2.9.5 (26-Mar-2018)

@@ -41,7 +41,7 @@ public class YearMonthDeserializer extends JodaDateDeserializerBase<YearMonth>
             if (str.isEmpty()) {
                 return null;
             }
-            return YearMonth.parse(str, this._format.createParser(ctxt));
+            return YearMonth.parse(str, _format.createParser(ctxt));
         }
         return (YearMonth) ctxt.handleUnexpectedToken(handledType(), p.getCurrentToken(), p,
                 "expected JSON String");
