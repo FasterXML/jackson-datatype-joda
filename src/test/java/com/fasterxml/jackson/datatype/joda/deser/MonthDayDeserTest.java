@@ -1,13 +1,13 @@
 package com.fasterxml.jackson.datatype.joda.deser;
 
-import java.io.IOException;
 import java.util.TimeZone;
 
 import org.joda.time.MonthDay;
 import org.joda.time.chrono.ISOChronology;
 
-import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.exc.MismatchedInputException;
 import com.fasterxml.jackson.datatype.joda.JodaTestBase;
 
 public class MonthDayDeserTest extends JodaTestBase
@@ -44,19 +44,17 @@ public class MonthDayDeserTest extends JodaTestBase
         assertNull(monthDay);
     }
 
-    public void testDeserMonthDayFailsForUnexpectedType() throws IOException
+    public void testDeserMonthDayFailsForUnexpectedType() throws Exception
     {
-        try
-        {
+        try {
             MAPPER.readValue("{\"month\":8}", MonthDay.class);
             fail();
-        } catch (JsonMappingException e)
-        {
-            assertTrue(e.getMessage().contains("expected JSON String"));
+        } catch (MismatchedInputException e) {
+            verifyException(e, "expected JSON String");
         }
     }
 
-    public void testDeserMonthDayCustomFormat() throws IOException
+    public void testDeserMonthDayCustomFormat() throws Exception
     {
         FormattedMonthDay input = MAPPER.readValue(aposToQuotes(
                 "{'value':'12:20'}"),
@@ -64,5 +62,17 @@ public class MonthDayDeserTest extends JodaTestBase
         MonthDay monthDay = input.value;
         assertEquals(12, monthDay.getMonthOfYear());
         assertEquals(20, monthDay.getDayOfMonth());
+    }
+
+    public void testDeserMonthDayConfigOverride() throws Exception
+    {
+        ObjectMapper mapper = jodaMapper();
+        mapper.configOverride(MonthDay.class)
+                .setFormat(JsonFormat.Value.forPattern("MM|dd"));
+        final MonthDay input = new MonthDay(12, 20);
+        final String exp = quote("12|20");
+        assertEquals(exp, mapper.writeValueAsString(input));
+        final MonthDay result = mapper.readValue(exp, MonthDay.class);
+        assertEquals(input, result);
     }
 }
