@@ -3,6 +3,7 @@ package com.fasterxml.jackson.datatype.joda.deser;
 import java.io.IOException;
 import java.util.TimeZone;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import org.joda.time.DateTimeZone;
 import org.joda.time.Interval;
 import org.joda.time.chrono.ISOChronology;
@@ -63,5 +64,36 @@ public class IntervalDeserTest extends JodaTestBase
         Interval interval= mapper.readValue("[\"org.joda.time.Interval\",\"1396439982-1396440001\"]", Interval.class);
         assertEquals(1396439982, interval.getStartMillis());
         assertEquals(1396440001, interval.getEndMillis());
+    }
+
+    public void testIntervalDeserFromIso8601WithTimezoneWithContextTimeZone() throws IOException
+    {
+        MAPPER.setTimeZone(TimeZone.getTimeZone("GMT-2:00"));
+        MAPPER.enable(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE);
+        final Interval expectedInterval = new Interval(1000, 2000, DateTimeZone.forOffsetHours(-2));
+        final Interval actualInterval =
+            MAPPER.readValue(quote("1970-01-01T06:00:01.000+06:00/1970-01-01T06:00:02.000+06:00"), Interval.class);
+
+        assertEquals(expectedInterval, actualInterval);
+    }
+
+    public void testIntervalDeserFromIso8601WithTimezoneWithoutContextTimeZone() throws IOException
+    {
+        MAPPER.disable(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE);
+        final Interval expectedInterval = new Interval(1000, 2000, DateTimeZone.forOffsetHours(6));
+        final Interval actualInterval =
+            MAPPER.readValue(quote("1970-01-01T06:00:01.000+06:00/1970-01-01T06:00:02.000+06:00"), Interval.class);
+
+        assertEquals(expectedInterval, actualInterval);
+    }
+
+    public void testIntervalDeserFromIso8601WithTimezoneWithDefaultTimeZone() throws IOException
+    {
+        MAPPER.enable(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE);
+        final Interval expectedInterval = new Interval(1000, 2000, DateTimeZone.UTC);
+        final Interval actualInterval =
+            MAPPER.readValue(quote("1970-01-01T06:00:01.000+06:00/1970-01-01T06:00:02.000+06:00"), Interval.class);
+
+        assertEquals(expectedInterval, actualInterval);
     }
 }
