@@ -37,11 +37,6 @@ public class JDKSerializabilityTest extends JodaTestBase
         ObjectInputStream inputStream = new ObjectInputStream(byteArrayInputStream);
 
         Object deserializedObject = inputStream.readObject();
-
-        //validate the object
-        assertTrue("Deserialized object should be an instance of ObjectMapper",
-                ObjectMapper.class == deserializedObject.getClass());
-
         return (ObjectMapper) deserializedObject;
     }
 }
