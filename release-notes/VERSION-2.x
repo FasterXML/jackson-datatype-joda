@@ -6,6 +6,10 @@ Project: jackson-datatype-joda
 
 2.10.0 (not yet released)
 
+2.9.8 (15-Dec-2018)
+
+No changes since 2.9.7
+
 2.9.7 (19-Sep-2018)
 
 #99: Binary compatibility broken in 2.9.x in `DateTimeSerializer`
