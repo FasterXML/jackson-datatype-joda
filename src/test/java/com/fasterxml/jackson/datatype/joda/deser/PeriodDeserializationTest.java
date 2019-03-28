@@ -73,7 +73,7 @@ public class PeriodDeserializationTest extends JodaTestBase
     public void testPeriodKeyDeserialize() throws IOException {
 
         final String json = "{" + quote("PT1H2M3.004S") + ":0}";
-        final Map<Period, Long> map = MAPPER.readValue(json, new TypeReference<Map<Period, String>>() { });
+        final Map<Period,Long> map = MAPPER.readValue(json, new TypeReference<Map<Period, Long>>() { });
         assertNotNull(map);
         assertTrue(map.containsKey(new Period(1, 2, 3, 4)));
     }

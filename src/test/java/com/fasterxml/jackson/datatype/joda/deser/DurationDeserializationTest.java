@@ -72,7 +72,7 @@ public class DurationDeserializationTest extends JodaTestBase
     public void testDurationKeyDeserialize() throws IOException
     {
         final String json = "{" + quote("PT60s") + ":0}";
-        final Map<Duration, Long> map = MAPPER.readValue(json,
+        final Map<Duration,?> map = MAPPER.readValue(json,
                 new TypeReference<Map<Duration, String>>() { });
         assertNotNull(map);
         assertTrue(map.containsKey(Duration.standardMinutes(1L)));
@@ -98,7 +98,7 @@ public class DurationDeserializationTest extends JodaTestBase
     public void testDurationAltKeyDeserialize() throws IOException
     {
         final String json = "{" + quote("PT4H30M") + ":0}";
-        final Map<Duration, Long> map = MAPPER.readValue(json,
+        final Map<Duration,?> map = MAPPER.readValue(json,
                 new TypeReference<Map<Duration, String>>() { });
         assertNotNull(map);
         assertTrue(map.containsKey(Duration.standardMinutes(4 * 60 + 30)));
