@@ -123,10 +123,15 @@ public class DateTimeTest extends JodaTestBase
     public void testCustomPatternStyle() throws IOException
     {
         // or, using annotations
-        assertEquals(aposToQuotes("{'date':'1/1/70 12:00 AM'}"),
-                STRING_MAPPER.writeValueAsString(new CustomDate(DATE_JAN_1_1970_UTC)));
+        // 05-May-2019, tatu: Looks like "short representation" somehow varies between JDK 8 and JDK 11?
+        //   JDK 11 adding an extra comma. No idea how, why but... need to work around
+        String json = STRING_MAPPER.writeValueAsString(new CustomDate(DATE_JAN_1_1970_UTC));
+        if (json.contains(",")) {
+            json = json.replace(", ", " ");
+        }
+        assertEquals(aposToQuotes("{'date':'1/1/70 12:00 AM'}"), json);
     }
-    
+
     public void testSerializationWithTypeInfo() throws IOException
     {
         // let's use epoch time (Jan 1, 1970, UTC)
