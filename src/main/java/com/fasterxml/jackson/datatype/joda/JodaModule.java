@@ -60,7 +60,7 @@ public class JodaModule extends Module
         }
         context.addDeserializers(desers);
 
-        SimpleSerializers sers = new SimpleSerializers()
+        context.addSerializers(new SimpleSerializers()
                 .addSerializer(DateTime.class, new DateTimeSerializer())
                 .addSerializer(DateTimeZone.class, new DateTimeZoneSerializer())
                 .addSerializer(Duration.class, new DurationSerializer())
@@ -74,18 +74,16 @@ public class JodaModule extends Module
                 .addSerializer(YearMonth.class, new YearMonthSerializer())
                 // DateMidnight deprecated since at least Joda 2.4, but not removed
                 .addSerializer(DateMidnight.class, new DateMidnightSerializer())
-                ;
-        context.addSerializers(sers);
+        );
 
         // then key deserializers
-        SimpleKeyDeserializers kd = new SimpleKeyDeserializers()
+        context.addKeyDeserializers(new SimpleKeyDeserializers()
                 .addDeserializer(DateTime.class, new DateTimeKeyDeserializer())
                 .addDeserializer(LocalTime.class, new LocalTimeKeyDeserializer())
                 .addDeserializer(LocalDate.class, new LocalDateKeyDeserializer())
                 .addDeserializer(LocalDateTime.class, new LocalDateTimeKeyDeserializer())
                 .addDeserializer(Duration.class, new DurationKeyDeserializer())
                 .addDeserializer(Period.class, new PeriodKeyDeserializer())
-        ;
-        context.addKeyDeserializers(kd);
+        );
     }
 }
