@@ -131,7 +131,7 @@ public class DateTimeTest extends JodaTestBase
         }
         assertEquals(aposToQuotes("{'date':'1/1/70 12:00 AM'}"), json);
     }
-    
+
     public void testSerializationWithTypeInfo() throws IOException
     {
         // let's use epoch time (Jan 1, 1970, UTC)
