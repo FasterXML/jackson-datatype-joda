@@ -14,8 +14,6 @@ import com.fasterxml.jackson.datatype.joda.cfg.JacksonJodaDateFormat;
 
 public class IntervalDeserializer extends JodaDateDeserializerBase<Interval>
 {
-    private static final long serialVersionUID = 1L;
-
     public IntervalDeserializer() {
         // NOTE: not currently used, but must pass something
         this(FormatConfig.DEFAULT_DATETIME_PARSER);
@@ -35,7 +33,7 @@ public class IntervalDeserializer extends JodaDateDeserializerBase<Interval>
         throws IOException
     {
         if (!p.hasToken(JsonToken.VALUE_STRING)) {
-            return (Interval) ctxt.handleUnexpectedToken(handledType(),
+            return (Interval) ctxt.handleUnexpectedToken(getValueType(ctxt),
                     p.currentToken(), p, "expected JSON String");
         }
 

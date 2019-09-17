@@ -17,8 +17,6 @@ import com.fasterxml.jackson.databind.DeserializationContext;
  */
 public class YearMonthDeserializer extends JodaDateDeserializerBase<YearMonth>
 {
-    private static final long serialVersionUID = 1L;
-
     public YearMonthDeserializer() {
         this(FormatConfig.DEFAULT_YEAR_MONTH_FORMAT);
     }
@@ -43,7 +41,7 @@ public class YearMonthDeserializer extends JodaDateDeserializerBase<YearMonth>
             }
             return YearMonth.parse(str, _format.createParser(ctxt));
         }
-        return (YearMonth) ctxt.handleUnexpectedToken(handledType(), p.currentToken(), p,
+        return (YearMonth) ctxt.handleUnexpectedToken(getValueType(ctxt), p.currentToken(), p,
                 "expected JSON String");
     }
 }

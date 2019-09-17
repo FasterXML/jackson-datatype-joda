@@ -7,7 +7,6 @@ import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.deser.std.StdScalarDeserializer;
 import com.fasterxml.jackson.databind.jsontype.TypeDeserializer;
 
-@SuppressWarnings("serial")
 abstract class JodaDeserializerBase<T> extends StdScalarDeserializer<T>
 {
     protected JodaDeserializerBase(Class<?> cls) {
@@ -29,7 +28,7 @@ abstract class JodaDeserializerBase<T> extends StdScalarDeserializer<T>
     public T _handleNotNumberOrString(JsonParser p, DeserializationContext ctxt)
         throws IOException
     {
-        return (T) ctxt.handleUnexpectedToken(handledType(),
+        return (T) ctxt.handleUnexpectedToken(getValueType(ctxt),
                 p.currentToken(), p, "expected JSON Number or String");
     }
 }

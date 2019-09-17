@@ -22,8 +22,6 @@ import com.fasterxml.jackson.datatype.joda.cfg.JacksonJodaDateFormat;
 public class DateMidnightDeserializer
     extends JodaDateDeserializerBase<DateMidnight>
 {
-    private static final long serialVersionUID = 1L;
-
     // final static DateTimeFormatter parser =
     // ISODateTimeFormat.localDateParser();
 

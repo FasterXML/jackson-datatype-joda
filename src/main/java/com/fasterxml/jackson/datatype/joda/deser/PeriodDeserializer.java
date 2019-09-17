@@ -14,8 +14,6 @@ import com.fasterxml.jackson.datatype.joda.cfg.JacksonJodaPeriodFormat;
 public class PeriodDeserializer
     extends JodaDeserializerBase<ReadablePeriod>
 {
-    private static final long serialVersionUID = 1L;
-
     private final JacksonJodaPeriodFormat _format = FormatConfig.DEFAULT_PERIOD_FORMAT;
     
     private final boolean _requireFullPeriod;
@@ -45,7 +43,7 @@ public class PeriodDeserializer
             return new Period(p.getLongValue());    
         }
         if (t != JsonToken.START_OBJECT && t != JsonToken.FIELD_NAME) {
-            return (ReadablePeriod) ctxt.handleUnexpectedToken(handledType(), t, p,
+            return (ReadablePeriod) ctxt.handleUnexpectedToken(getValueType(ctxt), t, p,
                     "expected JSON Number, String or Object");
         }
         

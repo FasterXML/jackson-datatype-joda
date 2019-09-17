@@ -10,11 +10,9 @@ import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.datatype.joda.cfg.FormatConfig;
 import com.fasterxml.jackson.datatype.joda.cfg.JacksonJodaDateFormat;
 
-public class InstantSerializer // non final since 2.6.1
+public class InstantSerializer
     extends JodaDateSerializerBase<Instant>
 {
-    private static final long serialVersionUID = 1L;
-
     public InstantSerializer() { this(FormatConfig.DEFAULT_DATETIME_PRINTER, 0); }
     public InstantSerializer(JacksonJodaDateFormat format) {
         this(format, 0);

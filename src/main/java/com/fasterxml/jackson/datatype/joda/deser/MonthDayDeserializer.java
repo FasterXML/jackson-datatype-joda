@@ -17,8 +17,6 @@ import com.fasterxml.jackson.databind.DeserializationContext;
  */
 public class MonthDayDeserializer extends JodaDateDeserializerBase<MonthDay>
 {
-    private static final long serialVersionUID = 1L;
-
     public MonthDayDeserializer() {
         this(FormatConfig.DEFAULT_MONTH_DAY_FORMAT);
     }
@@ -40,11 +38,11 @@ public class MonthDayDeserializer extends JodaDateDeserializerBase<MonthDay>
         {
             String str = p.getText().trim();
             if (str.isEmpty()) {
-                return getNullValue(ctxt);
+                return (MonthDay) getNullValue(ctxt);
             }
             return MonthDay.parse(str, this._format.createParser(ctxt));
         }
-        return (MonthDay) ctxt.handleUnexpectedToken(handledType(), p.currentToken(), p,
+        return (MonthDay) ctxt.handleUnexpectedToken(getValueType(ctxt), p.currentToken(), p,
                 "expected JSON String");
     }
 }

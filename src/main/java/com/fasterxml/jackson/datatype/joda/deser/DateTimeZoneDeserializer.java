@@ -13,8 +13,6 @@ import com.fasterxml.jackson.databind.DeserializationContext;
  */
 public class DateTimeZoneDeserializer extends JodaDeserializerBase<DateTimeZone>
 {
-    private static final long serialVersionUID = 1L;
-
     public DateTimeZoneDeserializer() { super(DateTimeZone.class); }
 
     @Override

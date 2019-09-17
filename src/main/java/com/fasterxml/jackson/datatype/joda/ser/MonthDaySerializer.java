@@ -11,8 +11,6 @@ import java.io.IOException;
 
 public class MonthDaySerializer extends JodaDateSerializerBase<MonthDay>
 {
-    private static final long serialVersionUID = 1L;
-
     public MonthDaySerializer() { this(FormatConfig.DEFAULT_MONTH_DAY_FORMAT, 0); }
     public MonthDaySerializer(JacksonJodaDateFormat format) {
         this(format, 0);
@@ -22,8 +20,6 @@ public class MonthDaySerializer extends JodaDateSerializerBase<MonthDay>
         super(MonthDay.class, format, SerializationFeature.WRITE_DATES_AS_TIMESTAMPS,
                 FORMAT_STRING, shapeOverride);
     }
-
-
 
     @Override
     public MonthDaySerializer withFormat(JacksonJodaDateFormat formatter,

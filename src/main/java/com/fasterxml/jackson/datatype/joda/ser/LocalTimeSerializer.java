@@ -11,11 +11,9 @@ import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.datatype.joda.cfg.FormatConfig;
 import com.fasterxml.jackson.datatype.joda.cfg.JacksonJodaDateFormat;
 
-public class LocalTimeSerializer // non final since 2.6.1
+public class LocalTimeSerializer
     extends JodaDateSerializerBase<LocalTime>
 {
-    private static final long serialVersionUID = 1L;
-
     public LocalTimeSerializer() {
         this(FormatConfig.DEFAULT_LOCAL_TIMEONLY_PRINTER, 0);
     }

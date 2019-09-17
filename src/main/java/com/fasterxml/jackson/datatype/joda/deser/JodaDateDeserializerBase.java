@@ -11,8 +11,6 @@ import com.fasterxml.jackson.datatype.joda.cfg.JacksonJodaDateFormat;
 public abstract class JodaDateDeserializerBase<T>
     extends JodaDeserializerBase<T>
 {
-    private static final long serialVersionUID = 1L;
-
     protected final JacksonJodaDateFormat _format;
 
     protected JodaDateDeserializerBase(Class<?> type, JacksonJodaDateFormat format)

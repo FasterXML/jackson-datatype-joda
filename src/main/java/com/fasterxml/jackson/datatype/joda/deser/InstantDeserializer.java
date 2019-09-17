@@ -18,8 +18,6 @@ import com.fasterxml.jackson.datatype.joda.cfg.JacksonJodaDateFormat;
 public class InstantDeserializer
     extends JodaDateDeserializerBase<Instant>
 {
-    private static final long serialVersionUID = 1L;
-
     public InstantDeserializer() {
         this(FormatConfig.DEFAULT_DATETIME_PARSER);
     }

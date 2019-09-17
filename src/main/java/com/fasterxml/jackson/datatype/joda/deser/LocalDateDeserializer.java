@@ -16,8 +16,6 @@ import com.fasterxml.jackson.datatype.joda.cfg.JacksonJodaDateFormat;
 public class LocalDateDeserializer
     extends JodaDateDeserializerBase<LocalDate>
 {
-    private static final long serialVersionUID = 1L;
-
     public LocalDateDeserializer() {
         this(FormatConfig.DEFAULT_LOCAL_DATEONLY_FORMAT);
     }
@@ -63,7 +61,7 @@ public class LocalDateDeserializer
             }
             return new LocalDate(year, month, day);
         }
-        return (LocalDate) ctxt.handleUnexpectedToken(handledType(), p.currentToken(), p,
+        return (LocalDate) ctxt.handleUnexpectedToken(getValueType(ctxt), p.currentToken(), p,
                 "expected String, Number or JSON Array");
     }
 }

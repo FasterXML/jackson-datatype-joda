@@ -13,8 +13,6 @@ import com.fasterxml.jackson.datatype.joda.cfg.JacksonJodaDateFormat;
 public class LocalTimeDeserializer
     extends JodaDateDeserializerBase<LocalTime>
 {
-    private static final long serialVersionUID = 1L;
-
     public LocalTimeDeserializer() {
         this(FormatConfig.DEFAULT_LOCAL_TIMEONLY_PARSER);
     }
@@ -62,7 +60,7 @@ public class LocalTimeDeserializer
                     : _format.createParser(ctxt).parseLocalTime(str);
         default:
         }
-        return (LocalTime) ctxt.handleUnexpectedToken(handledType(), p.currentToken(), p,
+        return (LocalTime) ctxt.handleUnexpectedToken(getValueType(ctxt), p.currentToken(), p,
                 "expected JSON Array, String or Number");
     }
 }

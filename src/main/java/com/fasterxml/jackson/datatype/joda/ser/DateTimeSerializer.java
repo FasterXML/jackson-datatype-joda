@@ -13,8 +13,6 @@ import com.fasterxml.jackson.datatype.joda.cfg.JacksonJodaDateFormat;
 public class DateTimeSerializer
     extends JodaDateSerializerBase<DateTime>
 {
-    private static final long serialVersionUID = 1L;
-
     public DateTimeSerializer() {
         this(FormatConfig.DEFAULT_DATETIME_PRINTER, 0);
     }

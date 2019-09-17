@@ -22,8 +22,6 @@ import com.fasterxml.jackson.datatype.joda.cfg.JacksonJodaDateFormat;
 public class DateTimeDeserializer
     extends JodaDateDeserializerBase<ReadableInstant>
 {
-    private static final long serialVersionUID = 1L;
-
     public DateTimeDeserializer(Class<?> cls, JacksonJodaDateFormat format) {
         super(cls, format);
     }

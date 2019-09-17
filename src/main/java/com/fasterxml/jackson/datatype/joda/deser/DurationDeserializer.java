@@ -19,8 +19,6 @@ import com.fasterxml.jackson.datatype.joda.cfg.JacksonJodaPeriodFormat;
 public class DurationDeserializer
     extends JodaDeserializerBase<Duration>
 {
-    private static final long serialVersionUID = 1L;
-
     protected final JacksonJodaPeriodFormat _format;
     
     public DurationDeserializer() {

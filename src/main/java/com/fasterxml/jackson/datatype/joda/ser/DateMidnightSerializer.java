@@ -19,8 +19,6 @@ import com.fasterxml.jackson.datatype.joda.cfg.JacksonJodaDateFormat;
 public class DateMidnightSerializer
     extends JodaDateSerializerBase<DateMidnight>
 {
-    private static final long serialVersionUID = 1L;
-
     public DateMidnightSerializer() {
         this(FormatConfig.DEFAULT_LOCAL_DATEONLY_FORMAT, 0);
     }
