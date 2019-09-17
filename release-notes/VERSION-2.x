@@ -4,6 +4,8 @@ Project: jackson-datatype-joda
 === Releases ===
 ------------------------------------------------------------------------
 
+2.10.0.pr3 (17-Sep-2019)
+2.10.0.pr2 (31-Aug-2019)
 2.10.0.pr1 (19-Jul-2019)
 
 - Add JDK9 `module-info.class` using Moditect plugin
