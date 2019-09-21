@@ -11,6 +11,7 @@ Project: jackson-datatype-joda
 - Add JDK9 `module-info.class` using Moditect plugin
 - Update Joda dependency to 2.9.9 (should still work with older versions too)
 
+2.9.10 (21-Sep-2019)
 2.9.9 (16-May-2019)
 2.9.8 (15-Dec-2018)
 
