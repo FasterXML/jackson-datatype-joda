@@ -1,0 +1,5 @@
+com.fasterxml.jackson.datatype.joda.cfg
+com.fasterxml.jackson.datatype.joda.deser
+com.fasterxml.jackson.datatype.joda.deser.key
+com.fasterxml.jackson.datatype.joda
+com.fasterxml.jackson.datatype.joda.ser
