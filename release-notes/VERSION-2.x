@@ -4,6 +4,11 @@ Project: jackson-datatype-joda
 === Releases ===
 ------------------------------------------------------------------------
 
+2.10.1 (not yet released)
+
+#108: `JodaDateSerializer` Discards Shape Override Preference
+ (reported by Adrian R; fix contributed by Vincent B)
+
 2.10.0 (26-Sep-2019)
 
 - Add JDK9 `module-info.class` using Moditect plugin

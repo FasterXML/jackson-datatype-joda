@@ -76,3 +76,11 @@ Adrian Palanques (devdevx@github)
  * Reported, contributed fix for #101: Instant, YearMonth and MonthDay not use
    pattern in @JsonFormat
   (2.9.7)
+
+Adrian Regan (knocknarea@github)
+ * Reported #108: `JodaDateSerializer` Discards Shape Override Preference
+  (2.10.1)
+
+Vincent Boulaye (vboulaye@github)
+ * Contributed fix for #108: `JodaDateSerializer` Discards Shape Override Preference
+  (2.10.1)
