@@ -76,3 +76,7 @@ Adrian Palanques (devdevx@github)
  * Reported, contributed fix for #101: Instant, YearMonth and MonthDay not use
    pattern in @JsonFormat
   (2.9.7)
+
+Richard Wise (Woodz@github)
+  * Contributed fix for #104: Deserializing Interval discards timezone information
+  (2.11.0)

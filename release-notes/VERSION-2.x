@@ -4,6 +4,12 @@ Project: jackson-datatype-joda
 === Releases ===
 ------------------------------------------------------------------------
 
+2.11.0 (not yet released)
+
+#104: Deserializing Interval discards timezone information
+ (contributed by Richard W)
+- Now requires use of Joda 2.9.x (wrt #104 fix)
+
 2.10.0 (26-Sep-2019)
 
 - Add JDK9 `module-info.class` using Moditect plugin
