@@ -3,7 +3,10 @@ package com.fasterxml.jackson.datatype.joda;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.ObjectMapper;
+<<<<<<< HEAD
 import com.fasterxml.jackson.databind.cfg.MapperBuilder;
+=======
+>>>>>>> 2.11
 import com.fasterxml.jackson.databind.json.JsonMapper;
 
 import junit.framework.TestCase;
