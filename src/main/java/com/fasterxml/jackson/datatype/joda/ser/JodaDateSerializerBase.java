@@ -56,9 +56,7 @@ public abstract class JodaDateSerializerBase<T> extends JodaSerializerBase<T>
     {
         JsonFormat.Value ann = findFormatOverrides(prov, property, handledType());
         if (ann != null) {
-            int shapeOverride = 0;
-            JacksonJodaDateFormat format = _format;
-
+            int shapeOverride;
             Boolean useTimestamp;
 
             // Simple case first: serialize as numeric timestamp?
@@ -75,8 +73,9 @@ public abstract class JodaDateSerializerBase<T> extends JodaSerializerBase<T>
                 shapeOverride = FORMAT_ARRAY;
             } else  {
                 useTimestamp = null;
-                shapeOverride = 0;
+                shapeOverride = _shapeOverride;
             }
+            JacksonJodaDateFormat format = _format;
             // must not call if flag defined, to rely on defaults:
             if (useTimestamp != null) {
                 format = format.withUseTimestamp(useTimestamp);
