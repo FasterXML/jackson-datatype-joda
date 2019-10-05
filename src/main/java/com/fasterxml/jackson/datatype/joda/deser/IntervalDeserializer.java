@@ -59,7 +59,7 @@ public class IntervalDeserializer extends JodaDateDeserializerBase<Interval>
         try {
             // !!! TODO: configurable formats...
             if (hasSlash) {
-                result = Interval.parse(v);
+                result = Interval.parseWithOffset(v);
             } else {
                 start = Long.valueOf(str);
                 str = v.substring(index + 1);
@@ -72,7 +72,9 @@ public class IntervalDeserializer extends JodaDateDeserializerBase<Interval>
                     str, v);
         }
 
-        DateTimeZone tz = _format.isTimezoneExplicit() ? _format.getTimeZone() : DateTimeZone.forTimeZone(ctxt.getTimeZone());
+        final DateTimeZone contextTimezone =
+            _format.shouldAdjustToContextTimeZone(ctxt) ? DateTimeZone.forTimeZone(ctxt.getTimeZone()) : null;
+        DateTimeZone tz = _format.isTimezoneExplicit() ? _format.getTimeZone() : contextTimezone;
         if (tz != null) {
             if (!tz.equals(result.getStart().getZone())) {
                 result = new Interval(result.getStartMillis(), result.getEndMillis(), tz);
