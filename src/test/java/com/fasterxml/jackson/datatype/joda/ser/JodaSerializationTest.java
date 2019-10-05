@@ -1,16 +1,17 @@
 package com.fasterxml.jackson.datatype.joda.ser;
 
-import java.io.IOException;
-
 import com.fasterxml.jackson.annotation.JsonInclude;
-
-import org.joda.time.*;
-
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.datatype.joda.JodaTestBase;
+import com.fasterxml.jackson.datatype.joda.cfg.JacksonJodaDateFormat;
+import org.joda.time.*;
+import org.joda.time.format.ISODateTimeFormat;
+
+import java.io.IOException;
 
 public class JodaSerializationTest extends JodaTestBase
 {
@@ -84,7 +85,7 @@ public class JodaSerializationTest extends JodaTestBase
     /* Tests for LocalTime type
     /**********************************************************
      */
-    
+
     public void testLocalTimeSer() throws IOException
     {
         LocalTime date = new LocalTime(13,20,54);
@@ -96,8 +97,28 @@ public class JodaSerializationTest extends JodaTestBase
         ObjectMapper mapper = jodaMapper();
         mapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);        
         assertEquals(quote("13:20:54.000"), mapper.writeValueAsString(date));
+
     }
-    
+
+    public void testLocalTimeSerWithFormatOverride() throws IOException
+    {
+        LocalTime date = new LocalTime(13,20,54);
+
+        // configure a custom serialzer fot the LocalTime
+        SimpleModule testModule = new SimpleModule("TestModule");
+        testModule.addSerializer(LocalTime.class, new LocalTimeSerializer(
+                new JacksonJodaDateFormat(ISODateTimeFormat.hourMinute()), 1));
+
+        ObjectMapper mapper = mapperWithModuleBuilder()
+                .addModule(testModule)
+                .build();
+
+        assertEquals(quote("13:20"), mapper.writeValueAsString(date));
+
+        assertEquals(aposToQuotes("{'contents':'13:20'}"), mapper.writeValueAsString(new Container<>(date)));
+
+    }
+
     public void testLocalTimeSerWithTypeInfo() throws IOException
     {
         LocalTime date = new LocalTime(13,20,54);
@@ -111,6 +132,7 @@ public class JodaSerializationTest extends JodaTestBase
         mapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);        
         assertEquals("[\"org.joda.time.LocalTime\",\"13:20:54.000\"]",
                 mapper.writeValueAsString(date));
+
     }
 
     /*
