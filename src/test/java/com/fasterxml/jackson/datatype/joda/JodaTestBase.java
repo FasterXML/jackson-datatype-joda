@@ -1,20 +1,17 @@
 package com.fasterxml.jackson.datatype.joda;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.fasterxml.jackson.databind.ObjectMapper;
-<<<<<<< HEAD
-import com.fasterxml.jackson.databind.cfg.MapperBuilder;
-=======
->>>>>>> 2.11
-import com.fasterxml.jackson.databind.json.JsonMapper;
-
-import junit.framework.TestCase;
-
 import java.io.IOException;
 import java.text.DateFormat;
 import java.util.Arrays;
 import java.util.TimeZone;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.cfg.MapperBuilder;
+import com.fasterxml.jackson.databind.json.JsonMapper;
+
+import junit.framework.TestCase;
 
 import org.joda.time.Instant;
 import org.joda.time.YearMonth;
@@ -54,9 +51,9 @@ public abstract class JodaTestBase extends TestCase
     }
 
     /*
-    /**********************************************************
+    /**********************************************************************
     /* Factory methods
-    /**********************************************************
+    /**********************************************************************
      */
 
     protected static MapperBuilder<?,?> mapperWithModuleBuilder() {
@@ -89,9 +86,9 @@ public abstract class JodaTestBase extends TestCase
     }
 
     /*
-    /**********************************************************
+    /**********************************************************************
     /* Additional assert methods
-    /**********************************************************
+    /**********************************************************************
      */
 
     protected void assertEquals(int[] exp, int[] act) {
@@ -99,9 +96,9 @@ public abstract class JodaTestBase extends TestCase
     }
     
     /*
-    /**********************************************************
+    /**********************************************************************
     /* Helper methods
-    /**********************************************************
+    /**********************************************************************
      */
 
     protected void verifyException(Throwable e, String... matches)
