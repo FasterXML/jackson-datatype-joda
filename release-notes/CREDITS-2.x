@@ -77,6 +77,15 @@ Adrian Palanques (devdevx@github)
    pattern in @JsonFormat
   (2.9.7)
 
+Adrian Regan (knocknarea@github)
+ * Reported #108: `JodaDateSerializer` Discards Shape Override Preference
+  (2.10.1)
+
+Vincent Boulaye (vboulaye@github)
+ * Contributed fix for #108: `JodaDateSerializer` Discards Shape Override Preference
+  (2.10.1)
+
 Richard Wise (Woodz@github)
   * Contributed fix for #104: Deserializing Interval discards timezone information
   (2.11.0)
+
