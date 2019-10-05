@@ -3,6 +3,7 @@ package com.fasterxml.jackson.datatype.joda;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.cfg.MapperBuilder;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 
 import junit.framework.TestCase;
@@ -57,7 +58,7 @@ public abstract class JodaTestBase extends TestCase
         return mapperWithModuleBuilder().build();
     }
 
-    protected static JsonMapper.Builder mapperWithModuleBuilder() {
+    protected static MapperBuilder<?,?> mapperWithModuleBuilder() {
         return JsonMapper.builder()
                 .addModule(new JodaModule());
     }
