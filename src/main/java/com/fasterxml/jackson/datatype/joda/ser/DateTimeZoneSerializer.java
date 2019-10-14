@@ -15,7 +15,7 @@ public class DateTimeZoneSerializer extends JodaSerializerBase<DateTimeZone>
     public DateTimeZoneSerializer() { super(DateTimeZone.class); }
 
     @Override
-    public void serialize(DateTimeZone value, JsonGenerator gen, SerializerProvider provider) throws IOException
+    public void serialize(DateTimeZone value, JsonGenerator gen, SerializerProvider ctxt) throws IOException
     {
         gen.writeString(value.getID());
     }
@@ -23,11 +23,11 @@ public class DateTimeZoneSerializer extends JodaSerializerBase<DateTimeZone>
     // as per [datatype-joda#82], need to ensure we will indicate nominal, NOT physical type:
     @Override
     public void serializeWithType(DateTimeZone value, JsonGenerator g,
-            SerializerProvider provider, TypeSerializer typeSer) throws IOException
+            SerializerProvider ctxt, TypeSerializer typeSer) throws IOException
     {
-        WritableTypeId typeIdDef = typeSer.writeTypePrefix(g,
+        WritableTypeId typeIdDef = typeSer.writeTypePrefix(g, ctxt,
                 typeSer.typeId(value, DateTimeZone.class, JsonToken.VALUE_STRING));
-        serialize(value, g, provider);
-        typeSer.writeTypeSuffix(g, typeIdDef);
+        serialize(value, g, ctxt);
+        typeSer.writeTypeSuffix(g, ctxt, typeIdDef);
     }
 }
