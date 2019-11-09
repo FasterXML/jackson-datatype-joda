@@ -4,7 +4,7 @@ Project: jackson-datatype-joda
 === Releases ===
 ------------------------------------------------------------------------
 
-2.10.1 (not yet released)
+2.10.1 (09-Nov-2019)
 
 #108: `JodaDateSerializer` Discards Shape Override Preference
  (reported by Adrian R; fix contributed by Vincent B)
