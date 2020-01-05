@@ -10,7 +10,11 @@ Project: jackson-datatype-joda
  (contributed by Richard W)
 - Now requires use of Joda 2.9.x (wrt #104 fix)
 
-2.10.1 (not yet released)
+2.10.2 (05-Jan-2020)
+
+No changes since 2.10.1
+
+2.10.1 (09-Nov-2019)
 
 #108: `JodaDateSerializer` Discards Shape Override Preference
  (reported by Adrian R; fix contributed by Vincent B)
