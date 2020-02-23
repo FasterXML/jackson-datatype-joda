@@ -12,6 +12,8 @@ import com.fasterxml.jackson.datatype.joda.deser.*;
 import com.fasterxml.jackson.datatype.joda.deser.key.*;
 import com.fasterxml.jackson.datatype.joda.ser.*;
 
+import org.joda.money.CurrencyUnit;
+import org.joda.money.Money;
 import org.joda.time.*;
 
 public class JodaModule extends Module
@@ -51,6 +53,9 @@ public class JodaModule extends Module
                 .addDeserializer(YearMonth.class, new YearMonthDeserializer())
                 // DateMidnight deprecated since at least Joda 2.4, but not removed
                 .addDeserializer(DateMidnight.class, new DateMidnightDeserializer())
+                // Money types
+                .addDeserializer(CurrencyUnit.class, new CurrencyUnitDeserializer())
+                .addDeserializer(Money.class, new MoneyDeserializer())
                 ;
         {
             @SuppressWarnings("unchecked")
@@ -74,6 +79,9 @@ public class JodaModule extends Module
                 .addSerializer(YearMonth.class, new YearMonthSerializer())
                 // DateMidnight deprecated since at least Joda 2.4, but not removed
                 .addSerializer(DateMidnight.class, new DateMidnightSerializer())
+                // Money types
+                .addSerializer(CurrencyUnit.class, new CurrencyUnitSerializer())
+                .addSerializer(Money.class, new MoneySerializer())
         );
 
         // then key deserializers
