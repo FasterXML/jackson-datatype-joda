@@ -158,7 +158,8 @@ public class DateTimeTest extends JodaTestBase
 
         String expectedJSON =
             "{\"jodaDateTime\":\"2000-01-01T00:00:00.000Z\","
-                + "\"javaUtilDate\":\"2000-01-01T00:00:00.000+0000\"}";
+                // 19-Mar-2020, tatu: [databind#2167] changed this to...
+                + "\"javaUtilDate\":\"2000-01-01T00:00:00.000+00:00\"}";
         String actualJSON = mapper.writeValueAsString(expectedBean);
         assertEquals(actualJSON, expectedJSON);
 
