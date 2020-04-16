@@ -84,3 +84,8 @@ Adrian Regan (knocknarea@github)
 Vincent Boulaye (vboulaye@github)
  * Contributed fix for #108: `JodaDateSerializer` Discards Shape Override Preference
   (2.10.1)
+
+Bertrand Renuart (brenuart@github)
+ * Reported #113: `ObjectMapper.setDefaultLeniency()` is causing `NullPointerException`
+  in `JacksonJodaDateFormat`
+  (2.10.4)
