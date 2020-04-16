@@ -120,7 +120,7 @@ public class JacksonJodaDateFormat extends JacksonJodaFormatBase
         JacksonJodaDateFormat format = this;
         format = format.withLocale(ann.getLocale());
         format = format.withTimeZone(ann.getTimeZone());
-        format = format.withFormat(ann.getPattern().trim());
+        format = format.withFormat(ann.getPattern());
         Boolean adjustTZ = ann.getFeature(JsonFormat.Feature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE);
         Boolean writeZoneId = ann.getFeature(JsonFormat.Feature.WRITE_DATES_WITH_ZONE_ID);
         if ((adjustTZ != _adjustToContextTZOverride)

@@ -85,7 +85,11 @@ Vincent Boulaye (vboulaye@github)
  * Contributed fix for #108: `JodaDateSerializer` Discards Shape Override Preference
   (2.10.1)
 
+Bertrand Renuart (brenuart@github)
+ * Reported #113: `ObjectMapper.setDefaultLeniency()` is causing `NullPointerException`
+  in `JacksonJodaDateFormat`
+  (2.10.4)
+
 Richard Wise (Woodz@github)
   * Contributed fix for #104: Deserializing Interval discards timezone information
   (2.11.0)
-
