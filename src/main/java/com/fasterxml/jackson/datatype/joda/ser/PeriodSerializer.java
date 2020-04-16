@@ -68,7 +68,7 @@ public class PeriodSerializer
                     format = format.withUseTimestamp(useTimestamp);
                 }
                 // for others, safe to call, null/empty just ignored
-                format = format.withFormat(ann.getPattern().trim());
+                format = format.withFormat(ann.getPattern());
                 format = format.withLocale(ann.getLocale());
                 if (format != _format) {
                     return new PeriodSerializer(format);
