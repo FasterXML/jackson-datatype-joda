@@ -4,7 +4,11 @@ Project: jackson-datatype-joda
 === Releases ===
 ------------------------------------------------------------------------
 
-2.11.0 (not yet released)
+2.11.1 (not yet released)
+
+-
+
+2.11.0 (26-Apr-2020)
 
 #104: Deserializing Interval discards timezone information
  (contributed by Richard W)
