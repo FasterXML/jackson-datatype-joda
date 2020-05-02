@@ -14,7 +14,7 @@ Project: jackson-datatype-joda
  (contributed by Richard W)
 - Now requires use of Joda 2.9.x (wrt #104 fix)
 
-2.10.4 (not yet released)
+2.10.4 (03-May-2020)
 
 #113: `ObjectMapper.setDefaultLeniency()` is causing `NullPointerException`
   in `JacksonJodaDateFormat`
