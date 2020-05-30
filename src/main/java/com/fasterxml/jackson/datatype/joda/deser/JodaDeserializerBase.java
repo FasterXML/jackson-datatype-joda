@@ -6,6 +6,7 @@ import com.fasterxml.jackson.core.*;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.deser.std.StdScalarDeserializer;
 import com.fasterxml.jackson.databind.jsontype.TypeDeserializer;
+import com.fasterxml.jackson.databind.type.LogicalType;
 
 @SuppressWarnings("serial")
 abstract class JodaDeserializerBase<T> extends StdScalarDeserializer<T>
@@ -24,6 +25,9 @@ abstract class JodaDeserializerBase<T> extends StdScalarDeserializer<T>
     {
         return typeDeserializer.deserializeTypedFromAny(p, ctxt);
     }
+
+    @Override
+    public LogicalType logicalType() { return LogicalType.DateTime; }
 
     @SuppressWarnings("unchecked")
     public T _handleNotNumberOrString(JsonParser p, DeserializationContext ctxt)
