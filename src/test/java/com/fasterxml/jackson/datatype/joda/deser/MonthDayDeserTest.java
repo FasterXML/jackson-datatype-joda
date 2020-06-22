@@ -1,7 +1,11 @@
 package com.fasterxml.jackson.datatype.joda.deser;
 
+import java.io.IOException;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.TimeZone;
 
+import org.joda.time.Instant;
 import org.joda.time.MonthDay;
 import org.joda.time.chrono.ISOChronology;
 
@@ -75,5 +79,17 @@ public class MonthDayDeserTest extends JodaTestBase
         assertEquals(exp, mapper.writeValueAsString(input));
         final MonthDay result = mapper.readValue(exp, MonthDay.class);
         assertEquals(input, result);
+    }
+
+    public void testDeserMonthDayWhichWasSerializedWithoutJodaModule() throws IOException {
+        Calendar cal = new GregorianCalendar(TimeZone.getTimeZone("UTC"));
+        cal.set(2020, Calendar.JUNE, 20, 11, 31, 44);
+        cal.set(Calendar.MILLISECOND, 276);
+        long timepoint = cal.getTime().getTime();
+        Instant instant = new Instant(timepoint);
+        MonthDay expectedMonthDay = new MonthDay(instant);
+        String json = mapper().writeValueAsString(expectedMonthDay);
+        MonthDay monthDay = mapperWithModule().readValue(json, MonthDay.class);
+        assertEquals(expectedMonthDay, monthDay);
     }
 }

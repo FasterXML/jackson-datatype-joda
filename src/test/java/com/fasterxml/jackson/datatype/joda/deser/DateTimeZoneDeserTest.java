@@ -1,5 +1,6 @@
 package com.fasterxml.jackson.datatype.joda.deser;
 
+import java.io.IOException;
 import java.util.TimeZone;
 
 import org.joda.time.DateTimeZone;
@@ -44,5 +45,13 @@ public class DateTimeZoneDeserTest extends JodaTestBase
         DateTimeZoneWrapper result2 = MAPPER.readValue(json, DateTimeZoneWrapper.class);    
         assertNotNull(result2.tz);
         assertEquals(input, result2.tz);
+    }
+
+    public void testDeserDateTimeZoneWhichWasSerializedWithoutJodaModule() throws IOException {
+        TimeZone timeZone = TimeZone.getTimeZone("GMT-7");
+        DateTimeZone expectedDateTimeZone = DateTimeZone.forTimeZone(timeZone);
+        String json = mapper().writeValueAsString(expectedDateTimeZone);
+        DateTimeZone dateTimeZone = mapperWithModule().readValue(json, DateTimeZone.class);
+        assertEquals(expectedDateTimeZone, dateTimeZone);
     }
 }

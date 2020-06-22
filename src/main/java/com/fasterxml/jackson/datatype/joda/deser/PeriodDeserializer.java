@@ -75,6 +75,17 @@ public class PeriodDeserializer
         }
         else if (periodName.equals( "Years" )) {
             rp = Years.years( periodValue );
+        }
+        else if (periodName.equals( "Standard" )) {
+            int years = treeNode.path("years").asInt(0);
+            int months = treeNode.path("months").asInt(0);
+            int weeks = treeNode.path("weeks").asInt(0);
+            int days = treeNode.path("days").asInt(0);
+            int hours = treeNode.path("hours").asInt(0);
+            int minutes = treeNode.path("minutes").asInt(0);
+            int seconds = treeNode.path("seconds").asInt(0);
+            int millis = treeNode.path("millis").asInt(0);
+            rp = new Period(years, months, weeks, days, hours, minutes, seconds, millis, PeriodType.standard());
         } else {
             ctxt.reportInputMismatch(handledType(),
                     "Don't know how to deserialize %s using periodName '%s'",

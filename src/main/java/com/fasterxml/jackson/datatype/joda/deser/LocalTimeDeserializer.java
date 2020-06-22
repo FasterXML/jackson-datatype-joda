@@ -8,6 +8,7 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.core.JsonTokenId;
 import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.datatype.joda.cfg.FormatConfig;
 import com.fasterxml.jackson.datatype.joda.cfg.JacksonJodaDateFormat;
 
@@ -38,6 +39,15 @@ public class LocalTimeDeserializer
             String str = p.getText().trim();
             return (str.length() == 0) ? null
                     : _format.createParser(ctxt).parseLocalTime(str);
+        case JsonTokenId.ID_START_OBJECT:
+            JsonNode treeNode = p.readValueAsTree();
+            int hourOfDay = treeNode.path("hourOfDay").asInt(Integer.MIN_VALUE);
+            int minuteOfHour = treeNode.path("minuteOfHour").asInt(Integer.MIN_VALUE);
+            int secondOfMinute = treeNode.path("secondOfMinute").asInt(Integer.MIN_VALUE);
+            int millisOfSecond = treeNode.path("millisOfSecond").asInt(0); // optional and defaults to zero
+            if (hourOfDay >= 0 && minuteOfHour >= 0 && secondOfMinute >= 0) {
+                return new LocalTime(hourOfDay, minuteOfHour, secondOfMinute, millisOfSecond);
+            }
         default:
         }
         // [HH,MM,ss,ms?]

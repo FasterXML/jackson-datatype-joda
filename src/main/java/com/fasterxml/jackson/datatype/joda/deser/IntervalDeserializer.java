@@ -9,6 +9,7 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 
 import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.datatype.joda.cfg.FormatConfig;
 import com.fasterxml.jackson.datatype.joda.cfg.JacksonJodaDateFormat;
 
@@ -33,6 +34,16 @@ public class IntervalDeserializer extends JodaDateDeserializerBase<Interval>
         throws IOException
     {
         if (!p.hasToken(JsonToken.VALUE_STRING)) {
+            if (p.hasToken(JsonToken.START_OBJECT)) {
+                JsonNode treeNode = p.readValueAsTree();
+                long startMillis = treeNode.path("startMillis").asLong(Long.MIN_VALUE);
+                long endMillis = treeNode.path("endMillis").asLong(Long.MIN_VALUE);
+                String id = treeNode.path("chronology").path("zone").path("ID").asText();
+                if (startMillis >= 0 && endMillis >= 0 && startMillis <= endMillis) {
+                    DateTimeZone tz = DateTimeZone.forID(id);
+                    return new Interval(startMillis, endMillis, tz);
+                }
+            }
             return (Interval) ctxt.handleUnexpectedToken(getValueType(ctxt),
                     p.currentToken(), p, "expected JSON String");
         }

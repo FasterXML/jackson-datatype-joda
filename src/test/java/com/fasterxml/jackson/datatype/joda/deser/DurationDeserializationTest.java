@@ -103,4 +103,12 @@ public class DurationDeserializationTest extends JodaTestBase
         assertNotNull(map);
         assertTrue(map.containsKey(Duration.standardMinutes(4 * 60 + 30)));
     }
+
+    public void testDeserDurationWhichWasSerializedWithoutJodaModule() throws IOException {
+        long millisInAnHour = 60 * 60 * 1000;
+        Duration expectedDuration = new Duration(millisInAnHour);
+        String json = mapper().writeValueAsString(expectedDuration);
+        Duration duration = mapperWithModule().readValue(json, Duration.class);
+        assertEquals(expectedDuration, duration);
+    }
 }

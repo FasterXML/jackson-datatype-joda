@@ -56,8 +56,12 @@ public abstract class JodaTestBase extends TestCase
     /**********************************************************************
      */
 
+    protected static MapperBuilder<?,?> mapperBuilder() {
+        return JsonMapper.builder();
+    }
+
     protected static MapperBuilder<?,?> mapperWithModuleBuilder() {
-        return JsonMapper.builder()
+        return mapperBuilder()
                 .addModule(new JodaModule());
     }
 
@@ -69,6 +73,10 @@ public abstract class JodaTestBase extends TestCase
     protected static MapperBuilder<?,?> jodaMapperBuilder(TimeZone tz) {
         return mapperWithModuleBuilder()
                 .defaultTimeZone(tz);
+    }
+
+    protected static ObjectMapper mapper() {
+        return mapperBuilder().build();
     }
 
     protected static ObjectMapper mapperWithModule() {

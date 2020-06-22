@@ -9,6 +9,7 @@ import org.joda.time.YearMonth;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.JsonNode;
 
 /**
  * A Jackson deserializer for Joda YearMonth objects.
@@ -40,6 +41,13 @@ public class YearMonthDeserializer extends JodaDateDeserializerBase<YearMonth>
                 return null;
             }
             return YearMonth.parse(str, _format.createParser(ctxt));
+        } else if (t == JsonToken.START_OBJECT) {
+            JsonNode treeNode = p.readValueAsTree();
+            int year = treeNode.path("year").asInt(Integer.MIN_VALUE);
+            int month = treeNode.path("monthOfYear").asInt(Integer.MIN_VALUE);
+            if (year != Integer.MIN_VALUE && month != Integer.MIN_VALUE) {
+                return new YearMonth(year, month);
+            }
         }
         return (YearMonth) ctxt.handleUnexpectedToken(getValueType(ctxt), p.currentToken(), p,
                 "expected JSON String");

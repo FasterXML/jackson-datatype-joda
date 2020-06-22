@@ -205,4 +205,11 @@ public class DateMidnightTest extends JodaTestBase
         // Is this stable enough for testing?
         assertEquals("America/New_York", resultTz.getID());
     }
+
+    public void testDeserDateMidnightWhichWasSerializedWithoutJodaModule() throws IOException {
+        DateMidnight expectedDateMidnight = new DateMidnight(2020, 1, 1, DateTimeZone.forID("America/New_York"));
+        String json = mapper().writeValueAsString(expectedDateMidnight);
+        DateMidnight dateMidnight = mapperWithModule().readValue(json, DateMidnight.class);
+        assertEquals(expectedDateMidnight, dateMidnight);
+    }
 }

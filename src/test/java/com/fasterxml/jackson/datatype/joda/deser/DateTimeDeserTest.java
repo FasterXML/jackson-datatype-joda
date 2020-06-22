@@ -161,4 +161,11 @@ public class DateTimeDeserTest extends JodaTestBase
         DateTimeZone expTZ = DateTimeZone.forID("Asia/Shanghai");
         assertEquals(new DateTime(2017, 1, 1, 1, 1, 1, expTZ), result);
     }
+
+    public void testDeserDateTimeWhichWasSerializedWithoutJodaModule() throws IOException {
+        DateTime expectedDateTime = new DateTime(2020, 1, 1, 3, 22, 51, 229, DateTimeZone.forID("Asia/Shanghai"));
+        String json = mapper().writeValueAsString(expectedDateTime);
+        DateTime dateTime = mapperWithModule().readValue(json, DateTime.class);
+        assertEquals(expectedDateTime, dateTime);
+    }
 }

@@ -45,6 +45,12 @@ public class InstantDeserializer
             // 11-Sep-2018, tatu: `DateTimeDeserializer` allows timezone inclusion in brackets;
             //    should that be checked here too?
             return Instant.parse(str, _format.createParser(ctxt));
+        case JsonTokenId.ID_START_OBJECT:
+            JsonNode treeNode = p.readValueAsTree();
+            long millis = treeNode.path("millis").asLong(Long.MIN_VALUE);
+            if (millis >= 0) {
+                return new Instant(millis);
+            }
         default:
         }
         return _handleNotNumberOrString(p, ctxt);

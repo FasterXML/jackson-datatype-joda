@@ -8,6 +8,7 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonTokenId;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.datatype.joda.cfg.FormatConfig;
 import com.fasterxml.jackson.datatype.joda.cfg.JacksonJodaPeriodFormat;
 
@@ -38,6 +39,12 @@ public class DurationDeserializer
             return new Duration(p.getLongValue());
         case JsonTokenId.ID_STRING:
             return _format.parsePeriod(ctxt, p.getText().trim()).toStandardDuration();
+        case JsonTokenId.ID_START_OBJECT:
+            JsonNode treeNode = p.readValueAsTree();
+            long millis = treeNode.path("millis").asLong(Long.MIN_VALUE);
+            if (millis >= 0) {
+                return new Duration(millis);
+            }
         default:
         }
         return _handleNotNumberOrString(p, ctxt);

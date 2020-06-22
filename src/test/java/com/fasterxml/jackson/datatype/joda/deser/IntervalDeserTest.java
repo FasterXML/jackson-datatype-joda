@@ -102,4 +102,13 @@ public class IntervalDeserTest extends JodaTestBase
 
         assertEquals(expectedInterval, actualInterval);
     }
+
+    public void testDeserIntervalWhichWasSerializedWithoutJodaModule() throws IOException {
+        long start = 1396439982;
+        long end = 1396440001;
+        Interval expectedInterval = new Interval(start, end, DateTimeZone.forID("America/New_York"));
+        String json = mapper().writeValueAsString(expectedInterval);
+        Interval interval = mapperWithModule().readValue(json, Interval.class);
+        assertEquals(expectedInterval, interval);
+    }
 }

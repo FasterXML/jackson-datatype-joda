@@ -1,7 +1,12 @@
 package com.fasterxml.jackson.datatype.joda.deser;
 
 import java.io.IOException;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+import java.util.TimeZone;
 
+import org.joda.time.DateTimeZone;
+import org.joda.time.Instant;
 import org.joda.time.LocalTime;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
@@ -65,5 +70,17 @@ public class LocalTimeDeserTest extends JodaTestBase
         assertEquals(45, time2.getMinuteOfHour());
         assertEquals(22, time2.getSecondOfMinute());
         assertEquals(0, time2.getMillisOfSecond());
+    }
+
+    public void testDeserLocalTimeWhichWasSerializedWithoutJodaModule() throws IOException {
+        Calendar cal = new GregorianCalendar(TimeZone.getTimeZone("UTC"));
+        cal.set(2020, Calendar.JUNE, 20, 11, 31, 44);
+        cal.set(Calendar.MILLISECOND, 276);
+        long timepoint = cal.getTime().getTime();
+        Instant instant = new Instant(timepoint);
+        LocalTime expectedLocalTime = new LocalTime(instant, DateTimeZone.UTC);
+        String json = mapper().writeValueAsString(expectedLocalTime);
+        LocalTime localTime = mapperWithModule().readValue(json, LocalTime.class);
+        assertEquals(expectedLocalTime, localTime);
     }
 }

@@ -1,8 +1,11 @@
 package com.fasterxml.jackson.datatype.joda.deser;
 
 import java.io.IOException;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.TimeZone;
 
+import org.joda.time.Instant;
 import org.joda.time.YearMonth;
 import org.joda.time.chrono.ISOChronology;
 
@@ -61,5 +64,17 @@ public class YearMonthDeserTest extends JodaTestBase
         YearMonth yearMonth = input.value;
         assertEquals(2013, yearMonth.getYear());
         assertEquals(8, yearMonth.getMonthOfYear());
+    }
+
+    public void testDeserYearMonthWhichWasSerializedWithoutJodaModule() throws IOException {
+        Calendar cal = new GregorianCalendar(TimeZone.getTimeZone("UTC"));
+        cal.set(2020, Calendar.JUNE, 20, 11, 31, 44);
+        cal.set(Calendar.MILLISECOND, 276);
+        long timepoint = cal.getTime().getTime();
+        Instant instant = new Instant(timepoint);
+        YearMonth expectedYearMonth = new YearMonth(instant);
+        String json = mapper().writeValueAsString(expectedYearMonth);
+        YearMonth yearMonth = mapperWithModule().readValue(json, YearMonth.class);
+        assertEquals(expectedYearMonth, yearMonth);
     }
 }

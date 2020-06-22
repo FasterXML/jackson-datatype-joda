@@ -70,4 +70,15 @@ public class InstantDeserTest extends JodaTestBase
         assertEquals(1972, date.getYear());
         assertEquals(789, date.getMillisOfSecond());
     }
+
+    public void testDeserInstantWhichWasSerializedWithoutJodaModule() throws IOException {
+        Calendar cal = new GregorianCalendar(TimeZone.getTimeZone("UTC"));
+        cal.set(2020, Calendar.JUNE, 20, 0, 0, 0);
+        cal.set(Calendar.MILLISECOND, 0);
+        long timepoint = cal.getTime().getTime();
+        Instant expectedInstant = new Instant(timepoint);
+        String json = mapper().writeValueAsString(expectedInstant);
+        Instant instant = mapperWithModule().readValue(json, Instant.class);
+        assertEquals(expectedInstant, instant);
+    }
 }
