@@ -35,7 +35,7 @@ public class DurationDeserializer
     @Override
     public Duration deserialize(JsonParser p, DeserializationContext ctxt) throws IOException
     {
-        switch (p.getCurrentTokenId()) {
+        switch (p.currentTokenId()) {
         case JsonTokenId.ID_NUMBER_INT: // assume it's millisecond count
             return new Duration(p.getLongValue());
         case JsonTokenId.ID_STRING:

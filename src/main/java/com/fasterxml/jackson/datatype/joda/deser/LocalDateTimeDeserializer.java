@@ -33,7 +33,7 @@ public class LocalDateTimeDeserializer
     public LocalDateTime deserialize(JsonParser p, DeserializationContext ctxt)
         throws IOException
     {
-        switch (p.getCurrentTokenId()) {
+        switch (p.currentTokenId()) {
         case JsonTokenId.ID_STRING:
             {
                 String str = p.getText().trim();
