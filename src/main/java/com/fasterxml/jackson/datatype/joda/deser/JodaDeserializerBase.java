@@ -4,9 +4,11 @@ import java.io.IOException;
 
 import com.fasterxml.jackson.core.*;
 import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.deser.std.StdScalarDeserializer;
 import com.fasterxml.jackson.databind.jsontype.TypeDeserializer;
 import com.fasterxml.jackson.databind.type.LogicalType;
+import com.fasterxml.jackson.databind.util.ClassUtil;
 
 abstract class JodaDeserializerBase<T> extends StdScalarDeserializer<T>
 {
@@ -32,7 +34,9 @@ abstract class JodaDeserializerBase<T> extends StdScalarDeserializer<T>
     public T _handleNotNumberOrString(JsonParser p, DeserializationContext ctxt)
         throws IOException
     {
-        return (T) ctxt.handleUnexpectedToken(getValueType(ctxt),
-                p.currentToken(), p, "expected JSON Number or String");
+        final JavaType type = getValueType(ctxt);
+        return (T) ctxt.handleUnexpectedToken(type, p.currentToken(), p,
+                String.format("Cannot deserialize value of type %s from `JsonToken.%s`: expected Number or String",
+                        ClassUtil.getTypeDescription(type), p.currentToken()));
     }
 }

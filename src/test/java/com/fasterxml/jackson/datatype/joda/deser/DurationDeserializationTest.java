@@ -9,6 +9,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.exc.MismatchedInputException;
 import com.fasterxml.jackson.datatype.joda.JodaTestBase;
 
 public class DurationDeserializationTest extends JodaTestBase
@@ -48,9 +49,9 @@ public class DurationDeserializationTest extends JodaTestBase
         try {
             MAPPER.readValue("{\"foo\":1234}", Duration.class);
             fail();
-        } catch (JsonMappingException e) {
-            // there's location info involving a string object id on the second line, so just use the first line
-            assertEquals("expected JSON Number or String", e.getMessage().split("\n")[0]);
+        } catch (MismatchedInputException e) {
+            verifyException(e, "Cannot deserialize value of type `org.joda.time.Duration`");
+            verifyException(e, "expected Number or String");
         }
     }
 
