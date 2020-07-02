@@ -34,11 +34,10 @@ public class InstantDeserializer
     @Override
     public Instant deserialize(JsonParser p, DeserializationContext ctxt) throws IOException
     {
-        JsonToken t = p.currentToken();
-        if (t == JsonToken.VALUE_NUMBER_INT) {
+        switch (p.currentTokenId()) {
+        case JsonTokenId.ID_NUMBER_INT:
             return new Instant(p.getLongValue());
-        }
-        if (t == JsonToken.VALUE_STRING) {
+        case JsonTokenId.ID_STRING:
             String str = p.getText().trim();
             if (str.length() == 0) {
                 return null;
@@ -46,6 +45,7 @@ public class InstantDeserializer
             // 11-Sep-2018, tatu: `DateTimeDeserializer` allows timezone inclusion in brackets;
             //    should that be checked here too?
             return Instant.parse(str, _format.createParser(ctxt));
+        default:
         }
         return _handleNotNumberOrString(p, ctxt);
     }

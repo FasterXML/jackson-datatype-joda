@@ -8,7 +8,8 @@ import org.joda.time.ReadableDateTime;
 import org.joda.time.ReadableInstant;
 
 import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonToken;
+import com.fasterxml.jackson.core.JsonTokenId;
+
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.datatype.joda.cfg.FormatConfig;
@@ -42,13 +43,12 @@ public class DateTimeDeserializer
     public ReadableInstant deserialize(JsonParser p, DeserializationContext ctxt)
         throws IOException
     {
-        JsonToken t = p.currentToken();
-        
-        if (t == JsonToken.VALUE_NUMBER_INT) {
-            DateTimeZone tz = _format.isTimezoneExplicit() ? _format.getTimeZone() : DateTimeZone.forTimeZone(ctxt.getTimeZone());
+        DateTimeZone tz;
+        switch (p.currentTokenId()) {
+        case JsonTokenId.ID_NUMBER_INT:
+            tz = _format.isTimezoneExplicit() ? _format.getTimeZone() : DateTimeZone.forTimeZone(ctxt.getTimeZone());
             return new DateTime(p.getLongValue(), tz);
-        }
-        if (t == JsonToken.VALUE_STRING) {
+        case JsonTokenId.ID_STRING:
             String str = p.getText().trim();
             if (str.length() == 0) {
                 return null;
@@ -61,7 +61,6 @@ public class DateTimeDeserializer
                 String tzId = (ix2 < ix)
                         ? str.substring(ix+1)
                         : str.substring(ix+1, ix2);
-                DateTimeZone tz;
                 try {
                     tz = DateTimeZone.forID(tzId);
                 } catch (IllegalArgumentException e) {
