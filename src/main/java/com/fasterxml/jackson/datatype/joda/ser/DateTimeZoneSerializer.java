@@ -2,6 +2,9 @@ package com.fasterxml.jackson.datatype.joda.ser;
 
 import java.io.IOException;
 
+import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.jsonFormatVisitors.JsonFormatVisitorWrapper;
 import org.joda.time.DateTimeZone;
 
 import com.fasterxml.jackson.core.JsonGenerator;
@@ -31,5 +34,11 @@ public class DateTimeZoneSerializer extends JodaSerializerBase<DateTimeZone>
                 typeSer.typeId(value, DateTimeZone.class, JsonToken.VALUE_STRING));
         serialize(value, g, provider);
         typeSer.writeTypeSuffix(g, typeIdDef);
+    }
+
+    @Override
+    public void acceptJsonFormatVisitor(JsonFormatVisitorWrapper visitor, JavaType typeHint)
+            throws JsonMappingException {
+        visitor.expectStringFormat(typeHint);
     }
 }
