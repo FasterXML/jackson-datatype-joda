@@ -4,6 +4,11 @@ Project: jackson-datatype-joda
 === Releases ===
 ------------------------------------------------------------------------
 
+2.12.0 (not yet released)
+
+#116: Improve schema support for DateTimeZone type
+ (contributed by Joost v-d-W)
+
 2.11.1 (25-Jun-2020)
 
 No changes since 2.11.0
