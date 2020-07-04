@@ -93,3 +93,7 @@ Bertrand Renuart (brenuart@github)
 Richard Wise (Woodz@github)
   * Contributed fix for #104: Deserializing Interval discards timezone information
   (2.11.0)
+
+Joost van de Wijgerd (jwijgerd@github)
+  * Contributed #116: Improve schema support for DateTimeZone type
+  (2.12.0)

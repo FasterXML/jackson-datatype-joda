@@ -39,4 +39,10 @@ public class DateTimeZoneSerializer extends JodaSerializerBase<DateTimeZone>
             throws JsonMappingException {
         visitor.expectStringFormat(typeHint);
     }
+
+    @Override
+    public void acceptJsonFormatVisitor(JsonFormatVisitorWrapper visitor, JavaType typeHint)
+            throws JsonMappingException {
+        visitor.expectStringFormat(typeHint);
+    }
 }
