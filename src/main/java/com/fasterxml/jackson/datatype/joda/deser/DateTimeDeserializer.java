@@ -12,6 +12,7 @@ import com.fasterxml.jackson.core.JsonTokenId;
 
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.datatype.joda.cfg.FormatConfig;
 import com.fasterxml.jackson.datatype.joda.cfg.JacksonJodaDateFormat;
 
@@ -93,6 +94,14 @@ public class DateTimeDeserializer
             // Not sure if it should use timezone or not...
             // 15-Sep-2015, tatu: impl of 'createParser()' SHOULD handle all timezone/locale setup
             return _format.createParser(ctxt).parseDateTime(str);
+        case JsonTokenId.ID_START_OBJECT:
+            JsonNode treeNode = p.readValueAsTree();
+            long millis = treeNode.path("millis").asLong(Long.MIN_VALUE);
+            String id = treeNode.path("zone").path("ID").asText();
+            if (millis >= 0) {
+                tz = DateTimeZone.forID(id);
+                return new DateTime(millis, tz);
+            }
         }
         return _handleNotNumberOrString(p, ctxt);
     }

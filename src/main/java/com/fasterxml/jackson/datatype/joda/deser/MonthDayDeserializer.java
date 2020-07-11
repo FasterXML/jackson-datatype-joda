@@ -9,6 +9,7 @@ import org.joda.time.MonthDay;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.JsonNode;
 
 /**
  * A Jackson deserializer for Joda MonthDay objects.
@@ -39,6 +40,13 @@ public class MonthDayDeserializer extends JodaDateDeserializerBase<MonthDay>
                 return (MonthDay) getNullValue(ctxt);
             }
             return MonthDay.parse(str, _format.createParser(ctxt));
+        } else if (p.hasToken(JsonToken.START_OBJECT)) {
+            JsonNode treeNode = p.readValueAsTree();
+            int month = treeNode.path("monthOfYear").asInt(Integer.MIN_VALUE);
+            int day = treeNode.path("dayOfMonth").asInt(Integer.MIN_VALUE);
+            if (month >= 0 && day >= 0) {
+                return new MonthDay(month, day);
+            }
         }
         return (MonthDay) ctxt.handleUnexpectedToken(getValueType(ctxt), p.currentToken(), p,
                 "expected JSON String");

@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.Map;
 
 import org.joda.time.Period;
+import org.joda.time.PeriodType;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -76,5 +77,12 @@ public class PeriodDeserializationTest extends JodaTestBase
         final Map<Period,Long> map = MAPPER.readValue(json, new TypeReference<Map<Period, Long>>() { });
         assertNotNull(map);
         assertTrue(map.containsKey(new Period(1, 2, 3, 4)));
+    }
+
+    public void testDeserPeriodWhichWasSerializedWithoutJodaModule() throws IOException {
+        Period expectedPeriod = new Period(2, 3, 1, 17, 6, 35, 16, 876, PeriodType.standard());
+        String json = mapper().writeValueAsString(expectedPeriod);
+        Period period = mapperWithModule().readValue(json, Period.class);
+        assertEquals(expectedPeriod, period);
     }
 }

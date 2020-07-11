@@ -10,6 +10,7 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.core.JsonTokenId;
 import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.datatype.joda.cfg.FormatConfig;
 import com.fasterxml.jackson.datatype.joda.cfg.JacksonJodaDateFormat;
 
@@ -72,6 +73,14 @@ public class DateMidnightDeserializer
                 return null;
             }
             return local.toDateMidnight();
+        case JsonTokenId.ID_START_OBJECT:
+            JsonNode treeNode = p.readValueAsTree();
+            long millis = treeNode.path("millis").asLong(Long.MIN_VALUE);
+            String id = treeNode.path("zone").path("ID").asText();
+            if (millis >= 0) {
+                DateTimeZone tz = DateTimeZone.forID(id);
+                return new DateMidnight(millis, tz);
+            }
         default:
         }
         return (DateMidnight) ctxt.handleUnexpectedToken(getValueType(ctxt), p.currentToken(), p,

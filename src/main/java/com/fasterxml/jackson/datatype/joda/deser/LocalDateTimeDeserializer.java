@@ -8,6 +8,7 @@ import org.joda.time.LocalDateTime;
 import com.fasterxml.jackson.core.*;
 
 import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.datatype.joda.cfg.FormatConfig;
 import com.fasterxml.jackson.datatype.joda.cfg.JacksonJodaDateFormat;
 
@@ -78,6 +79,20 @@ public class LocalDateTimeDeserializer
                 return dt;
             }
             throw ctxt.wrongTokenException(p, handledType(), JsonToken.END_ARRAY, "after LocalDateTime ints");
+        case JsonTokenId.ID_START_OBJECT:
+            JsonNode treeNode = p.readValueAsTree();
+            int year = treeNode.path("year").asInt(Integer.MIN_VALUE);
+            int month = treeNode.path("monthOfYear").asInt(Integer.MIN_VALUE);
+            int day = treeNode.path("dayOfMonth").asInt(Integer.MIN_VALUE);
+            int hourOfDay = treeNode.path("hourOfDay").asInt(Integer.MIN_VALUE);
+            int minuteOfHour = treeNode.path("minuteOfHour").asInt(Integer.MIN_VALUE);
+            int secondOfMinute = treeNode.path("secondOfMinute").asInt(Integer.MIN_VALUE);
+            int millisOfSecond = treeNode.path("millisOfSecond").asInt(0); // optional and defaults to zero
+            if (year != Integer.MIN_VALUE && month >= 0 && day >= 0
+                    && hourOfDay >= 0 && minuteOfHour >= 0 && secondOfMinute >= 0) {
+                return new LocalDateTime(year, month, day,
+                        hourOfDay, minuteOfHour, secondOfMinute, millisOfSecond);
+            }
         default:
         }
         return (LocalDateTime) ctxt.handleUnexpectedToken(getValueType(ctxt), p.currentToken(), p,

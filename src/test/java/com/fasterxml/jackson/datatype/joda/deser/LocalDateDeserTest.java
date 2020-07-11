@@ -1,8 +1,12 @@
 package com.fasterxml.jackson.datatype.joda.deser;
 
 import java.io.IOException;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.TimeZone;
 
+import org.joda.time.DateTimeZone;
+import org.joda.time.Instant;
 import org.joda.time.LocalDate;
 import org.joda.time.chrono.ISOChronology;
 
@@ -105,5 +109,17 @@ public class LocalDateDeserTest extends JodaTestBase
         assertEquals(2001, date.getYear());
         assertEquals(5, date.getMonthOfYear());
         assertEquals(25, date.getDayOfMonth());
+    }
+
+    public void testDeserLocalDateWhichWasSerializedWithoutJodaModule() throws IOException {
+        Calendar cal = new GregorianCalendar(TimeZone.getTimeZone("UTC"));
+        cal.set(2020, Calendar.JUNE, 20, 11, 31, 44);
+        cal.set(Calendar.MILLISECOND, 276);
+        long timepoint = cal.getTime().getTime();
+        Instant instant = new Instant(timepoint);
+        LocalDate expectedLocalDate = new LocalDate(instant, DateTimeZone.UTC);
+        String json = mapper().writeValueAsString(expectedLocalDate);
+        LocalDate localDate = mapperWithModule().readValue(json, LocalDate.class);
+        assertEquals(expectedLocalDate, localDate);
     }
 }
