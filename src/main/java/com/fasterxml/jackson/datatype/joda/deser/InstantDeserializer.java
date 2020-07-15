@@ -40,7 +40,7 @@ public class InstantDeserializer
         case JsonTokenId.ID_STRING:
             String str = p.getText().trim();
             if (str.length() == 0) {
-                return null;
+                return (Instant) getNullValue(ctxt);
             }
             // 11-Sep-2018, tatu: `DateTimeDeserializer` allows timezone inclusion in brackets;
             //    should that be checked here too?

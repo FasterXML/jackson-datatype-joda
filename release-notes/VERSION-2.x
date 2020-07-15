@@ -8,6 +8,7 @@ Project: jackson-datatype-joda
 
 #116: Improve schema support for DateTimeZone type
  (contributed by Joost v-d-W)
+#117: Timestamp deserialization not working for CSV, Properties or XML
 
 2.11.1 (25-Jun-2020)
 
