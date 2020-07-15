@@ -38,8 +38,10 @@ public class LocalTimeDeserializer
             return new LocalTime(p.getLongValue());            
         case JsonTokenId.ID_STRING:
             String str = p.getText().trim();
-            return (str.length() == 0) ? null
-                    : _format.createParser(ctxt).parseLocalTime(str);
+            if (str.length() == 0) {
+                return getNullValue(ctxt);
+            }
+            return _format.createParser(ctxt).parseLocalTime(str);
         default:
         }
         // [HH,MM,ss,ms?]

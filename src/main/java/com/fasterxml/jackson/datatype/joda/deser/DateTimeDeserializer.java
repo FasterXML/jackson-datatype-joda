@@ -9,7 +9,8 @@ import org.joda.time.ReadableInstant;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonTokenId;
-
+import com.fasterxml.jackson.core.StreamReadCapability;
+import com.fasterxml.jackson.core.io.NumberInput;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.datatype.joda.cfg.FormatConfig;
@@ -48,8 +49,7 @@ public class DateTimeDeserializer
         DateTimeZone tz;
         switch (p.currentTokenId()) {
         case JsonTokenId.ID_NUMBER_INT:
-            tz = _format.isTimezoneExplicit() ? _format.getTimeZone() : DateTimeZone.forTimeZone(ctxt.getTimeZone());
-            return new DateTime(p.getLongValue(), tz);
+            return _fromTimestamp(ctxt, p.getLongValue());
         case JsonTokenId.ID_STRING:
             String str = p.getText().trim();
             if (str.length() == 0) {
@@ -92,10 +92,23 @@ public class DateTimeDeserializer
                 }
                 return result;
             }
+            // 14-Jul-2020: [datatype-joda#117] Should allow use of "Timestamp as String" for
+            //     some textual formats
+            if (ctxt.isEnabled(StreamReadCapability.UNTYPED_SCALARS)
+                    && _isValidTimestampString(str)) {
+                return _fromTimestamp(ctxt, NumberInput.parseLong(str));
+            }
+
             // Not sure if it should use timezone or not...
             // 15-Sep-2015, tatu: impl of 'createParser()' SHOULD handle all timezone/locale setup
             return _format.createParser(ctxt).parseDateTime(str);
         }
         return _handleNotNumberOrString(p, ctxt);
+    }
+
+    protected DateTime _fromTimestamp(DeserializationContext ctxt, long ts) {
+        DateTimeZone tz = _format.isTimezoneExplicit() ? _format.getTimeZone()
+                : DateTimeZone.forTimeZone(ctxt.getTimeZone());
+        return new DateTime(ts, tz);
     }
 }

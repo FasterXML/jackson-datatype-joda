@@ -35,15 +35,14 @@ public class YearMonthDeserializer extends JodaDateDeserializerBase<YearMonth>
     @Override
     public YearMonth deserialize(final JsonParser p, final DeserializationContext ctxt) throws IOException
     {
-        JsonToken t = p.getCurrentToken();
-        if (t == JsonToken.VALUE_STRING) {
+        if (p.hasToken(JsonToken.VALUE_STRING)) {
             String str = p.getText().trim();
             if (str.isEmpty()) {
-                return null;
+                return getNullValue(ctxt);
             }
             return YearMonth.parse(str, _format.createParser(ctxt));
         }
-        return (YearMonth) ctxt.handleUnexpectedToken(handledType(), p.getCurrentToken(), p,
+        return (YearMonth) ctxt.handleUnexpectedToken(handledType(), p.currentToken(), p,
                 "expected JSON String");
     }
 }

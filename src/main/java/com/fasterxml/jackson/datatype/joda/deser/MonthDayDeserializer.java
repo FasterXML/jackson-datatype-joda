@@ -42,7 +42,7 @@ public class MonthDayDeserializer extends JodaDateDeserializerBase<MonthDay>
             }
             return MonthDay.parse(str, _format.createParser(ctxt));
         }
-        return (MonthDay) ctxt.handleUnexpectedToken(handledType(), p.getCurrentToken(), p,
+        return (MonthDay) ctxt.handleUnexpectedToken(handledType(), p.currentToken(), p,
                 "expected JSON String");
     }
 }

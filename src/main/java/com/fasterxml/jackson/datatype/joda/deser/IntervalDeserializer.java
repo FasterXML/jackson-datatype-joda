@@ -36,14 +36,13 @@ public class IntervalDeserializer extends JodaDateDeserializerBase<Interval>
     {
         if (!p.hasToken(JsonToken.VALUE_STRING)) {
             return (Interval) ctxt.handleUnexpectedToken(handledType(),
-                    p.getCurrentToken(), p, "expected JSON String");
+                    p.currentToken(), p, "expected JSON String");
         }
 
         String v = p.getText().trim();
 
-        /* 17-Nov-2014, tatu: Actually let's start with slash, instead of hyphen, because
-         *   that is the separator for standard functionality...
-         */
+        // 17-Nov-2014, tatu: Actually let's start with slash, instead of hyphen, because
+        //   that is the separator for standard functionality...
         int index = v.indexOf('/', 1);
         boolean hasSlash = (index > 0);
         if (!hasSlash) {
