@@ -21,7 +21,7 @@ public class DateTimeZoneDeserializer extends JodaDeserializerBase<DateTimeZone>
     public DateTimeZone deserialize(JsonParser p, DeserializationContext ctxt)
         throws IOException
     {
-        JsonToken t = p.getCurrentToken();
+        JsonToken t = p.currentToken();
         if (t == JsonToken.VALUE_NUMBER_INT) {
             // for fun let's allow use of offsets...
             return DateTimeZone.forOffsetHours(p.getIntValue());

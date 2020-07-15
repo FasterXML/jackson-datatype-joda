@@ -62,16 +62,16 @@ public class LocalTimeDeserializer
             int second = p.getIntValue();
             p.nextToken(); // VALUE_NUMBER_INT | END_ARRAY
             int millis = 0;
-            if (p.getCurrentToken() != JsonToken.END_ARRAY) {
+            if (p.currentToken() != JsonToken.END_ARRAY) {
                 millis = p.getIntValue();
                 p.nextToken(); // END_ARRAY?
             }
-            if (p.getCurrentToken() != JsonToken.END_ARRAY) {
+            if (p.currentToken() != JsonToken.END_ARRAY) {
                 throw ctxt.wrongTokenException(p, handledType(), JsonToken.END_ARRAY, "after LocalTime ints");
             }
             return new LocalTime(hour, minute, second, millis);
         }
-        return (LocalTime) ctxt.handleUnexpectedToken(handledType(), p.getCurrentToken(), p,
+        return (LocalTime) ctxt.handleUnexpectedToken(handledType(), p.currentToken(), p,
                 "expected JSON Array, String or Number");
     }
 }

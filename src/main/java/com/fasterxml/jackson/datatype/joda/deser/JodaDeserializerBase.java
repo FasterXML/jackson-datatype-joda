@@ -35,7 +35,7 @@ abstract class JodaDeserializerBase<T> extends StdScalarDeserializer<T>
         throws IOException
     {
         return (T) ctxt.handleUnexpectedToken(handledType(),
-                p.getCurrentToken(), p,
+                p.currentToken(), p,
                 String.format("Cannot deserialize value of type %s from `JsonToken.%s`: expected Number or String",
                         ClassUtil.getTypeDescription(getValueType(ctxt)), p.currentToken()));
     }
