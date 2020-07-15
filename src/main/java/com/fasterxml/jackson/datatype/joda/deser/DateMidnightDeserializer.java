@@ -9,6 +9,8 @@ import org.joda.time.LocalDate;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.core.JsonTokenId;
+import com.fasterxml.jackson.core.StreamReadCapability;
+import com.fasterxml.jackson.core.io.NumberInput;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.datatype.joda.cfg.FormatConfig;
 import com.fasterxml.jackson.datatype.joda.cfg.JacksonJodaDateFormat;
@@ -67,6 +69,12 @@ public class DateMidnightDeserializer
             if (str.length() == 0) { // [JACKSON-360]
                 return null;
             }
+            // 14-Jul-2020: [datatype-joda#117] Should allow use of "Timestamp as String" for
+            //     some textual formats
+            if (ctxt.isEnabled(StreamReadCapability.UNTYPED_SCALARS)
+                    && _isValidTimestampString(str)) {
+                return new DateMidnight(NumberInput.parseLong(str));
+            }
             LocalDate local = _format.createParser(ctxt).parseLocalDate(str);
             if (local == null) {
                 return null;
@@ -76,5 +84,9 @@ public class DateMidnightDeserializer
         }
         return (DateMidnight) ctxt.handleUnexpectedToken(getValueType(ctxt), p.currentToken(), p,
                 "expected JSON Array, Number or String");
+    }
+
+    protected DateMidnight _fromTimestamp(DeserializationContext ctxt, long ts) {
+        return new DateMidnight(ts);
     }
 }

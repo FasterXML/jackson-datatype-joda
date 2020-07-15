@@ -7,6 +7,8 @@ import org.joda.time.LocalTime;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.core.JsonTokenId;
+import com.fasterxml.jackson.core.StreamReadCapability;
+import com.fasterxml.jackson.core.io.NumberInput;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.datatype.joda.cfg.FormatConfig;
 import com.fasterxml.jackson.datatype.joda.cfg.JacksonJodaDateFormat;
@@ -38,6 +40,12 @@ public class LocalTimeDeserializer
             String str = p.getText().trim();
             if (str.length() == 0) {
                 return (LocalTime) getNullValue(ctxt);
+            }
+            // 14-Jul-2020: [datatype-joda#117] Should allow use of "Timestamp as String" for
+            //     some textual formats
+            if (ctxt.isEnabled(StreamReadCapability.UNTYPED_SCALARS)
+                    && _isValidTimestampString(str)) {
+                return new LocalTime(NumberInput.parseLong(str));
             }
             return _format.createParser(ctxt).parseLocalTime(str);
         default:
