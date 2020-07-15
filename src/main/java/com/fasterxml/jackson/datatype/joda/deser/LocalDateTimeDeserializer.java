@@ -6,7 +6,7 @@ import org.joda.time.DateTimeZone;
 import org.joda.time.LocalDateTime;
 
 import com.fasterxml.jackson.core.*;
-
+import com.fasterxml.jackson.core.io.NumberInput;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.datatype.joda.cfg.FormatConfig;
 import com.fasterxml.jackson.datatype.joda.cfg.JacksonJodaDateFormat;
@@ -37,14 +37,19 @@ public class LocalDateTimeDeserializer
         case JsonTokenId.ID_STRING:
             {
                 String str = p.getText().trim();
-                return (str.length() == 0) ? null
-                        : _format.createParser(ctxt).parseLocalDateTime(str);
+                if (str.length() == 0) {
+                    return getNullValue(ctxt);
+                }
+                // 14-Jul-2020: [datatype-joda#117] Should allow use of "Timestamp as String" for
+                //     some textual formats
+                if (ctxt.isEnabled(StreamReadCapability.UNTYPED_SCALARS)
+                        && _isValidTimestampString(str)) {
+                    return _fromTimestamp(ctxt, NumberInput.parseLong(str));
+                }
+                return _format.createParser(ctxt).parseLocalDateTime(str);
             }
         case JsonTokenId.ID_NUMBER_INT:
-            {
-                DateTimeZone tz = _format.isTimezoneExplicit() ? _format.getTimeZone() : DateTimeZone.forTimeZone(ctxt.getTimeZone());
-                return new LocalDateTime(p.getLongValue(), tz);
-            }
+            return _fromTimestamp(ctxt, p.getLongValue());
         case JsonTokenId.ID_START_ARRAY:
             // [yyyy,mm,dd,hh,MM,ss,ms]
             JsonToken t = p.nextToken();
@@ -82,7 +87,13 @@ public class LocalDateTimeDeserializer
             throw ctxt.wrongTokenException(p, handledType(), JsonToken.END_ARRAY, "after LocalDateTime ints");
         default:
         }
-        return (LocalDateTime) ctxt.handleUnexpectedToken(handledType(), p.getCurrentToken(), p,
+        return (LocalDateTime) ctxt.handleUnexpectedToken(handledType(), p.currentToken(), p,
             "expected String, Number or JSON Array");
+    }
+
+    protected LocalDateTime _fromTimestamp(DeserializationContext ctxt, long ts) {
+        DateTimeZone tz = _format.isTimezoneExplicit() ? _format.getTimeZone()
+                : DateTimeZone.forTimeZone(ctxt.getTimeZone());
+        return new LocalDateTime(ts, tz);
     }
 }

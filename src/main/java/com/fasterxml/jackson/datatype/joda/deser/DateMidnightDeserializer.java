@@ -9,6 +9,8 @@ import org.joda.time.LocalDate;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.core.JsonTokenId;
+import com.fasterxml.jackson.core.StreamReadCapability;
+import com.fasterxml.jackson.core.io.NumberInput;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.datatype.joda.cfg.FormatConfig;
 import com.fasterxml.jackson.datatype.joda.cfg.JacksonJodaDateFormat;
@@ -45,7 +47,6 @@ public class DateMidnightDeserializer
     public DateMidnight deserialize(JsonParser p, DeserializationContext ctxt)
         throws IOException
     {
-    	
         // We'll accept either long (timestamp) or array:
         if (p.isExpectedStartArrayToken()) {
             p.nextToken(); // VALUE_NUMBER_INT
@@ -55,7 +56,7 @@ public class DateMidnightDeserializer
             p.nextToken(); // VALUE_NUMBER_INT
             int day = p.getIntValue();
             if (p.nextToken() != JsonToken.END_ARRAY) {
-                throw ctxt.wrongTokenException(p, JsonToken.END_ARRAY,
+                throw ctxt.wrongTokenException(p, handledType(), JsonToken.END_ARRAY,
                         "after DateMidnight ints");
             }
             DateTimeZone tz = _format.isTimezoneExplicit() ? _format.getTimeZone() : DateTimeZone.forTimeZone(ctxt.getTimeZone());
@@ -70,6 +71,12 @@ public class DateMidnightDeserializer
             if (str.length() == 0) { // [JACKSON-360]
                 return null;
             }
+            // 14-Jul-2020: [datatype-joda#117] Should allow use of "Timestamp as String" for
+            //     some textual formats
+            if (ctxt.isEnabled(StreamReadCapability.UNTYPED_SCALARS)
+                    && _isValidTimestampString(str)) {
+                return new DateMidnight(NumberInput.parseLong(str));
+            }
             LocalDate local = _format.createParser(ctxt).parseLocalDate(str);
             if (local == null) {
                 return null;
@@ -80,4 +87,9 @@ public class DateMidnightDeserializer
         throw ctxt.wrongTokenException(p, handledType(), JsonToken.START_ARRAY,
                 "expected JSON Array, Number or String");
     }
+
+    protected DateMidnight _fromTimestamp(DeserializationContext ctxt, long ts) {
+        return new DateMidnight(ts);
+    }
+
 }

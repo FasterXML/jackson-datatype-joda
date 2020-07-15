@@ -5,7 +5,7 @@ import java.io.IOException;
 import org.joda.time.Instant;
 
 import com.fasterxml.jackson.core.*;
-
+import com.fasterxml.jackson.core.io.NumberInput;
 import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.datatype.joda.cfg.FormatConfig;
 import com.fasterxml.jackson.datatype.joda.cfg.JacksonJodaDateFormat;
@@ -43,6 +43,12 @@ public class InstantDeserializer
             String str = p.getText().trim();
             if (str.length() == 0) {
                 return getNullValue(ctxt);
+            }
+            // 14-Jul-2020: [datatype-joda#117] Should allow use of "Timestamp as String" for
+            //     some textual formats
+            if (ctxt.isEnabled(StreamReadCapability.UNTYPED_SCALARS)
+                    && _isValidTimestampString(str)) {
+                return new Instant(NumberInput.parseLong(str));
             }
             // 11-Sep-2018, tatu: `DateTimeDeserializer` allows timezone inclusion in brackets;
             //    should that be checked here too?
