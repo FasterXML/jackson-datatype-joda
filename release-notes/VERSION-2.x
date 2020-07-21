@@ -4,6 +4,10 @@ Project: jackson-datatype-joda
 === Releases ===
 ------------------------------------------------------------------------
 
+2.10.5 (21-Jul-2020)
+
+No changes since 2.10.4
+
 2.10.4 (03-May-2020)
 
 #113: `ObjectMapper.setDefaultLeniency()` is causing `NullPointerException`
