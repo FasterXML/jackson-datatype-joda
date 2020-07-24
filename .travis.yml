@@ -9,4 +9,11 @@ jdk:
 branches:
   only:
     - master
-    - "3.0"
+
+before_install: "git clone -b travis `git config --get remote.origin.url` target/travis"
+script: "[ ${TRAVIS_PULL_REQUEST} = 'false' ] && mvn clean deploy --settings target/travis/settings.xml || mvn clean verify --settings target/travis/settings.xml"
+
+env:
+  global:
+    - secure: "Xbj7i5h4v3qAmORAxu3UEEdSWygveonulbe2wSZm6r1fpHAimM+XjVbFP6/omY3vGLrxAczrHFm3J92etDvbUA0tvr68qBUR4WPtLTh4lQ22SG+cDoQ9UNkDo1NFjBRtnwJXepmazLIUMq5BprTizXEc6txN4/a7BjxQI1BGTlQ="
+    - secure: "zQZ0yaEI6zTJjXT/GfVuXcwvz5yBUBCPSUDKGk/nBBp6cFlPJvimVL+gwosewM1nkfmN0ldonPOLZ+5dHZi5jDKKL8vbi757HR/xsKeVrzhQ0FyZrkBdwkrFyxlTHUSDGOoeZ5+nB1I00IXDjG4meCyB7Om0Bd155PgfQKJTB3s="
