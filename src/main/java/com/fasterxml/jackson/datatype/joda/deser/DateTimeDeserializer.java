@@ -64,7 +64,7 @@ public class DateTimeDeserializer
     {
         value = value.trim();
         if (value.isEmpty()) {
-            return getNullValue(ctxt);
+            return (ReadableInstant) getNullValue(ctxt);
         }
         // 08-Jul-2015, tatu: as per [datatype-joda#44], optional TimeZone inclusion
         // NOTE: on/off feature only for serialization; on deser should accept both
@@ -78,7 +78,7 @@ public class DateTimeDeserializer
             try {
                 tz = DateTimeZone.forID(tzId);
             } catch (IllegalArgumentException e) {
-                ctxt.reportInputMismatch(handledType(), "Unknown DateTimeZone id '%s'", tzId);
+                ctxt.reportInputMismatch(getValueType(ctxt), "Unknown DateTimeZone id '%s'", tzId);
                 tz = null; // never gets here
             }
             value = value.substring(0, ix);
