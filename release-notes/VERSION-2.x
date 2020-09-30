@@ -10,6 +10,7 @@ Project: jackson-datatype-joda
  (contributed by Joost v-d-W)
 #117: Timestamp deserialization not working for CSV, Properties or XML
 
+2.11.2 (02-Aug-2020)
 2.11.1 (25-Jun-2020)
 
 No changes since 2.11.0

@@ -47,9 +47,10 @@ public class YearMonthDeserTest extends JodaTestBase
     {
         try {
             MAPPER.readValue("{\"year\":2013}", YearMonth.class);
-            fail();
+            fail("Should not pass");
         } catch (MismatchedInputException e) {
-            verifyException(e, "expected JSON String");
+            verifyException(e, "Cannot deserialize value of type ");
+            verifyException(e, "from Object value");
         }
     }
 

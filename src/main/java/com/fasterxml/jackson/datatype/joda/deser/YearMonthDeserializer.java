@@ -34,13 +34,26 @@ public class YearMonthDeserializer extends JodaDateDeserializerBase<YearMonth>
     public YearMonth deserialize(final JsonParser p, final DeserializationContext ctxt) throws IOException
     {
         if (p.hasToken(JsonToken.VALUE_STRING)) {
-            String str = p.getText().trim();
-            if (str.isEmpty()) {
-                return (YearMonth) getNullValue(ctxt);
-            }
-            return YearMonth.parse(str, _format.createParser(ctxt));
+            return _fromString(p, ctxt, p.getText());
+        }
+        // 30-Sep-2020, tatu: New! "Scalar from Object" (mostly for XML)
+        if (p.isExpectedStartObjectToken()) {
+            return _fromString(p, ctxt,
+                    ctxt.extractScalarFromObject(p, this, handledType()));
         }
         return (YearMonth) ctxt.handleUnexpectedToken(getValueType(ctxt), p.currentToken(), p,
                 "expected JSON String");
+    }
+
+    // @since 2.12
+    public YearMonth _fromString(final JsonParser p, final DeserializationContext ctxt,
+            String value)
+        throws IOException
+    {
+        value = value.trim();
+        if (value.isEmpty()) {
+            return (YearMonth) getNullValue(ctxt);
+        }
+        return YearMonth.parse(value, _format.createParser(ctxt));
     }
 }
