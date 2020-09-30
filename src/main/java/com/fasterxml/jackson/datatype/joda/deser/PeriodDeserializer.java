@@ -7,7 +7,9 @@ import org.joda.time.*;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.util.ClassUtil;
 import com.fasterxml.jackson.datatype.joda.cfg.FormatConfig;
 import com.fasterxml.jackson.datatype.joda.cfg.JacksonJodaPeriodFormat;
 
@@ -46,7 +48,7 @@ public class PeriodDeserializer
     }
 
     // @since 2.12
-    public ReadablePeriod _fromString(final JsonParser p, final DeserializationContext ctxt,
+    protected ReadablePeriod _fromString(final JsonParser p, final DeserializationContext ctxt,
             String value)
         throws IOException
     {
@@ -58,7 +60,7 @@ public class PeriodDeserializer
     }
 
     // @since 2.12
-    public ReadablePeriod _fromObject(final JsonParser p, final DeserializationContext ctxt)
+    protected ReadablePeriod _fromObject(final JsonParser p, final DeserializationContext ctxt)
         throws IOException
     {
         // 30-Sep-2020, tatu: This can be problematic with XML, if there
@@ -94,9 +96,10 @@ public class PeriodDeserializer
         else if (periodName.equals( "Years" )) {
             rp = Years.years( periodValue );
         } else {
-            ctxt.reportInputMismatch(handledType(),
+            final JavaType type = getValueType(ctxt);
+            ctxt.reportInputMismatch(type,
                     "Don't know how to deserialize %s using periodName '%s'",
-                    handledType().getName(), periodName);
+                    ClassUtil.getTypeDescription(type), periodName);
             rp = null; // never gets here
         }
 

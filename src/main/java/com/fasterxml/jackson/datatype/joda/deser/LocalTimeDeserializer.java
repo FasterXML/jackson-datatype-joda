@@ -52,7 +52,7 @@ public class LocalTimeDeserializer
     }
 
     // @since 2.12
-    public LocalTime _fromString(final JsonParser p, final DeserializationContext ctxt,
+    protected LocalTime _fromString(final JsonParser p, final DeserializationContext ctxt,
             String value)
         throws IOException
     {
@@ -70,7 +70,7 @@ public class LocalTimeDeserializer
     }
 
     // @since 2.12
-    public LocalTime _fromArray(final JsonParser p, final DeserializationContext ctxt)
+    protected LocalTime _fromArray(final JsonParser p, final DeserializationContext ctxt)
         throws IOException
     {
         p.nextToken(); // VALUE_NUMBER_INT 
@@ -86,7 +86,7 @@ public class LocalTimeDeserializer
             p.nextToken(); // END_ARRAY?
         }
         if (p.currentToken() != JsonToken.END_ARRAY) {
-            throw ctxt.wrongTokenException(p, handledType(), JsonToken.END_ARRAY, "after LocalTime ints");
+            throw ctxt.wrongTokenException(p, getValueType(ctxt), JsonToken.END_ARRAY, "after LocalTime ints");
         }
         return new LocalTime(hour, minute, second, millis);
     }
