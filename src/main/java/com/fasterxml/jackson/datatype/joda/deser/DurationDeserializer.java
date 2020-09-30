@@ -6,8 +6,9 @@ import org.joda.time.Duration;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonTokenId;
+import com.fasterxml.jackson.core.StreamReadCapability;
+import com.fasterxml.jackson.core.io.NumberInput;
 import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.datatype.joda.cfg.FormatConfig;
 import com.fasterxml.jackson.datatype.joda.cfg.JacksonJodaPeriodFormat;
 
@@ -37,22 +38,37 @@ public class DurationDeserializer
     {
         switch (p.currentTokenId()) {
         case JsonTokenId.ID_NUMBER_INT: // assume it's millisecond count
-            return new Duration(p.getLongValue());
+            return _fromTimestamp(ctxt, p.getLongValue());
         case JsonTokenId.ID_STRING:
-            return _format.parsePeriod(ctxt, p.getText().trim()).toStandardDuration();
+            return _fromString(p, ctxt, p.getText());
+        case JsonTokenId.ID_START_OBJECT:
+            // 30-Sep-2020, tatu: New! "Scalar from Object" (mostly for XML)
+            return _fromString(p, ctxt,
+                    ctxt.extractScalarFromObject(p, this, handledType()));
         default:
         }
         return _handleNotNumberOrString(p, ctxt);
     }
 
-    protected Duration _deserialize(DeserializationContext ctxt, String str)
-            throws IOException
+    protected Duration _fromString(JsonParser p, DeserializationContext ctxt,
+            String value) throws IOException
     {
-        if (str.length() == 0) {
-            if (ctxt.isEnabled(DeserializationFeature.ACCEPT_EMPTY_STRING_AS_NULL_OBJECT)) {
-                return null;
-            }
+        value = value.trim();
+        if (value.isEmpty()) {
+            return getNullValue(ctxt);
         }
-        return Duration.parse(str);
+        // 14-Jul-2020: [datatype-joda#117] Should allow use of "Timestamp as String" for
+        //     some textual formats
+        if (ctxt.isEnabled(StreamReadCapability.UNTYPED_SCALARS)
+                && _isValidTimestampString(value)) {
+            return _fromTimestamp(ctxt, NumberInput.parseLong(value));
+        }
+        
+        return _format.parsePeriod(ctxt, value).toStandardDuration();
+    }
+
+    // @since 2.12
+    protected Duration _fromTimestamp(DeserializationContext ctxt, long ts) {
+        return new Duration(ts);
     }
 }

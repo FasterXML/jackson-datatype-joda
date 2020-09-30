@@ -1,7 +1,7 @@
 package com.fasterxml.jackson.datatype.joda.deser;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.core.io.NumberInput;
+
 import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.deser.ContextualDeserializer;
 import com.fasterxml.jackson.datatype.joda.cfg.JacksonJodaDateFormat;
@@ -60,13 +60,5 @@ public abstract class JodaDateDeserializerBase<T>
             }
         }
         return this;
-    }
-
-    // @since 2.12
-    protected boolean _isValidTimestampString(String str) {
-        // 14-Jul-2020, tatu: Need to support "numbers as Strings" for data formats
-        //    that only have String values for scalars (CSV, Properties, XML)
-        // NOTE: we do allow negative values, but has to fit in 64-bits:
-        return _isIntNumber(str) && NumberInput.inLongRange(str, (str.charAt(0) == '-'));
     }
 }

@@ -34,41 +34,57 @@ public class IntervalDeserializer extends JodaDateDeserializerBase<Interval>
     public Interval deserialize(JsonParser p, DeserializationContext ctxt)
         throws IOException
     {
-        if (!p.hasToken(JsonToken.VALUE_STRING)) {
-            return (Interval) ctxt.handleUnexpectedToken(handledType(),
-                    p.currentToken(), p, "expected JSON String");
+        if (p.hasToken(JsonToken.VALUE_STRING)) {
+            return _fromString(p, ctxt, p.getText());
         }
+        // 30-Sep-2020, tatu: New! "Scalar from Object" (mostly for XML)
+        if (p.isExpectedStartObjectToken()) {
+            return _fromString(p, ctxt,
+                    ctxt.extractScalarFromObject(p, this, handledType()));
+        }
+        return (Interval) ctxt.handleUnexpectedToken(getValueType(ctxt),
+                p.currentToken(), p, "expected JSON String");
+    }
 
-        String v = p.getText().trim();
+    // @since 2.12
+    protected Interval _fromString(final JsonParser p, final DeserializationContext ctxt,
+            String value)
+        throws IOException
+    {
+        value = value.trim();
+        if (value.isEmpty()) {
+            return getNullValue(ctxt);
+        }
+        value = value.trim();
 
         // 17-Nov-2014, tatu: Actually let's start with slash, instead of hyphen, because
         //   that is the separator for standard functionality...
-        int index = v.indexOf('/', 1);
+        int index = value.indexOf('/', 1);
         boolean hasSlash = (index > 0);
         if (!hasSlash) {
-            index = v.indexOf('-', 1);
+            index = value.indexOf('-', 1);
         }
         if (index < 0) {
-            throw ctxt.weirdStringException(v, handledType(), "no slash or hyphen found to separate start, end");
+            throw ctxt.weirdStringException(value, handledType(), "no slash or hyphen found to separate start, end");
         }
         long start, end;
-        String str = v.substring(0, index);
+        String str = value.substring(0, index);
         Interval result;
 
         try {
             // !!! TODO: configurable formats...
             if (hasSlash) {
-                result = Interval.parseWithOffset(v);
+                result = Interval.parseWithOffset(value);
             } else {
                 start = Long.valueOf(str);
-                str = v.substring(index + 1);
+                str = value.substring(index + 1);
                 end = Long.valueOf(str);
                 result = new Interval(start, end);
             }
         } catch (NumberFormatException e) {
             return (Interval) ctxt.handleWeirdStringValue(handledType(), str,
 "Failed to parse number from '%s' (full source String '%s')",
-                    str, v);
+                    str, value);
         }
 
         final DateTimeZone contextTimezone =
