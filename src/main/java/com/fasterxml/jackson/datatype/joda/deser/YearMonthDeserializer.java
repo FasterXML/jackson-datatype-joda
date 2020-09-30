@@ -48,7 +48,7 @@ public class YearMonthDeserializer extends JodaDateDeserializerBase<YearMonth>
     }
 
     // @since 2.12
-    public YearMonth _fromString(final JsonParser p, final DeserializationContext ctxt,
+    protected YearMonth _fromString(final JsonParser p, final DeserializationContext ctxt,
             String value)
         throws IOException
     {

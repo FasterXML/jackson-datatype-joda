@@ -48,7 +48,7 @@ public class PeriodDeserializer
     }
 
     // @since 2.12
-    public ReadablePeriod _fromString(final JsonParser p, final DeserializationContext ctxt,
+    protected ReadablePeriod _fromString(final JsonParser p, final DeserializationContext ctxt,
             String value)
         throws IOException
     {
@@ -60,7 +60,7 @@ public class PeriodDeserializer
     }
 
     // @since 2.12
-    public ReadablePeriod _fromObject(final JsonParser p, final DeserializationContext ctxt)
+    protected ReadablePeriod _fromObject(final JsonParser p, final DeserializationContext ctxt)
         throws IOException
     {
         // 30-Sep-2020, tatu: This can be problematic with XML, if there

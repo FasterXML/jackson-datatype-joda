@@ -54,7 +54,7 @@ public class LocalTimeDeserializer
     }
 
     // @since 2.12
-    public LocalTime _fromString(final JsonParser p, final DeserializationContext ctxt,
+    protected LocalTime _fromString(final JsonParser p, final DeserializationContext ctxt,
             String value)
         throws IOException
     {
@@ -72,7 +72,7 @@ public class LocalTimeDeserializer
     }
 
     // @since 2.12
-    public LocalTime _fromArray(final JsonParser p, final DeserializationContext ctxt)
+    protected LocalTime _fromArray(final JsonParser p, final DeserializationContext ctxt)
         throws IOException
     {
         p.nextToken(); // VALUE_NUMBER_INT 

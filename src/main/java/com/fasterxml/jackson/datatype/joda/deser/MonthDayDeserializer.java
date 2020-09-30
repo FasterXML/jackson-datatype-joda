@@ -50,7 +50,7 @@ public class MonthDayDeserializer extends JodaDateDeserializerBase<MonthDay>
     }
 
     // @since 2.12
-    public MonthDay _fromString(final JsonParser p, final DeserializationContext ctxt,
+    protected MonthDay _fromString(final JsonParser p, final DeserializationContext ctxt,
             String value)
         throws IOException
     {
