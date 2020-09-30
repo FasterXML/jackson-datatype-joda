@@ -61,7 +61,6 @@ public class DurationDeserializer
                 && _isValidTimestampString(value)) {
             return _fromTimestamp(ctxt, NumberInput.parseLong(value));
         }
-        
         return _format.parsePeriod(ctxt, value).toStandardDuration();
     }
 

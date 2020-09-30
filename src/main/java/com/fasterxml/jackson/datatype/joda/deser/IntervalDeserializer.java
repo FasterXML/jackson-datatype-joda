@@ -53,7 +53,6 @@ public class IntervalDeserializer extends JodaDateDeserializerBase<Interval>
         if (value.isEmpty()) {
             return (Interval) getNullValue(ctxt);
         }
-        value = value.trim();
 
         // 17-Nov-2014, tatu: Actually let's start with slash, instead of hyphen, because
         //   that is the separator for standard functionality...

@@ -65,27 +65,35 @@ public class DateMidnightDeserializer
         case JsonTokenId.ID_NUMBER_INT:
             return new DateMidnight(p.getLongValue());
         case JsonTokenId.ID_STRING:
-            String str = p.getText().trim();
-            if (str.length() == 0) { // [JACKSON-360]
-                return null;
-            }
-            // 14-Jul-2020: [datatype-joda#117] Should allow use of "Timestamp as String" for
-            //     some textual formats
-            if (ctxt.isEnabled(StreamReadCapability.UNTYPED_SCALARS)
-                    && _isValidTimestampString(str)) {
-                return new DateMidnight(NumberInput.parseLong(str));
-            }
-            LocalDate local = _format.createParser(ctxt).parseLocalDate(str);
-            if (local == null) {
-                return null;
-            }
-            return local.toDateMidnight();
+            return _fromString(p, ctxt, p.getText());
         default:
         }
         return (DateMidnight) ctxt.handleUnexpectedToken(getValueType(ctxt), p.currentToken(), p,
                 "expected JSON Array, Number or String");
     }
 
+    // @since 2.12
+    protected DateMidnight _fromString(final JsonParser p, final DeserializationContext ctxt,
+            String value)
+        throws IOException
+    {
+        value = value.trim();
+        if (value.isEmpty()) {
+            return getNullValue(ctxt);
+        }
+        // 14-Jul-2020: [datatype-joda#117] Should allow use of "Timestamp as String" for
+        //     some textual formats
+        if (ctxt.isEnabled(StreamReadCapability.UNTYPED_SCALARS)
+                && _isValidTimestampString(value)) {
+            return _fromTimestamp(ctxt, NumberInput.parseLong(value));
+        }
+        LocalDate local = _format.createParser(ctxt).parseLocalDate(value);
+        if (local == null) {
+            return null;
+        }
+        return local.toDateMidnight();
+    }
+    
     protected DateMidnight _fromTimestamp(DeserializationContext ctxt, long ts) {
         return new DateMidnight(ts);
     }
