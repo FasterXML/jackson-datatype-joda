@@ -35,11 +35,7 @@ public class PeriodDeserializer
     {
         JsonToken t = p.currentToken();
         if (t == JsonToken.VALUE_STRING) {
-            String str = p.getText().trim();
-            if (str.isEmpty()) {
-                return null;
-            }
-            return _format.parsePeriod(ctxt, str);
+            return _fromString(p, ctxt, p.getText());
         }
         if (t == JsonToken.VALUE_NUMBER_INT) {
             return new Period(p.getLongValue());    
@@ -48,6 +44,28 @@ public class PeriodDeserializer
             return (ReadablePeriod) ctxt.handleUnexpectedToken(handledType(), t, p,
                     "expected JSON Number, String or Object");
         }
+        return _fromObject(p, ctxt);
+    }
+
+    // @since 2.12
+    public ReadablePeriod _fromString(final JsonParser p, final DeserializationContext ctxt,
+            String value)
+        throws IOException
+    {
+        value = value.trim();
+        if (value.isEmpty()) {
+            return getNullValue(ctxt);
+        }
+        return _format.parsePeriod(ctxt, value);
+    }
+
+    // @since 2.12
+    public ReadablePeriod _fromObject(final JsonParser p, final DeserializationContext ctxt)
+        throws IOException
+    {
+        // 30-Sep-2020, tatu: This can be problematic with XML, if there
+        //   is an element with String but also attribute(s) -- but worry
+        //   if we ever hit that.
         
         JsonNode treeNode = p.readValueAsTree();
         String periodType = treeNode.path("fieldType").path("name").asText();

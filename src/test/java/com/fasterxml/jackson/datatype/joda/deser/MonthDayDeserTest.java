@@ -50,7 +50,8 @@ public class MonthDayDeserTest extends JodaTestBase
             MAPPER.readValue("{\"month\":8}", MonthDay.class);
             fail();
         } catch (MismatchedInputException e) {
-            verifyException(e, "expected JSON String");
+            verifyException(e, "Cannot deserialize value of type");
+            verifyException(e, "from Object value (token");
         }
     }
 
