@@ -50,7 +50,7 @@ public class DurationDeserializationTest extends JodaTestBase
             fail();
         } catch (MismatchedInputException e) {
             verifyException(e, "Cannot deserialize value of type `org.joda.time.Duration`");
-            verifyException(e, "expected Number or String");
+            verifyException(e, "from Object value");
         }
     }
 
