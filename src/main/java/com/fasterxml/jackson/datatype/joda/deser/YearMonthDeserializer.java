@@ -54,7 +54,7 @@ public class YearMonthDeserializer extends JodaDateDeserializerBase<YearMonth>
     {
         value = value.trim();
         if (value.isEmpty()) {
-            return getNullValue(ctxt);
+            return _fromEmptyString(p, ctxt, value);
         }
         return YearMonth.parse(value, _format.createParser(ctxt));
     }

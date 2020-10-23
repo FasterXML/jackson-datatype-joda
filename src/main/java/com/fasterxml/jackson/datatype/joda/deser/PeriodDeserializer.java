@@ -54,7 +54,7 @@ public class PeriodDeserializer
     {
         value = value.trim();
         if (value.isEmpty()) {
-            return getNullValue(ctxt);
+            return _fromEmptyString(p, ctxt, value);
         }
         return _format.parsePeriod(ctxt, value);
     }

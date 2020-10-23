@@ -6,8 +6,12 @@ import java.util.Map;
 import org.joda.time.Duration;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+
 import com.fasterxml.jackson.core.type.TypeReference;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectReader;
+import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.fasterxml.jackson.databind.exc.MismatchedInputException;
 import com.fasterxml.jackson.datatype.joda.JodaTestBase;
 
@@ -24,29 +28,30 @@ public class DurationDeserializationTest extends JodaTestBase
      */
 
     private final ObjectMapper MAPPER = jodaMapper();
+    private final ObjectReader READER = MAPPER.readerFor(Duration.class);
 
     public void testDurationDeserFromInt() throws IOException
     {
-        Duration d = MAPPER.readValue("1234", Duration.class);
+        Duration d = READER.readValue("1234");
         assertEquals(1234, d.getMillis());
     }
 
     public void testDurationDeserFromString() throws IOException
     {
-        Duration d = MAPPER.readValue(quote("PT1.234S"), Duration.class);
+        Duration d = READER.readValue(quote("PT1.234S"));
         assertEquals(1234, d.getMillis());
     }
 
     public void testDurationRoundtrip() throws IOException
     {
         Duration d = new Duration(5513);
-        assertEquals(d, MAPPER.readValue(MAPPER.writeValueAsString(d), Duration.class));
+        assertEquals(d, READER.readValue(MAPPER.writeValueAsString(d)));
     }
 
     public void testDurationFailsDeserializingUnexpectedType() throws IOException
     {
         try {
-            MAPPER.readValue("{\"foo\":1234}", Duration.class);
+            READER.readValue("{\"foo\":1234}");
             fail();
         } catch (MismatchedInputException e) {
             verifyException(e, "Cannot deserialize value of type `org.joda.time.Duration`");
@@ -102,5 +107,29 @@ public class DurationDeserializationTest extends JodaTestBase
                 new TypeReference<Map<Duration, String>>() { });
         assertNotNull(map);
         assertTrue(map.containsKey(Duration.standardMinutes(4 * 60 + 30)));
+    }
+
+    /*
+    /**********************************************************
+    /* Coercion tests
+    /**********************************************************
+     */
+
+    // @since 2.12
+    public void testReadFromEmptyString() throws Exception
+    {
+        // By default, fine to deser from empty or blank
+        assertNull(READER.readValue(quote("")));
+        assertNull(READER.readValue(quote("    ")));
+
+        final ObjectMapper m = mapperWithFailFromEmptyString();
+        try {
+            m.readerFor(Duration.class)
+                .readValue(quote(""));
+            fail("Should not pass");
+        } catch (InvalidFormatException e) {
+            verifyException(e, "Cannot coerce empty String");
+            verifyException(e, Duration.class.getName());
+        }
     }
 }

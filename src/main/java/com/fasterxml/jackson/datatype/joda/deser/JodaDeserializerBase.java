@@ -6,6 +6,7 @@ import com.fasterxml.jackson.core.*;
 import com.fasterxml.jackson.core.io.NumberInput;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.cfg.CoercionAction;
 import com.fasterxml.jackson.databind.deser.std.StdScalarDeserializer;
 import com.fasterxml.jackson.databind.jsontype.TypeDeserializer;
 import com.fasterxml.jackson.databind.type.LogicalType;
@@ -38,6 +39,28 @@ abstract class JodaDeserializerBase<T> extends StdScalarDeserializer<T>
         //    that only have String values for scalars (CSV, Properties, XML)
         // NOTE: we do allow negative values, but has to fit in 64-bits:
         return _isIntNumber(str) && NumberInput.inLongRange(str, (str.charAt(0) == '-'));
+    }
+
+    /**
+     * Helper method for specific case of deserialization
+     * from empty or blank String.
+     *
+     * @since 2.12
+     */
+    @SuppressWarnings("unchecked")
+    protected T _fromEmptyString(JsonParser p, DeserializationContext ctxt,
+            String str)
+        throws IOException
+    {
+        final CoercionAction act = _checkFromStringCoercion(ctxt, str);
+        switch (act) { // note: Fail handled above
+        case AsEmpty:
+            return (T) getEmptyValue(ctxt);
+        case TryConvert:
+        case AsNull:
+        default:
+        }
+        return null;
     }
 
     @SuppressWarnings("unchecked")

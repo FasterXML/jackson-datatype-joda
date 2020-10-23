@@ -66,7 +66,7 @@ public class DateTimeDeserializer
     {
         value = value.trim();
         if (value.isEmpty()) {
-            return getNullValue(ctxt);
+            return _fromEmptyString(p, ctxt, value);
         }
         // 08-Jul-2015, tatu: as per [datatype-joda#44], optional TimeZone inclusion
         // NOTE: on/off feature only for serialization; on deser should accept both

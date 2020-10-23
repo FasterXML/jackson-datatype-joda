@@ -3,6 +3,8 @@ package com.fasterxml.jackson.datatype.joda;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.cfg.CoercionAction;
+import com.fasterxml.jackson.databind.cfg.CoercionInputShape;
 import com.fasterxml.jackson.databind.cfg.MapperBuilder;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 
@@ -61,6 +63,14 @@ public abstract class JodaTestBase extends TestCase
     protected static MapperBuilder<?,?> mapperWithModuleBuilder() {
         return JsonMapper.builder()
                 .addModule(new JodaModule());
+    }
+
+    // @since 2.12
+    protected static ObjectMapper mapperWithFailFromEmptyString() {
+        ObjectMapper mapper = jodaMapper();
+        mapper.coercionConfigDefaults()
+            .setCoercion(CoercionInputShape.EmptyString, CoercionAction.Fail);
+        return mapper;
     }
 
     /*
