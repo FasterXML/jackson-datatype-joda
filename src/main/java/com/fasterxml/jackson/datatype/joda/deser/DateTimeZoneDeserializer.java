@@ -43,7 +43,7 @@ public class DateTimeZoneDeserializer extends JodaDeserializerBase<DateTimeZone>
     {
         value = value.trim();
         if (value.isEmpty()) {
-            return (DateTimeZone) getNullValue(ctxt);
+            return _fromEmptyString(p, ctxt, value);
         }
         // 30-Sep-2020: [datatype-joda#117] Should allow use of "Timestamp as String" for
         //     some textual formats

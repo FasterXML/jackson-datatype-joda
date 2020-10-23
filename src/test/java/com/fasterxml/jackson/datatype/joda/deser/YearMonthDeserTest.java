@@ -7,6 +7,8 @@ import org.joda.time.YearMonth;
 import org.joda.time.chrono.ISOChronology;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectReader;
+import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.fasterxml.jackson.databind.exc.MismatchedInputException;
 import com.fasterxml.jackson.datatype.joda.JodaTestBase;
 
@@ -18,12 +20,13 @@ public class YearMonthDeserTest extends JodaTestBase
     /**********************************************************
      */
 
-    final ObjectMapper MAPPER = mapperWithModule();
-    
+    private final ObjectMapper MAPPER = mapperWithModule();
+    private final ObjectReader READER = MAPPER.readerFor(YearMonth.class);
+
     public void testDeserYearMonth() throws Exception
     {
         String yearMonthString = new YearMonth(2013, 8).toString();
-        YearMonth yearMonth = MAPPER.readValue(quote(yearMonthString), YearMonth.class);
+        YearMonth yearMonth = READER.readValue(quote(yearMonthString));
         assertEquals(new YearMonth(2013, 8), yearMonth);
     }
 
@@ -37,16 +40,10 @@ public class YearMonthDeserTest extends JodaTestBase
         assertEquals(ISOChronology.getInstanceUTC(), yearMonth.getChronology());
     }
 
-    public void testDeserYearMonthFromEmptyString() throws Exception
-    {
-        YearMonth yearMonth = MAPPER.readValue(quote(""), YearMonth.class);
-        assertNull(yearMonth);
-    }
-
     public void testDeserYearMonthFailsForUnexpectedType() throws IOException
     {
         try {
-            MAPPER.readValue("{\"year\":2013}", YearMonth.class);
+            READER.readValue("{\"year\":2013}");
             fail("Should not pass");
         } catch (MismatchedInputException e) {
             verifyException(e, "Cannot deserialize value of type ");
@@ -62,5 +59,29 @@ public class YearMonthDeserTest extends JodaTestBase
         YearMonth yearMonth = input.value;
         assertEquals(2013, yearMonth.getYear());
         assertEquals(8, yearMonth.getMonthOfYear());
+    }
+
+    /*
+    /**********************************************************
+    /* Coercion tests
+    /**********************************************************
+     */
+
+    // @since 2.12
+    public void testReadFromEmptyString() throws Exception
+    {
+        // By default, fine to deser from empty or blank
+        assertNull(READER.readValue(quote("")));
+        assertNull(READER.readValue(quote("    ")));
+
+        final ObjectMapper m = mapperWithFailFromEmptyString();
+        try {
+            m.readerFor(YearMonth.class)
+                .readValue(quote(""));
+            fail("Should not pass");
+        } catch (InvalidFormatException e) {
+            verifyException(e, "Cannot coerce empty String");
+            verifyException(e, YearMonth.class.getName());
+        }
     }
 }

@@ -8,6 +8,8 @@ import java.util.TimeZone;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.cfg.CoercionAction;
+import com.fasterxml.jackson.databind.cfg.CoercionInputShape;
 import com.fasterxml.jackson.databind.cfg.MapperBuilder;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 
@@ -83,6 +85,13 @@ public abstract class JodaTestBase extends TestCase
     protected static ObjectMapper mapperWithModule(TimeZone tz) {
         return jodaMapperBuilder(tz)
                 .build();
+    }
+
+    protected static ObjectMapper mapperWithFailFromEmptyString() {
+        return mapperWithModuleBuilder()
+                .withCoercionConfigDefaults(cfg ->
+                    cfg.setCoercion(CoercionInputShape.EmptyString, CoercionAction.Fail)
+                ).build();
     }
 
     /*

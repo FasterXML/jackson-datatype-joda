@@ -11,7 +11,8 @@ import org.joda.time.*;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
+import com.fasterxml.jackson.databind.ObjectReader;
+import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.fasterxml.jackson.datatype.joda.JodaTestBase;
 
 /**
@@ -59,37 +60,34 @@ public class DateTimeDeserTest extends JodaTestBase
     /**********************************************************
      */
 
+    private final ObjectMapper MAPPER = mapperWithModule();
+    private final ObjectReader READER = MAPPER.readerFor(DateTime.class);
+
     /**
      * Ok, then: should be able to convert from JSON String or Number,
      * with standard deserializer we provide.
      */
     public void testDeserFromNumber() throws IOException
     {
-        final ObjectMapper mapper = mapperWithModule();
-        
         Calendar cal = new GregorianCalendar(TimeZone.getTimeZone("GMT"));
         // use some arbitrary but non-default time point (after 1.1.1970)
         cal.set(Calendar.YEAR, 1972);
         long timepoint = cal.getTime().getTime();
 
         // Ok, first: using JSON number (milliseconds since epoch)
-        DateTime dt = mapper.readValue(String.valueOf(timepoint), DateTime.class);
+        DateTime dt = READER.readValue(String.valueOf(timepoint));
         assertEquals(timepoint, dt.getMillis());
 
         // And then ISO-8601 String
-        dt = mapper.readValue(quote("1972-12-28T12:00:01.000+0000"), DateTime.class);
+        dt = READER.readValue(quote("1972-12-28T12:00:01.000+0000"));
         assertEquals("1972-12-28T12:00:01.000Z", dt.toString());
     }
 
     public void testDeserReadableDateTime() throws IOException
     {
-        final ObjectMapper mapper = mapperWithModule();
-
-        ReadableDateTime date = mapper.readValue(quote("1972-12-28T12:00:01.000+0000"), ReadableDateTime.class);
-        assertNotNull(date);
+        ReadableDateTime date = MAPPER.readValue(quote("1972-12-28T12:00:01.000+0000"),
+                ReadableDateTime.class);
         assertEquals("1972-12-28T12:00:01.000Z", date.toString());
-
-        assertNull(mapper.readValue(quote(""), ReadableDateTime.class));
     }
 
     // [datatype-joda#8]
@@ -160,5 +158,29 @@ public class DateTimeDeserTest extends JodaTestBase
 
         DateTimeZone expTZ = DateTimeZone.forID("Asia/Shanghai");
         assertEquals(new DateTime(2017, 1, 1, 1, 1, 1, expTZ), result);
+    }
+
+    /*
+    /**********************************************************
+    /* Coercion tests
+    /**********************************************************
+     */
+
+    // @since 2.12
+    public void testReadFromEmptyString() throws Exception
+    {
+        // By default, fine to deser from empty or blank
+        assertNull(READER.readValue(quote("")));
+        assertNull(READER.readValue(quote("    ")));
+
+        final ObjectMapper m = mapperWithFailFromEmptyString();
+        try {
+            m.readerFor(DateTime.class)
+                .readValue(quote(""));
+            fail("Should not pass");
+        } catch (InvalidFormatException e) {
+            verifyException(e, "Cannot coerce empty String");
+            verifyException(e, DateTime.class.getName());
+        }
     }
 }

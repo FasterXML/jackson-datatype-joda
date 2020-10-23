@@ -53,7 +53,7 @@ public class DurationDeserializer
     {
         value = value.trim();
         if (value.isEmpty()) {
-            return (Duration) getNullValue(ctxt);
+            return _fromEmptyString(p, ctxt, value);
         }
         // 14-Jul-2020: [datatype-joda#117] Should allow use of "Timestamp as String" for
         //     some textual formats

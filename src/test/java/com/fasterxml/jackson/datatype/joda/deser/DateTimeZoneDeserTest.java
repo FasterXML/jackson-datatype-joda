@@ -6,6 +6,8 @@ import org.joda.time.DateTimeZone;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectReader;
+import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.fasterxml.jackson.datatype.joda.JodaTestBase;
 import com.fasterxml.jackson.datatype.joda.deser.DateTimeDeserTest.DateTimeZoneWrapper;
 
@@ -16,6 +18,7 @@ public class DateTimeZoneDeserTest extends JodaTestBase
     }
 
     private final ObjectMapper MAPPER = mapperWithModule();
+    private final ObjectReader READER = MAPPER.readerFor(DateTimeZone.class);
 
     /*
     /**********************************************************
@@ -31,7 +34,7 @@ public class DateTimeZoneDeserTest extends JodaTestBase
         String json = MAPPER.writeValueAsString(input);
         assertEquals(quote("-06:00"), json);
 
-        DateTimeZone result = MAPPER.readValue(json, DateTimeZone.class);
+        DateTimeZone result = READER.readValue(json);
         assertEquals(result, input);
 
         // But then verify polymorphic handling
@@ -44,5 +47,29 @@ public class DateTimeZoneDeserTest extends JodaTestBase
         DateTimeZoneWrapper result2 = MAPPER.readValue(json, DateTimeZoneWrapper.class);    
         assertNotNull(result2.tz);
         assertEquals(input, result2.tz);
+    }
+
+    /*
+    /**********************************************************
+    /* Coercion tests
+    /**********************************************************
+     */
+
+    // @since 2.12
+    public void testReadFromEmptyString() throws Exception
+    {
+        // By default, fine to deser from empty or blank
+        assertNull(READER.readValue(quote("")));
+        assertNull(READER.readValue(quote("    ")));
+
+        final ObjectMapper m = mapperWithFailFromEmptyString();
+        try {
+            m.readerFor(DateTimeZone.class)
+                .readValue(quote(""));
+            fail("Should not pass");
+        } catch (InvalidFormatException e) {
+            verifyException(e, "Cannot coerce empty String");
+            verifyException(e, DateTimeZone.class.getName());
+        }
     }
 }
