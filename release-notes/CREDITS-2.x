@@ -97,3 +97,7 @@ Richard Wise (Woodz@github)
 Joost van de Wijgerd (jwijgerd@github)
   * Contributed #116: Improve schema support for DateTimeZone type
   (2.12.0)
+
+Pierre Grasser (piorrro33@github)
+  * Requested #119: Baseline Joda dependency now 2.10.8 (but should work with 2.9.x still)
+  (2.12.0)
