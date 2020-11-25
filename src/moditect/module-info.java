@@ -1,5 +1,9 @@
-
-// Generated 24-Nov-2020 using Moditect maven plugin
+// Initially generated using Moditect maven plugin
+// Last changes:
+//
+// * 2020-11-25 change joda requires from "joda.time" to "org.joda.time"
+//     (Joda 2.10 now has automatic module name)
+//    
 module com.fasterxml.jackson.datatype.joda {
     requires com.fasterxml.jackson.annotation;
     requires com.fasterxml.jackson.core;
