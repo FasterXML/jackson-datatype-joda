@@ -101,3 +101,7 @@ Joost van de Wijgerd (jwijgerd@github)
 Pierre Grasser (piorrro33@github)
   * Requested #119: Baseline Joda dependency now 2.10.8 (but should work with 2.9.x still)
   (2.12.0)
+
+Guido Medina (guidomedina@github)
+  * Contributed #120: Cache formatter with offset parsed (performance improvement)
+  (2.12.1)
