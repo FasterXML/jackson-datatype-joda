@@ -4,6 +4,11 @@ Project: jackson-datatype-joda
 === Releases ===
 ------------------------------------------------------------------------
 
+2.12.1 (not yet released)
+
+#120: Cache formatter with offset parsed (performance improvement)
+ (contributed by Guido M)
+
 2.12.0 (29-Nov-2020)
 
 #116: Improve schema support for DateTimeZone type
@@ -12,6 +17,7 @@ Project: jackson-datatype-joda
 #119: Baseline Joda dependency now 2.10.8 (but should work with 2.9.x still)
  (requested by Pierre G)
 
+2.11.4 (12-Dec-2020)
 2.11.3 (02-Oct-2020)
 2.11.2 (02-Aug-2020)
 2.11.1 (25-Jun-2020)
