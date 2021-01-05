@@ -74,33 +74,28 @@ public class PeriodDeserializer
         int periodValue = treeNode.path(periodType).asInt();
 
         ReadablePeriod rp;
-        
+
+        // !!! 05-Jan-2021, tatu: Change to switch for 2.13 or later (Java 8)
         if (periodName.equals( "Seconds" )) {
             rp = Seconds.seconds( periodValue );
-        }
-        else if (periodName.equals( "Minutes" )) {
+        } else if (periodName.equals( "Minutes" )) {
             rp = Minutes.minutes( periodValue );
-        }
-        else if (periodName.equals( "Hours" )) {
+        } else if (periodName.equals( "Hours" )) {
             rp = Hours.hours( periodValue );
-        }
-        else if (periodName.equals( "Days" )) {
+        } else if (periodName.equals( "Days" )) {
             rp = Days.days( periodValue );
-        }
-        else if (periodName.equals( "Weeks" )) {
+        } else if (periodName.equals( "Weeks" )) {
             rp = Weeks.weeks( periodValue );
-        }
-        else if (periodName.equals( "Months" )) {
+        } else if (periodName.equals( "Months" )) {
             rp = Months.months( periodValue );
-        }
-        else if (periodName.equals( "Years" )) {
+        } else if (periodName.equals( "Years" )) {
             rp = Years.years( periodValue );
         } else {
             final JavaType type = getValueType(ctxt);
             ctxt.reportInputMismatch(type,
                     "Don't know how to deserialize %s using periodName '%s'",
                     ClassUtil.getTypeDescription(type), periodName);
-            rp = null; // never gets here
+            return null; // never gets here
         }
 
         if (_requireFullPeriod && !(rp instanceof Period)) {
