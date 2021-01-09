@@ -4,7 +4,7 @@ Project: jackson-datatype-joda
 === Releases ===
 ------------------------------------------------------------------------
 
-2.12.1 (not yet released)
+2.12.1 (08-Jan-2021)
 
 #120: Cache formatter with offset parsed (performance improvement)
  (contributed by Guido M)
