@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import org.joda.time.Duration;
 
+import com.fasterxml.jackson.core.JacksonException;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonTokenId;
 import com.fasterxml.jackson.core.StreamReadCapability;
@@ -32,7 +33,8 @@ public class DurationDeserializer
     }
 
     @Override
-    public Duration deserialize(JsonParser p, DeserializationContext ctxt) throws IOException
+    public Duration deserialize(JsonParser p, DeserializationContext ctxt)
+        throws JacksonException
     {
         switch (p.currentTokenId()) {
         case JsonTokenId.ID_NUMBER_INT: // assume it's millisecond count
@@ -49,7 +51,8 @@ public class DurationDeserializer
     }
 
     protected Duration _fromString(JsonParser p, DeserializationContext ctxt,
-            String value) throws IOException
+            String value)
+        throws JacksonException
     {
         value = value.trim();
         if (value.isEmpty()) {
@@ -61,7 +64,11 @@ public class DurationDeserializer
                 && _isValidTimestampString(value)) {
             return _fromTimestamp(ctxt, NumberInput.parseLong(value));
         }
-        return _format.parsePeriod(ctxt, value).toStandardDuration();
+        try {
+            return _format.parsePeriod(ctxt, value).toStandardDuration();
+        } catch (IOException e) {
+            throw _wrapJodaFailure(e);
+        }
     }
 
     // @since 2.12

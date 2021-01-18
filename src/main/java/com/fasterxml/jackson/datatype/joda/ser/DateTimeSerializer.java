@@ -1,14 +1,13 @@
 package com.fasterxml.jackson.datatype.joda.ser;
 
-import java.io.IOException;
-
-import org.joda.time.*;
-
+import com.fasterxml.jackson.core.JacksonException;
 import com.fasterxml.jackson.core.JsonGenerator;
 
 import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.datatype.joda.cfg.FormatConfig;
 import com.fasterxml.jackson.datatype.joda.cfg.JacksonJodaDateFormat;
+
+import org.joda.time.*;
 
 public class DateTimeSerializer
     extends JodaDateSerializerBase<DateTime>
@@ -22,7 +21,8 @@ public class DateTimeSerializer
     }
 
     public DateTimeSerializer(JacksonJodaDateFormat format,
-            int shapeOverride) {
+            int shapeOverride)
+    {
         // false -> no arrays (numbers)
         super(DateTime.class, format,
                 SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, FORMAT_TIMESTAMP,
@@ -41,7 +41,8 @@ public class DateTimeSerializer
     }
 
     @Override
-    public void serialize(DateTime value, JsonGenerator gen, SerializerProvider provider) throws IOException
+    public void serialize(DateTime value, JsonGenerator gen, SerializerProvider provider)
+        throws JacksonException
     {
         boolean numeric = (_serializationShape(provider) != FORMAT_STRING);
 

@@ -1,7 +1,5 @@
 package com.fasterxml.jackson.datatype.joda.ser;
 
-import java.io.IOException;
-
 import org.joda.time.*;
 
 import com.fasterxml.jackson.core.*;
@@ -40,7 +38,7 @@ public class LocalDateTimeSerializer // non final since 2.6.1
 
     @Override
     public void serialize(LocalDateTime value, JsonGenerator gen, SerializerProvider provider)
-        throws IOException
+        throws JacksonException
     {
         switch (_serializationShape(provider)) {
         case FORMAT_STRING:

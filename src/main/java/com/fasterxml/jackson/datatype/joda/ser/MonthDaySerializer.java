@@ -1,13 +1,13 @@
 package com.fasterxml.jackson.datatype.joda.ser;
 
 import com.fasterxml.jackson.core.*;
+
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.datatype.joda.cfg.FormatConfig;
 import com.fasterxml.jackson.datatype.joda.cfg.JacksonJodaDateFormat;
-import org.joda.time.MonthDay;
 
-import java.io.IOException;
+import org.joda.time.MonthDay;
 
 public class MonthDaySerializer extends JodaDateSerializerBase<MonthDay>
 {
@@ -28,7 +28,8 @@ public class MonthDaySerializer extends JodaDateSerializerBase<MonthDay>
     }
 
     @Override
-    public void serialize(MonthDay value, JsonGenerator gen, SerializerProvider provider) throws IOException
+    public void serialize(MonthDay value, JsonGenerator gen, SerializerProvider provider)
+        throws JacksonException
     {
         gen.writeString(_format.createFormatter(provider).print(value));
     }

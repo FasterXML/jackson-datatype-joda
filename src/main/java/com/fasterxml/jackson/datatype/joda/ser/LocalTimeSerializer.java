@@ -1,9 +1,8 @@
 package com.fasterxml.jackson.datatype.joda.ser;
 
-import java.io.IOException;
-
 import org.joda.time.LocalTime;
 
+import com.fasterxml.jackson.core.JacksonException;
 import com.fasterxml.jackson.core.JsonGenerator;
 
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -43,18 +42,19 @@ public class LocalTimeSerializer
     */
 
     @Override
-    public void serialize(LocalTime value, JsonGenerator gen, SerializerProvider provider) throws IOException
+    public void serialize(LocalTime value, JsonGenerator g, SerializerProvider provider)
+        throws JacksonException
     {
         if (_serializationShape(provider) == FORMAT_STRING) {
-            gen.writeString(_format.createFormatter(provider).print(value));
+            g.writeString(_format.createFormatter(provider).print(value));
             return;
         }
         // Timestamp here actually means an array of values
-        gen.writeStartArray();
-        gen.writeNumber(value.hourOfDay().get());
-        gen.writeNumber(value.minuteOfHour().get());
-        gen.writeNumber(value.secondOfMinute().get());
-        gen.writeNumber(value.millisOfSecond().get());
-        gen.writeEndArray();
+        g.writeStartArray();
+        g.writeNumber(value.hourOfDay().get());
+        g.writeNumber(value.minuteOfHour().get());
+        g.writeNumber(value.secondOfMinute().get());
+        g.writeNumber(value.millisOfSecond().get());
+        g.writeEndArray();
     }
 }

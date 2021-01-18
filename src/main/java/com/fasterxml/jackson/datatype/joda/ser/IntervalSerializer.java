@@ -1,7 +1,6 @@
 package com.fasterxml.jackson.datatype.joda.ser;
 
-import java.io.IOException;
-
+import com.fasterxml.jackson.core.JacksonException;
 import com.fasterxml.jackson.core.JsonGenerator;
 
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -36,7 +35,8 @@ public class IntervalSerializer extends JodaDateSerializerBase<Interval>
     }
 
     @Override
-    public void serialize(Interval interval, JsonGenerator gen, SerializerProvider provider) throws IOException
+    public void serialize(Interval interval, JsonGenerator gen, SerializerProvider provider)
+        throws JacksonException
     {
         // 19-Nov-2014, tatu: Support textual representation similar to what Joda uses
         //   (and why not exact one? In future we'll make it configurable)

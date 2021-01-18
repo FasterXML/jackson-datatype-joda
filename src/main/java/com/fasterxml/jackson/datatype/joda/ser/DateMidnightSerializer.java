@@ -1,9 +1,8 @@
 package com.fasterxml.jackson.datatype.joda.ser;
 
-import java.io.IOException;
-
 import org.joda.time.DateMidnight;
 
+import com.fasterxml.jackson.core.JacksonException;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.datatype.joda.cfg.FormatConfig;
@@ -48,7 +47,8 @@ public class DateMidnightSerializer
 
     @Override
     public void serialize(DateMidnight value, JsonGenerator gen,
-            SerializerProvider provider) throws IOException
+            SerializerProvider provider)
+        throws JacksonException
     {
         switch (_serializationShape(provider)) {
         case FORMAT_STRING:

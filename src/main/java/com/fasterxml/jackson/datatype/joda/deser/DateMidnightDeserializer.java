@@ -1,11 +1,10 @@
 package com.fasterxml.jackson.datatype.joda.deser;
 
-import java.io.IOException;
-
 import org.joda.time.DateMidnight;
 import org.joda.time.DateTimeZone;
 import org.joda.time.LocalDate;
 
+import com.fasterxml.jackson.core.JacksonException;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.core.JsonTokenId;
@@ -43,7 +42,7 @@ public class DateMidnightDeserializer
 
     @Override
     public DateMidnight deserialize(JsonParser p, DeserializationContext ctxt)
-        throws IOException
+        throws JacksonException
     {
         // We'll accept either long (timestamp) or array:
         if (p.isExpectedStartArrayToken()) {
@@ -75,7 +74,7 @@ public class DateMidnightDeserializer
     // @since 2.12
     protected DateMidnight _fromString(final JsonParser p, final DeserializationContext ctxt,
             String value)
-        throws IOException
+        throws JacksonException
     {
         value = value.trim();
         if (value.isEmpty()) {

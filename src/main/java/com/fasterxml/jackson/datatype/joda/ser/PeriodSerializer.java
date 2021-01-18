@@ -1,15 +1,16 @@
 package com.fasterxml.jackson.datatype.joda.ser;
 
-import java.io.IOException;
-
-import org.joda.time.ReadablePeriod;
-
 import com.fasterxml.jackson.annotation.JsonFormat;
+
+import com.fasterxml.jackson.core.JacksonException;
 import com.fasterxml.jackson.core.JsonGenerator;
+
 import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.jsonFormatVisitors.*;
 import com.fasterxml.jackson.datatype.joda.cfg.FormatConfig;
 import com.fasterxml.jackson.datatype.joda.cfg.JacksonJodaPeriodFormat;
+
+import org.joda.time.ReadablePeriod;
 
 /**
  * Serializes a {@link ReadablePeriod} using Joda default formatting.
@@ -43,7 +44,7 @@ public class PeriodSerializer
     // Lots of work, although realistically, won't have much or any effect...
     @Override
     public JsonSerializer<?> createContextual(SerializerProvider prov,
-            BeanProperty property) throws JsonMappingException
+            BeanProperty property)
     {
         if (property != null) {
             JsonFormat.Value ann = findFormatOverrides(prov, property, handledType());
@@ -79,13 +80,14 @@ public class PeriodSerializer
     }
 
     @Override
-    public void serialize(ReadablePeriod value, JsonGenerator gen, SerializerProvider provider) throws IOException
+    public void serialize(ReadablePeriod value, JsonGenerator g, SerializerProvider provider)
+        throws JacksonException
     {
-        gen.writeString(_format.createFormatter(provider).print(value));
+        g.writeString(_format.createFormatter(provider).print(value));
     }
 
     @Override
-    public void acceptJsonFormatVisitor(JsonFormatVisitorWrapper visitor, JavaType typeHint) throws JsonMappingException
+    public void acceptJsonFormatVisitor(JsonFormatVisitorWrapper visitor, JavaType typeHint)
     {
         JsonStringFormatVisitor v2 = visitor.expectStringFormat(typeHint);
 

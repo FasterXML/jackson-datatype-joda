@@ -1,9 +1,8 @@
 package com.fasterxml.jackson.datatype.joda.ser;
 
-import java.io.IOException;
-
 import org.joda.time.Instant;
 
+import com.fasterxml.jackson.core.JacksonException;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.SerializerProvider;
@@ -30,7 +29,6 @@ public class InstantSerializer
         return new InstantSerializer(formatter, shapeOverride);
     }
 
-    // @since 2.5
     @Override
     public boolean isEmpty(SerializerProvider prov, Instant value) {
         return (value.getMillis() == 0L);
@@ -38,7 +36,7 @@ public class InstantSerializer
 
     @Override
     public void serialize(Instant value, JsonGenerator gen, SerializerProvider provider)
-        throws IOException
+        throws JacksonException
     {
         if (_serializationShape(provider) == FORMAT_STRING) {
             gen.writeString(_format.createFormatter(provider).print(value));

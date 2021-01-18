@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import org.joda.time.*;
 
+import com.fasterxml.jackson.core.JacksonException;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.DeserializationContext;
@@ -31,7 +32,7 @@ public class PeriodDeserializer
    
     @Override
     public ReadablePeriod deserialize(JsonParser p, DeserializationContext ctxt)
-        throws IOException
+        throws JacksonException
     {
         JsonToken t = p.currentToken();
         if (t == JsonToken.VALUE_STRING) {
@@ -50,18 +51,22 @@ public class PeriodDeserializer
     // @since 2.12
     protected ReadablePeriod _fromString(final JsonParser p, final DeserializationContext ctxt,
             String value)
-        throws IOException
+        throws JacksonException
     {
         value = value.trim();
         if (value.isEmpty()) {
             return _fromEmptyString(p, ctxt, value);
         }
-        return _format.parsePeriod(ctxt, value);
+        try {
+            return _format.parsePeriod(ctxt, value);
+        } catch (IOException e) {
+            throw _wrapJodaFailure(e);
+        }
     }
 
     // @since 2.12
     protected ReadablePeriod _fromObject(final JsonParser p, final DeserializationContext ctxt)
-        throws IOException
+        throws JacksonException
     {
         // 30-Sep-2020, tatu: This can be problematic with XML, if there
         //   is an element with String but also attribute(s) -- but worry
