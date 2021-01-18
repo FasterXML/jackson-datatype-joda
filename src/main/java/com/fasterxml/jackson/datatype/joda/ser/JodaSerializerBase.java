@@ -1,7 +1,6 @@
 package com.fasterxml.jackson.datatype.joda.ser;
 
-import java.io.IOException;
-
+import com.fasterxml.jackson.core.JacksonException;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.core.type.WritableTypeId;
@@ -16,7 +15,8 @@ abstract class JodaSerializerBase<T> extends StdSerializer<T>
 
     @Override
     public void serializeWithType(T value, JsonGenerator g, SerializerProvider ctxt,
-            TypeSerializer typeSer) throws IOException
+            TypeSerializer typeSer)
+        throws JacksonException
     {
         // NOTE: we do not actually know the exact shape (or, rather, it varies by settings
         // and so should not claim particular shape) -- but need to make sure NOT to report

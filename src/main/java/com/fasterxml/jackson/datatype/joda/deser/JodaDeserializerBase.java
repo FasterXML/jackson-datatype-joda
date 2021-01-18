@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import com.fasterxml.jackson.core.*;
 import com.fasterxml.jackson.core.io.NumberInput;
+
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.cfg.CoercionAction;
@@ -24,7 +25,8 @@ abstract class JodaDeserializerBase<T> extends StdScalarDeserializer<T>
     
     @Override
     public Object deserializeWithType(JsonParser p, DeserializationContext ctxt,
-            TypeDeserializer typeDeserializer) throws IOException
+            TypeDeserializer typeDeserializer)
+        throws JacksonException
     {
         return typeDeserializer.deserializeTypedFromAny(p, ctxt);
     }
@@ -49,7 +51,7 @@ abstract class JodaDeserializerBase<T> extends StdScalarDeserializer<T>
     @SuppressWarnings("unchecked")
     protected T _fromEmptyString(JsonParser p, DeserializationContext ctxt,
             String str)
-        throws IOException
+        throws JacksonException
     {
         final CoercionAction act = _checkFromStringCoercion(ctxt, str);
         switch (act) { // note: Fail handled above
@@ -64,11 +66,29 @@ abstract class JodaDeserializerBase<T> extends StdScalarDeserializer<T>
 
     @SuppressWarnings("unchecked")
     public T _handleNotNumberOrString(JsonParser p, DeserializationContext ctxt)
-        throws IOException
+        throws JacksonException
     {
         final JavaType type = getValueType(ctxt);
         return (T) ctxt.handleUnexpectedToken(type, p.currentToken(), p,
                 String.format("Cannot deserialize value of type %s from `JsonToken.%s`: expected Number or String",
                         ClassUtil.getTypeDescription(type), p.currentToken()));
+    }
+
+    /**
+     * Helper method called to handle cases of Joda functionality throwing an
+     * {@link IOException} due to parse/generation issue, distinct from general
+     * input/output issues underlying streaming might throw.
+     * Currently handling does not differ but it is possible this might change in
+     * future to, for example, give more information on type of failure.
+     *
+     * @param e {@link IOException} thrown by one of Joda methods (as opposed to other
+     *    kinds of input/output problems)
+     *
+     * @return Suitable wrapped exception instance to throw
+     */
+    protected JacksonException _wrapJodaFailure(IOException e) {
+        // 18-Jan-2021, tatu: Start by simply reusing functionality of more
+        //   general handling, for now
+        return _wrapIOFailure(e);
     }
 }

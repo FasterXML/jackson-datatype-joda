@@ -1,32 +1,33 @@
 package com.fasterxml.jackson.datatype.joda.ser;
 
-import java.io.IOException;
-
 import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.jsonFormatVisitors.JsonFormatVisitorWrapper;
-import org.joda.time.DateTimeZone;
 
+import com.fasterxml.jackson.core.JacksonException;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.core.type.WritableTypeId;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.jsontype.TypeSerializer;
 
+import org.joda.time.DateTimeZone;
+
 public class DateTimeZoneSerializer extends JodaSerializerBase<DateTimeZone>
 {
     public DateTimeZoneSerializer() { super(DateTimeZone.class); }
 
     @Override
-    public void serialize(DateTimeZone value, JsonGenerator gen, SerializerProvider ctxt) throws IOException
+    public void serialize(DateTimeZone value, JsonGenerator g, SerializerProvider ctxt)
+        throws JacksonException
     {
-        gen.writeString(value.getID());
+        g.writeString(value.getID());
     }
 
     // as per [datatype-joda#82], need to ensure we will indicate nominal, NOT physical type:
     @Override
     public void serializeWithType(DateTimeZone value, JsonGenerator g,
-            SerializerProvider ctxt, TypeSerializer typeSer) throws IOException
+            SerializerProvider ctxt, TypeSerializer typeSer)
+        throws JacksonException
     {
         WritableTypeId typeIdDef = typeSer.writeTypePrefix(g, ctxt,
                 typeSer.typeId(value, DateTimeZone.class, JsonToken.VALUE_STRING));
@@ -36,7 +37,7 @@ public class DateTimeZoneSerializer extends JodaSerializerBase<DateTimeZone>
 
     @Override
     public void acceptJsonFormatVisitor(JsonFormatVisitorWrapper visitor, JavaType typeHint)
-            throws JsonMappingException {
+    {
         visitor.expectStringFormat(typeHint);
     }
 }

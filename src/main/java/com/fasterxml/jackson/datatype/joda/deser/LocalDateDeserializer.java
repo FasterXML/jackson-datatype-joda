@@ -1,10 +1,9 @@
 package com.fasterxml.jackson.datatype.joda.deser;
 
-import java.io.IOException;
-
 import org.joda.time.DateTimeZone;
 import org.joda.time.LocalDate;
 
+import com.fasterxml.jackson.core.JacksonException;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.core.JsonTokenId;
@@ -31,7 +30,8 @@ public class LocalDateDeserializer
     }
 
     @Override
-    public LocalDate deserialize(JsonParser p, DeserializationContext ctxt) throws IOException
+    public LocalDate deserialize(JsonParser p, DeserializationContext ctxt)
+        throws JacksonException
     {
         switch (p.currentTokenId()) {
         case JsonTokenId.ID_NUMBER_INT:
@@ -53,7 +53,7 @@ public class LocalDateDeserializer
     // @since 2.12
     protected LocalDate _fromString(final JsonParser p, final DeserializationContext ctxt,
             String value)
-        throws IOException
+        throws JacksonException
     {
         value = value.trim();
         if (value.isEmpty()) {
@@ -70,7 +70,7 @@ public class LocalDateDeserializer
 
     // @since 2.12
     protected LocalDate _fromArray(final JsonParser p, final DeserializationContext ctxt)
-        throws IOException
+        throws JacksonException
     {
         // [yyyy,mm,dd] or ["yyyy","mm","dd"]
         int year = p.nextIntValue(-1); // fast speculative case

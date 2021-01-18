@@ -1,7 +1,5 @@
 package com.fasterxml.jackson.datatype.joda.deser;
 
-import java.io.IOException;
-
 import org.joda.time.DateTimeZone;
 import org.joda.time.LocalDateTime;
 
@@ -29,7 +27,7 @@ public class LocalDateTimeDeserializer
 
     @Override
     public LocalDateTime deserialize(JsonParser p, DeserializationContext ctxt)
-        throws IOException
+        throws JacksonException
     {
         switch (p.currentTokenId()) {
         case JsonTokenId.ID_NUMBER_INT:
@@ -52,7 +50,7 @@ public class LocalDateTimeDeserializer
     // @since 2.12
     protected LocalDateTime _fromString(final JsonParser p, final DeserializationContext ctxt,
             String value)
-        throws IOException
+        throws JacksonException
     {
         value = value.trim();
         if (value.isEmpty()) {
@@ -68,7 +66,7 @@ public class LocalDateTimeDeserializer
     }
 
     protected LocalDateTime _fromArray(final JsonParser p, final DeserializationContext ctxt)
-        throws IOException
+        throws JacksonException
     {
         // [yyyy,mm,dd,hh,MM,ss,ms]
         JsonToken t = p.nextToken();

@@ -1,13 +1,13 @@
 package com.fasterxml.jackson.datatype.joda.ser;
 
 import com.fasterxml.jackson.core.*;
+
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.datatype.joda.cfg.FormatConfig;
 import com.fasterxml.jackson.datatype.joda.cfg.JacksonJodaDateFormat;
-import org.joda.time.YearMonth;
 
-import java.io.IOException;
+import org.joda.time.YearMonth;
 
 public class YearMonthSerializer extends JodaDateSerializerBase<YearMonth>
 {
@@ -22,14 +22,15 @@ public class YearMonthSerializer extends JodaDateSerializerBase<YearMonth>
     }
 
     @Override
-    public YearMonthSerializer withFormat(JacksonJodaDateFormat formatter,
-                                          int shapeOverride) {
+    public YearMonthSerializer withFormat(JacksonJodaDateFormat formatter, int shapeOverride)
+    {
         return new YearMonthSerializer(formatter, shapeOverride);
     }
 
     @Override
-    public void serialize(YearMonth value, JsonGenerator gen, SerializerProvider provider) throws IOException
+    public void serialize(YearMonth value, JsonGenerator g, SerializerProvider provider)
+        throws JacksonException
     {
-        gen.writeString(_format.createFormatter(provider).print(value));
+        g.writeString(_format.createFormatter(provider).print(value));
     }
 }

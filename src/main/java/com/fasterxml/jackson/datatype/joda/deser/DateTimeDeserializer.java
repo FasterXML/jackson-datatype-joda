@@ -1,12 +1,11 @@
 package com.fasterxml.jackson.datatype.joda.deser;
 
-import java.io.IOException;
-
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.ReadableDateTime;
 import org.joda.time.ReadableInstant;
 
+import com.fasterxml.jackson.core.JacksonException;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonTokenId;
 import com.fasterxml.jackson.core.StreamReadCapability;
@@ -42,7 +41,7 @@ public class DateTimeDeserializer
 
     @Override
     public ReadableInstant deserialize(JsonParser p, DeserializationContext ctxt)
-        throws IOException
+        throws JacksonException
     {
         switch (p.currentTokenId()) {
         case JsonTokenId.ID_NUMBER_INT:
@@ -60,7 +59,7 @@ public class DateTimeDeserializer
     // @since 2.12
     protected ReadableInstant _fromString(final JsonParser p, final DeserializationContext ctxt,
             String value)
-        throws IOException
+        throws JacksonException
     {
         value = value.trim();
         if (value.isEmpty()) {

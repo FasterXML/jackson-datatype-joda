@@ -1,7 +1,5 @@
 package com.fasterxml.jackson.datatype.joda.deser;
 
-import java.io.IOException;
-
 import org.joda.time.Instant;
 
 import com.fasterxml.jackson.core.*;
@@ -32,7 +30,8 @@ public class InstantDeserializer
     }
 
     @Override
-    public Instant deserialize(JsonParser p, DeserializationContext ctxt) throws IOException
+    public Instant deserialize(JsonParser p, DeserializationContext ctxt)
+        throws JacksonException
     {
         switch (p.currentTokenId()) {
         case JsonTokenId.ID_NUMBER_INT:
@@ -51,7 +50,7 @@ public class InstantDeserializer
     // @since 2.12
     protected Instant _fromString(final JsonParser p, final DeserializationContext ctxt,
             String value)
-        throws IOException
+        throws JacksonException
     {
         value = value.trim();
         if (value.isEmpty()) {

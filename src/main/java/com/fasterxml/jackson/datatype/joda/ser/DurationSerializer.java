@@ -1,15 +1,14 @@
 package com.fasterxml.jackson.datatype.joda.ser;
 
-import java.io.IOException;
-
-import org.joda.time.Duration;
-
+import com.fasterxml.jackson.core.JacksonException;
 import com.fasterxml.jackson.core.JsonGenerator;
 
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.datatype.joda.cfg.FormatConfig;
 import com.fasterxml.jackson.datatype.joda.cfg.JacksonJodaDateFormat;
+
+import org.joda.time.Duration;
 
 /**
  * Serializes a Duration; either as number of millis, or, if textual output
@@ -47,12 +46,13 @@ public class DurationSerializer
     }
 
     @Override
-    public void serialize(Duration value, JsonGenerator gen, SerializerProvider provider) throws IOException
+    public void serialize(Duration value, JsonGenerator g, SerializerProvider provider)
+        throws JacksonException
     {
         if (_serializationShape(provider) == FORMAT_STRING) {
-            gen.writeString(value.toString());
+            g.writeString(value.toString());
         } else {
-            gen.writeNumber(value.getMillis());
+            g.writeNumber(value.getMillis());
         }
     }
 }

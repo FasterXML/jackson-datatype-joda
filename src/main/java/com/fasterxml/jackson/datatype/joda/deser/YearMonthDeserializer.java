@@ -1,11 +1,10 @@
 package com.fasterxml.jackson.datatype.joda.deser;
 
-import java.io.IOException;
-
 import com.fasterxml.jackson.datatype.joda.cfg.FormatConfig;
 import com.fasterxml.jackson.datatype.joda.cfg.JacksonJodaDateFormat;
 import org.joda.time.YearMonth;
 
+import com.fasterxml.jackson.core.JacksonException;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.DeserializationContext;
@@ -31,7 +30,8 @@ public class YearMonthDeserializer extends JodaDateDeserializerBase<YearMonth>
     }
 
     @Override
-    public YearMonth deserialize(final JsonParser p, final DeserializationContext ctxt) throws IOException
+    public YearMonth deserialize(final JsonParser p, final DeserializationContext ctxt)
+        throws JacksonException
     {
         if (p.hasToken(JsonToken.VALUE_STRING)) {
             return _fromString(p, ctxt, p.getText());
@@ -48,7 +48,7 @@ public class YearMonthDeserializer extends JodaDateDeserializerBase<YearMonth>
     // @since 2.12
     protected YearMonth _fromString(final JsonParser p, final DeserializationContext ctxt,
             String value)
-        throws IOException
+        throws JacksonException
     {
         value = value.trim();
         if (value.isEmpty()) {

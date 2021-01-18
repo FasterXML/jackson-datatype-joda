@@ -1,10 +1,9 @@
 package com.fasterxml.jackson.datatype.joda.deser;
 
-import java.io.IOException;
-
 import org.joda.time.DateTimeZone;
 import org.joda.time.Interval;
 
+import com.fasterxml.jackson.core.JacksonException;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 
@@ -30,7 +29,7 @@ public class IntervalDeserializer extends JodaDateDeserializerBase<Interval>
 
     @Override
     public Interval deserialize(JsonParser p, DeserializationContext ctxt)
-        throws IOException
+        throws JacksonException
     {
         if (p.hasToken(JsonToken.VALUE_STRING)) {
             return _fromString(p, ctxt, p.getText());
@@ -47,7 +46,7 @@ public class IntervalDeserializer extends JodaDateDeserializerBase<Interval>
     // @since 2.12
     protected Interval _fromString(final JsonParser p, final DeserializationContext ctxt,
             String value)
-        throws IOException
+        throws JacksonException
     {
         value = value.trim();
         if (value.isEmpty()) {

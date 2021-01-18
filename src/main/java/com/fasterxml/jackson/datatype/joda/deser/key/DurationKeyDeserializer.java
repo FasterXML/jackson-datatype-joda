@@ -1,14 +1,20 @@
 package com.fasterxml.jackson.datatype.joda.deser.key;
 
-import com.fasterxml.jackson.databind.DeserializationContext;
-
 import java.io.IOException;
 
-public class DurationKeyDeserializer extends JodaKeyDeserializer {
-    private static final long serialVersionUID = 1L;
+import com.fasterxml.jackson.core.JacksonException;
+import com.fasterxml.jackson.databind.DeserializationContext;
 
+public class DurationKeyDeserializer extends JodaKeyDeserializer
+{
     @Override
-    protected Object deserialize(String key, DeserializationContext ctxt) throws IOException {
-        return PERIOD_FORMAT.parsePeriod(ctxt, key).toStandardDuration();
+    protected Object deserialize(String key, DeserializationContext ctxt)
+        throws JacksonException
+    {
+        try {
+            return PERIOD_FORMAT.parsePeriod(ctxt, key).toStandardDuration();
+        } catch (IOException e) {
+            throw _wrapJodaFailure(e);
+        }
     }
 }
