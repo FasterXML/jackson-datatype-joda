@@ -86,9 +86,9 @@ abstract class JodaDeserializerBase<T> extends StdScalarDeserializer<T>
      *
      * @return Suitable wrapped exception instance to throw
      */
-    protected JacksonException _wrapJodaFailure(IOException e) {
+    protected JacksonException _wrapJodaFailure(DeserializationContext ctxt, IOException e) {
         // 18-Jan-2021, tatu: Start by simply reusing functionality of more
         //   general handling, for now
-        return _wrapIOFailure(e);
+        return _wrapIOFailure(ctxt, e);
     }
 }

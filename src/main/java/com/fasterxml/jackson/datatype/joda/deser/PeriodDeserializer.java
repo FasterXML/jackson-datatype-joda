@@ -60,7 +60,7 @@ public class PeriodDeserializer
         try {
             return _format.parsePeriod(ctxt, value);
         } catch (IOException e) {
-            throw _wrapJodaFailure(e);
+            throw _wrapJodaFailure(ctxt, e);
         }
     }
 

@@ -67,7 +67,7 @@ public class DurationDeserializer
         try {
             return _format.parsePeriod(ctxt, value).toStandardDuration();
         } catch (IOException e) {
-            throw _wrapJodaFailure(e);
+            throw _wrapJodaFailure(ctxt, e);
         }
     }
 

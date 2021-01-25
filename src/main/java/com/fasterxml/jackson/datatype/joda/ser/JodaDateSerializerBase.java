@@ -52,7 +52,7 @@ public abstract class JodaDateSerializerBase<T> extends JodaSerializerBase<T>
 
     @Override
     public JsonSerializer<?> createContextual(SerializerProvider prov,
-            BeanProperty property) throws JsonMappingException
+            BeanProperty property)
     {
         JsonFormat.Value ann = findFormatOverrides(prov, property, handledType());
         if (ann != null) {
@@ -90,7 +90,6 @@ public abstract class JodaDateSerializerBase<T> extends JodaSerializerBase<T>
 
     @Override
     public void acceptJsonFormatVisitor(JsonFormatVisitorWrapper visitor, JavaType typeHint)
-            throws JsonMappingException
     {
         switch (_serializationShape(visitor.getProvider())) {
         case FORMAT_TIMESTAMP:

@@ -24,7 +24,7 @@ public abstract class JodaDateDeserializerBase<T>
 
     @Override
     public JsonDeserializer<?> createContextual(DeserializationContext ctxt,
-            BeanProperty prop) throws JsonMappingException
+            BeanProperty prop)
     {
         JsonFormat.Value ann = findFormatOverrides(ctxt, prop, handledType());
         if (ann != null) {
