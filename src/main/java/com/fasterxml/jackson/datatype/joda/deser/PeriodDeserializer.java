@@ -41,7 +41,7 @@ public class PeriodDeserializer
         if (t == JsonToken.VALUE_NUMBER_INT) {
             return new Period(p.getLongValue());    
         }
-        if (t != JsonToken.START_OBJECT && t != JsonToken.FIELD_NAME) {
+        if (t != JsonToken.START_OBJECT && t != JsonToken.PROPERTY_NAME) {
             return (ReadablePeriod) ctxt.handleUnexpectedToken(getValueType(ctxt), t, p,
                     "expected JSON Number, String or Object");
         }
