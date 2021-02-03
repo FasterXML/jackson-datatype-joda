@@ -16,6 +16,6 @@ module com.fasterxml.jackson.datatype.joda {
     exports com.fasterxml.jackson.datatype.joda.deser.key;
     exports com.fasterxml.jackson.datatype.joda.ser;
 
-    provides com.fasterxml.jackson.databind.Module with
+    provides com.fasterxml.jackson.databind.JacksonModule with
         com.fasterxml.jackson.datatype.joda.JodaModule;
 }

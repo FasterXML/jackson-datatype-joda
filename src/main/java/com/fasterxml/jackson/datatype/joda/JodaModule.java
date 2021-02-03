@@ -3,7 +3,7 @@ package com.fasterxml.jackson.datatype.joda;
 import com.fasterxml.jackson.core.Version;
 
 import com.fasterxml.jackson.databind.JsonDeserializer;
-import com.fasterxml.jackson.databind.Module;
+import com.fasterxml.jackson.databind.JacksonModule;
 import com.fasterxml.jackson.databind.module.SimpleDeserializers;
 import com.fasterxml.jackson.databind.module.SimpleKeyDeserializers;
 import com.fasterxml.jackson.databind.module.SimpleSerializers;
@@ -14,7 +14,7 @@ import com.fasterxml.jackson.datatype.joda.ser.*;
 
 import org.joda.time.*;
 
-public class JodaModule extends Module
+public class JodaModule extends JacksonModule
     implements java.io.Serializable
 {
     private static final long serialVersionUID = 3L;
