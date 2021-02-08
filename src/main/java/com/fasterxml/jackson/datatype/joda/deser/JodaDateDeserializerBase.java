@@ -23,7 +23,7 @@ public abstract class JodaDateDeserializerBase<T>
     public abstract JodaDateDeserializerBase<?> withFormat(JacksonJodaDateFormat format);
 
     @Override
-    public JsonDeserializer<?> createContextual(DeserializationContext ctxt,
+    public ValueDeserializer<?> createContextual(DeserializationContext ctxt,
             BeanProperty prop)
     {
         JsonFormat.Value ann = findFormatOverrides(ctxt, prop, handledType());

@@ -11,7 +11,7 @@ import com.fasterxml.jackson.core.JsonTokenId;
 import com.fasterxml.jackson.core.StreamReadCapability;
 import com.fasterxml.jackson.core.io.NumberInput;
 import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.JsonDeserializer;
+import com.fasterxml.jackson.databind.ValueDeserializer;
 import com.fasterxml.jackson.datatype.joda.cfg.FormatConfig;
 import com.fasterxml.jackson.datatype.joda.cfg.JacksonJodaDateFormat;
 
@@ -28,9 +28,9 @@ public class DateTimeDeserializer
     }
 
     @SuppressWarnings("unchecked")
-    public static <T extends ReadableInstant> JsonDeserializer<T> forType(Class<T> cls)
+    public static <T extends ReadableInstant> ValueDeserializer<T> forType(Class<T> cls)
     {
-        return (JsonDeserializer<T>) new DateTimeDeserializer(cls,
+        return (ValueDeserializer<T>) new DateTimeDeserializer(cls,
                 FormatConfig.DEFAULT_DATETIME_PARSER);
     }
 

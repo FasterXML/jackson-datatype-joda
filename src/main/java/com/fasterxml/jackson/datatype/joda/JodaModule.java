@@ -2,7 +2,7 @@ package com.fasterxml.jackson.datatype.joda;
 
 import com.fasterxml.jackson.core.Version;
 
-import com.fasterxml.jackson.databind.JsonDeserializer;
+import com.fasterxml.jackson.databind.ValueDeserializer;
 import com.fasterxml.jackson.databind.JacksonModule;
 import com.fasterxml.jackson.databind.module.SimpleDeserializers;
 import com.fasterxml.jackson.databind.module.SimpleKeyDeserializers;
@@ -54,7 +54,7 @@ public class JodaModule extends JacksonModule
                 ;
         {
             @SuppressWarnings("unchecked")
-            JsonDeserializer<Period> d = (JsonDeserializer<Period>)(JsonDeserializer<?>) 
+            ValueDeserializer<Period> d = (ValueDeserializer<Period>)(ValueDeserializer<?>) 
                     new PeriodDeserializer(true);
             desers.addDeserializer(Period.class, d);
         }
