@@ -43,7 +43,7 @@ public class PeriodSerializer
 
     // Lots of work, although realistically, won't have much or any effect...
     @Override
-    public JsonSerializer<?> createContextual(SerializerProvider prov,
+    public ValueSerializer<?> createContextual(SerializerProvider prov,
             BeanProperty property)
     {
         if (property != null) {
