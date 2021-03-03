@@ -8,6 +8,10 @@ Project: jackson-datatype-joda
 
 No changes since 2.12
 
+2.12.2 (03-Mar-2021)
+
+No changes since 2.12.1
+
 2.12.1 (08-Jan-2021)
 
 #120: Cache formatter with offset parsed (performance improvement)
