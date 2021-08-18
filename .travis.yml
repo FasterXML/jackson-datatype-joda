@@ -11,3 +11,7 @@ branches:
     - "3.0"
 
 script: mvn -B clean verify
+
+cache:
+  directories:
+  - $HOME/.m2
