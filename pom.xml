@@ -66,13 +66,6 @@
         <version>2.10.8</version>
     </dependency>
 
-    <!-- and junit for testing -->
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <scope>test</scope>
-    </dependency>
-
   </dependencies>
 
   <!-- Alas, need to include snapshot reference since otherwise can not find
