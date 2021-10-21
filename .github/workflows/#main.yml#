@@ -4,15 +4,14 @@ on:
     branches:
     - master
     - "3.0"
-    - "2.14"
     - "2.13"
-    paths-ignore:
+
+paths-ignore:
     - "README.md"
     - "release-notes/*"
   pull_request:
     branches:
     - master
-    - "2.14"
     paths-ignore:
     - "README.md"
     - "release-notes/*"
