@@ -30,6 +30,10 @@ public class DateTimeDeserializer
         super(cls, format);
     }
 
+    public DateTimeDeserializer(Class<?> cls) {
+        super(cls, FormatConfig.DEFAULT_DATETIME_PARSER);
+    }
+
     @SuppressWarnings("unchecked")
     public static <T extends ReadableInstant> JsonDeserializer<T> forType(Class<T> cls)
     {
