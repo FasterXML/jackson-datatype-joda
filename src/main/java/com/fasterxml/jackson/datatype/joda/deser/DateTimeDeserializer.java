@@ -30,8 +30,8 @@ public class DateTimeDeserializer
         super(cls, format);
     }
 
-    public DateTimeDeserializer(Class<?> cls) {
-        super(cls, FormatConfig.DEFAULT_DATETIME_PARSER);
+    public DateTimeDeserializer() {
+        super(DateTime.class, FormatConfig.DEFAULT_DATETIME_PARSER);
     }
 
     @SuppressWarnings("unchecked")
