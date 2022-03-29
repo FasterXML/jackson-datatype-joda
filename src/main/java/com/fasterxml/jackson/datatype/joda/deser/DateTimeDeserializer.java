@@ -27,6 +27,13 @@ public class DateTimeDeserializer
         super(cls, format);
     }
 
+    /**
+     * @since 2.14 (to allow use via annotations)
+     */
+    public DateTimeDeserializer() {
+        super(DateTime.class, FormatConfig.DEFAULT_DATETIME_PARSER);
+    }
+
     @SuppressWarnings("unchecked")
     public static <T extends ReadableInstant> ValueDeserializer<T> forType(Class<T> cls)
     {
