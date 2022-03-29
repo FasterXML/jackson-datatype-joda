@@ -30,6 +30,9 @@ public class DateTimeDeserializer
         super(cls, format);
     }
 
+    /**
+     * @since 2.14 (to allow use via annotations)
+     */
     public DateTimeDeserializer() {
         super(DateTime.class, FormatConfig.DEFAULT_DATETIME_PARSER);
     }
