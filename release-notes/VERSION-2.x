@@ -16,6 +16,7 @@ Project: jackson-datatype-joda
 
 No changes since 2.12
 
+2.12.7 (26-May-2022)
 2.12.6 (15-Dec-2021)
 2.12.5 (27-Aug-2021)
 2.12.4 (06-Jul-2021)
