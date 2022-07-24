@@ -6,3 +6,5 @@ Major version: 3 (for earlier, see VERSION-2.x)
 ------------------------------------------------------------------------
 
 3.0.0 (not yet released)
+
+* Rename "com.fasterxml.jackson" -> "tools.jackson"
