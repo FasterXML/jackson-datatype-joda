@@ -1,21 +1,20 @@
-// Initially generated using Moditect maven plugin
 // Last changes:
 //
 // * 2020-11-25 change joda requires from "joda.time" to "org.joda.time"
 //     (Joda 2.10 now has automatic module name)
 //    
-module com.fasterxml.jackson.datatype.joda {
+module tools.jackson.datatype.joda {
     requires com.fasterxml.jackson.annotation;
-    requires com.fasterxml.jackson.core;
-    requires com.fasterxml.jackson.databind;
+    requires tools.jackson.core;
+    requires tools.jackson.databind;
     requires org.joda.time;
 
-    exports com.fasterxml.jackson.datatype.joda;
-    exports com.fasterxml.jackson.datatype.joda.cfg;
-    exports com.fasterxml.jackson.datatype.joda.deser;
-    exports com.fasterxml.jackson.datatype.joda.deser.key;
-    exports com.fasterxml.jackson.datatype.joda.ser;
+    exports tools.jackson.datatype.joda;
+    exports tools.jackson.datatype.joda.cfg;
+    exports tools.jackson.datatype.joda.deser;
+    exports tools.jackson.datatype.joda.deser.key;
+    exports tools.jackson.datatype.joda.ser;
 
-    provides com.fasterxml.jackson.databind.JacksonModule with
-        com.fasterxml.jackson.datatype.joda.JodaModule;
+    provides tools.jackson.databind.JacksonModule with
+        tools.jackson.datatype.joda.JodaModule;
 }
