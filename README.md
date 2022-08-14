@@ -6,7 +6,7 @@ to support JSON serialization and deserialization of
 
 [![Build Status](https://travis-ci.org/FasterXML/jackson-datatype-joda.svg)](https://travis-ci.org/FasterXML/jackson-datatype-joda)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.fasterxml.jackson.datatype/jackson-datatype-joda/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.fasterxml.jackson.datatype/jackson-datatype-joda/)
-[![Javadoc](https://javadoc.io/badge/com.fasterxml.jackson.datatype/jackson-datatype-joda.svg)](http://www.javadoc.io/doc/com.fasterxml.jackson.datatype/jackson-datatype-joda)
+[![Javadoc](https://javadoc.io/badge/com.fasterxml.jackson.datatype/jackson-datatype-joda.svg)](https://www.javadoc.io/doc/com.fasterxml.jackson.datatype/jackson-datatype-joda)
 
 Module has been production-ready since version 2.0, and offers relatively extensive support for Joda datatypes.
 Contributions are always welcome -- not all types are yet supported; and we may want to support even wider alternative
@@ -14,7 +14,7 @@ formats on input side.
 
 ## License
 
-[Apache License 2.0](http://www.apache.org/licenses/LICENSE-2.0.txt)
+[Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0.txt)
 
 ## Usage
 
@@ -29,7 +29,7 @@ To use module on Maven-based projects, use following dependency:
 <dependency>
   <groupId>com.fasterxml.jackson.datatype</groupId>
   <artifactId>jackson-datatype-joda</artifactId>
-  <version>2.9.0</version>
+  <version>2.13.3</version>
 </dependency>    
 ```
 
@@ -40,6 +40,11 @@ To use module on Maven-based projects, use following dependency:
 To use Joda datatypes with Jackson, you will first need to register the module first (same as
 with all Jackson datatype modules):
 
+```java
+ObjectMapper mapper = JsonMapper.builder().addModule(new JodaModule()).build();
+```
+
+Using older style (that is being phased out):
 ```java
 ObjectMapper mapper = new ObjectMapper();
 mapper.registerModule(new JodaModule());
