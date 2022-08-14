@@ -16,14 +16,20 @@
   <name>Jackson datatype: Joda</name>
   <version>2.14.0-SNAPSHOT</version>
   <packaging>bundle</packaging>
-  <description>Add-on module for Jackson (http://github.com/FasterXML/jackson) to support Joda (https://www.joda.org/joda-time/) data types.
+  <description>Add-on module for Jackson (https://github.com/FasterXML/jackson) to support Joda (https://www.joda.org/joda-time/) data types.
   </description>
   <url>https://github.com/FasterXML/jackson-datatype-joda</url>
+  <licenses>
+    <license>
+      <name>The Apache Software License, Version 2.0</name>
+      <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
   <scm>
     <connection>scm:git:git@github.com:FasterXML/jackson-datatype-joda.git</connection>
     <developerConnection>scm:git:git@github.com:FasterXML/jackson-datatype-joda.git</developerConnection>
-    <url>http://github.com/FasterXML/jackson-datatype-joda</url>    
-    <tag>HEAD</tag>
+    <url>https://github.com/FasterXML/jackson-datatype-joda</url>
   </scm>
   <properties>
     <!-- Generate PackageVersion.java into this directory. -->
