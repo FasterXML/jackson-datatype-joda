@@ -105,3 +105,8 @@ Pierre Grasser (piorrro33@github)
 Guido Medina (guidomedina@github)
   * Contributed #120: Cache formatter with offset parsed (performance improvement)
   (2.12.1)
+
+Stephane Paulus (StephanePaulus@github)
+  * Contributed #129: Add gradle-module-metadata-maven-plugin
+  (2.14.0)
+
