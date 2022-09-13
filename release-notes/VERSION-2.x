@@ -9,6 +9,11 @@ Project: jackson-datatype-joda
 #124: Add no-arg constructor for DateTimeDeserializer
  (contributed by abbychau@github)
 
+2.13.5 (not yet released)
+
+#129: Add gradle-module-metadata-maven-plugin
+ (contributed by Stephane P)
+
 2.13.4 (03-Sep-2022)
 2.13.3 (14-May-2022)
 2.13.2 (06-Mar-2022)
