@@ -4,9 +4,7 @@ Project: jackson-datatype-joda
 === Releases ===
 ------------------------------------------------------------------------
 
-2.14.0-rc3 (28-Oct-2022)
-2.14.0-rc2 (10-Oct-2022)
-2.14.0-rc1 (25-Sep-2022)
+2.14.0 (05-Nov-2022)
 
 #124: Add no-arg constructor for DateTimeDeserializer
  (contributed by abbychau@github)
