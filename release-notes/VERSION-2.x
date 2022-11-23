@@ -4,6 +4,10 @@ Project: jackson-datatype-joda
 === Releases ===
 ------------------------------------------------------------------------
 
+2.15.0 (not yet released)
+
+-
+
 2.14.1 (21-Nov-2022)
 
 No changes since 2.14.0
