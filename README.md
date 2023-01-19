@@ -29,7 +29,7 @@ To use module on Maven-based projects, use following dependency:
 <dependency>
   <groupId>com.fasterxml.jackson.datatype</groupId>
   <artifactId>jackson-datatype-joda</artifactId>
-  <version>2.13.3</version>
+  <version>2.14.1</version>
 </dependency>    
 ```
 
@@ -75,6 +75,10 @@ Conversely, you can produce JSON (and other supported formats) simply with:
 String json = mapper.writeValueAsString(bean);
 Assert.assertEquals(INPUT_JSON, json);
 ```
+
+## Compatibility
+
+Module works with Joda version 2.9 and higher (CI tests compatibility since module version 2.14)
 
 ## More
 
