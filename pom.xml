@@ -48,7 +48,7 @@
          Jackson 2.10: Joda 2.9[.9]
          Jackson 2.12: Joda 2.10[.8]
           -->
-    <version.joda>2.10.8</version.joda>
+    <version.joda>2.10.14</version.joda>
 
     <!-- Configuration properties for the OSGi maven-bundle-plugin -->
     <osgi.export>${project.groupId}.joda.*</osgi.export>

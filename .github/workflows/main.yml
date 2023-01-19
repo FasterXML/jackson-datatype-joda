@@ -23,6 +23,7 @@ jobs:
       fail-fast: false
       matrix:
         java_version: ['8', '11', '17']
+	joda_version: ['2.3`, '2.9.9',  '2.10.14']
         os: ['ubuntu-20.04']
     env:
       JAVA_OPTS: "-XX:+TieredCompilation -XX:TieredStopAtLevel=1"
@@ -41,22 +42,26 @@ jobs:
         # gpg-private-key: ${{ secrets.MAVEN_GPG_PRIVATE_KEY }} # Value of the GPG private key to import
         # gpg-passphrase: MAVEN_GPG_PASSPHRASE # env variable for GPG private key passphrase
     - name: Build
-      run: ./mvnw -B -q -ff -ntp verify
+      # Note: build separately first with default joda
+      run: ./mvnw -B -q -ff -ntp -DskipTests clean package
+    - name: Test
+      # Note: actual testing to use matrix-version of Joda
+      run: ./mvnw -B -q -ff -ntp -Dversion.joda=${{ matrix.joda_version }} surefire:test
     - name: Extract project Maven version
       id: projectVersion
-      run: echo ::set-output name=version::$(./mvnw org.apache.maven.plugins:maven-help-plugin:3.2.0:evaluate -DforceStdout -Dexpression=project.version -q)
+      run: echo ::set-output name=version::$(./mvnw org.apache.maven.plugins:maven-help-plugin:3.3.0:evaluate -DforceStdout -Dexpression=project.version -q)
     - name: Deploy snapshot
-      if: github.event_name != 'pull_request' && matrix.java_version == '8' && endsWith(steps.projectVersion.outputs.version, '-SNAPSHOT')
+      if: github.event_name != 'pull_request' && matrix.java_version == '8' && matrix.joda_version == '2.10.14' && endsWith(steps.projectVersion.outputs.version, '-SNAPSHOT')
       env:
         CI_DEPLOY_USERNAME: ${{ secrets.CI_DEPLOY_USERNAME }}
         CI_DEPLOY_PASSWORD: ${{ secrets.CI_DEPLOY_PASSWORD }}
         # MAVEN_GPG_PASSPHRASE: ${{ secrets.MAVEN_GPG_PASSPHRASE }}
       run: ./mvnw -B -q -ff -DskipTests -ntp source:jar deploy
     - name: Generate code coverage
-      if: github.event_name != 'pull_request' && matrix.java_version == '8'
+      if: github.event_name != 'pull_request' && matrix.java_version == '8' && matrix.joda_version == '2.10.14' && endsWith(steps.projectVersion.outputs.version, '-SNAPSHOT')
       run: ./mvnw -B -q -ff -ntp test
     - name: Publish code coverage
-      if: github.event_name != 'pull_request' && matrix.java_version == '8'
+      if: github.event_name != 'pull_request' && matrix.java_version == '8' && matrix.joda_version == '2.10.14' && endsWith(steps.projectVersion.outputs.version, '-SNAPSHOT')
       uses: codecov/codecov-action@v1
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
