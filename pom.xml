@@ -40,6 +40,16 @@
     <!-- for Reproducible Builds -->
     <project.build.outputTimestamp>2022-11-27T00:00:00Z</project.build.outputTimestamp>
 
+    <!-- to allow overriding Joda dep from CI -->
+    <!-- Baseline was 2.2 for Jackson 2.4: no new functionality used from laster
+         versions but gradually increasing baseline to get bugfixes etc
+
+         Jackson  2.9: Joda 2.7
+         Jackson 2.10: Joda 2.9[.9]
+         Jackson 2.12: Joda 2.10[.8]
+          -->
+    <version.joda>2.10.8</version.joda>
+
     <!-- Configuration properties for the OSGi maven-bundle-plugin -->
     <osgi.export>${project.groupId}.joda.*</osgi.export>
     <osgi.versionpolicy>${range;[===,+);${@}}</osgi.versionpolicy>
@@ -66,14 +76,7 @@
     <dependency>
         <groupId>joda-time</groupId>
         <artifactId>joda-time</artifactId>
-        <!-- Baseline was 2.2 for Jackson 2.4: no new functionality used from laster
-             versions but gradually increasing baseline to get bugfixes etc
-
-             Jackson  2.9: Joda 2.7
-             Jackson 2.10: Joda 2.9[.9]
-             Jackson 2.12: Joda 2.10[.8]
-          -->
-        <version>2.10.8</version>
+        <version>${version.joda}</version>
     </dependency>
 
   </dependencies>
