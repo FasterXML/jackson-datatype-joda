@@ -8,7 +8,7 @@ Project: jackson-datatype-joda
 
 No changes since 2.13
 
-2.13.5 (not yet released)
+2.13.5 (23-Jan-2023)
 
 #129: Add gradle-module-metadata-maven-plugin
  (contributed by Stephane P)
