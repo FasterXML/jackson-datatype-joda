@@ -29,7 +29,7 @@ To use module on Maven-based projects, use following dependency:
 <dependency>
   <groupId>com.fasterxml.jackson.datatype</groupId>
   <artifactId>jackson-datatype-joda</artifactId>
-  <version>2.14.1</version>
+  <version>2.14.2</version>
 </dependency>    
 ```
 
