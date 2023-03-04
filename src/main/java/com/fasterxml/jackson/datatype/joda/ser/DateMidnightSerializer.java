@@ -2,8 +2,6 @@ package com.fasterxml.jackson.datatype.joda.ser;
 
 import java.io.IOException;
 
-import org.joda.time.DateMidnight;
-
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.datatype.joda.cfg.FormatConfig;
@@ -17,7 +15,7 @@ import com.fasterxml.jackson.datatype.joda.cfg.JacksonJodaDateFormat;
  */
 @Deprecated // since Jackson 2.7 (and Joda 2.4)
 public class DateMidnightSerializer
-    extends JodaDateSerializerBase<DateMidnight>
+    extends JodaDateSerializerBase<org.joda.time.DateMidnight>
 {
     private static final long serialVersionUID = 1L;
 
@@ -32,7 +30,7 @@ public class DateMidnightSerializer
     public DateMidnightSerializer(JacksonJodaDateFormat format,
             int shapeOverride) {
         // true -> use arrays
-        super(DateMidnight.class, format,
+        super(org.joda.time.DateMidnight.class, format,
                 SerializationFeature.WRITE_DATES_AS_TIMESTAMPS,
                 FORMAT_ARRAY, shapeOverride);
     }
@@ -44,12 +42,12 @@ public class DateMidnightSerializer
     }
 
     @Override
-    public boolean isEmpty(SerializerProvider provider, DateMidnight value) {
+    public boolean isEmpty(SerializerProvider provider, org.joda.time.DateMidnight value) {
         return (value.getMillis() == 0L);
     }
 
     @Override
-    public void serialize(DateMidnight value, JsonGenerator gen,
+    public void serialize(org.joda.time.DateMidnight value, JsonGenerator gen,
             SerializerProvider provider) throws IOException
     {
         switch (_serializationShape(provider)) {

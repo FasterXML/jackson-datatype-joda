@@ -2,7 +2,6 @@ package com.fasterxml.jackson.datatype.joda.deser;
 
 import java.io.IOException;
 
-import org.joda.time.DateMidnight;
 import org.joda.time.DateTimeZone;
 import org.joda.time.LocalDate;
 
@@ -23,7 +22,7 @@ import com.fasterxml.jackson.datatype.joda.cfg.JacksonJodaDateFormat;
  */
 @Deprecated // since Jackson 2.7 (and Joda 2.4)
 public class DateMidnightDeserializer
-    extends JodaDateDeserializerBase<DateMidnight>
+    extends JodaDateDeserializerBase<org.joda.time.DateMidnight>
 {
     private static final long serialVersionUID = 1L;
 
@@ -35,7 +34,7 @@ public class DateMidnightDeserializer
     }
 
     public DateMidnightDeserializer(JacksonJodaDateFormat format) {
-        super(DateMidnight.class, format);
+        super(org.joda.time.DateMidnight.class, format);
     }
 
     @Override
@@ -44,7 +43,7 @@ public class DateMidnightDeserializer
     }
 
     @Override
-    public DateMidnight deserialize(JsonParser p, DeserializationContext ctxt)
+    public org.joda.time.DateMidnight deserialize(JsonParser p, DeserializationContext ctxt)
         throws IOException
     {
         // We'll accept either long (timestamp) or array:
@@ -61,11 +60,11 @@ public class DateMidnightDeserializer
             }
             DateTimeZone tz = _format.isTimezoneExplicit() ? _format.getTimeZone() : DateTimeZone.forTimeZone(ctxt.getTimeZone());
 
-            return new DateMidnight(year, month, day, tz);
+            return new org.joda.time.DateMidnight(year, month, day, tz);
         }
         switch (p.currentTokenId()) {
         case JsonTokenId.ID_NUMBER_INT:
-            return new DateMidnight(p.getLongValue());
+            return new org.joda.time.DateMidnight(p.getLongValue());
         case JsonTokenId.ID_STRING:
             return _fromString(p, ctxt, p.getText());
         default:
@@ -75,7 +74,7 @@ public class DateMidnightDeserializer
     }
 
     // @since 2.12
-    protected DateMidnight _fromString(final JsonParser p, final DeserializationContext ctxt,
+    protected org.joda.time.DateMidnight _fromString(final JsonParser p, final DeserializationContext ctxt,
             String value)
         throws IOException
     {
@@ -96,7 +95,7 @@ public class DateMidnightDeserializer
         return local.toDateMidnight();
     }
     
-    protected DateMidnight _fromTimestamp(DeserializationContext ctxt, long ts) {
-        return new DateMidnight(ts);
+    protected org.joda.time.DateMidnight _fromTimestamp(DeserializationContext ctxt, long ts) {
+        return new org.joda.time.DateMidnight(ts);
     }
 }

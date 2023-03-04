@@ -89,6 +89,7 @@ public class PeriodSerializer // non final since 2.6.1
     }
 
     @Override
+    @Deprecated // since 2.15
     public JsonNode getSchema(SerializerProvider provider, java.lang.reflect.Type typeHint) {
         return createSchemaNode("string", true);
     }

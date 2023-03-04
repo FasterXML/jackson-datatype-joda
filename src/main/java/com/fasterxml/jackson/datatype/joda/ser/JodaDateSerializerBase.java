@@ -100,6 +100,7 @@ public abstract class JodaDateSerializerBase<T> extends JodaSerializerBase<T>
     }
 
     @Override
+    @Deprecated // since 2.15
     public JsonNode getSchema(SerializerProvider provider, java.lang.reflect.Type typeHint) {
         switch (_serializationShape(provider)) {
         case FORMAT_TIMESTAMP:
