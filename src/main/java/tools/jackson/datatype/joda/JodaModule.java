@@ -48,8 +48,6 @@ public class JodaModule extends JacksonModule
                 .addDeserializer(Interval.class, new IntervalDeserializer())
                 .addDeserializer(MonthDay.class, new MonthDayDeserializer())
                 .addDeserializer(YearMonth.class, new YearMonthDeserializer())
-                // DateMidnight deprecated since at least Joda 2.4, but not removed
-                .addDeserializer(DateMidnight.class, new DateMidnightDeserializer())
                 ;
         {
             @SuppressWarnings("unchecked")
@@ -71,8 +69,6 @@ public class JodaModule extends JacksonModule
                 .addSerializer(Interval.class, new IntervalSerializer())
                 .addSerializer(MonthDay.class, new MonthDaySerializer())
                 .addSerializer(YearMonth.class, new YearMonthSerializer())
-                // DateMidnight deprecated since at least Joda 2.4, but not removed
-                .addSerializer(DateMidnight.class, new DateMidnightSerializer())
         );
 
         // then key deserializers
