@@ -4,6 +4,10 @@ Project: jackson-datatype-joda
 === Releases ===
 ------------------------------------------------------------------------
 
+2.16.0 (not yet released)
+
+No changes since 2.15
+
 2.15.0 (23-Apr-2023)
 
 - Joda dependency to 2.10.14
