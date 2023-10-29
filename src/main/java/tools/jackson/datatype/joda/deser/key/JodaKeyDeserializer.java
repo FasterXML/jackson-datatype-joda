@@ -3,7 +3,7 @@ package tools.jackson.datatype.joda.deser.key;
 import java.io.IOException;
 
 import tools.jackson.core.JacksonException;
-import tools.jackson.core.exc.WrappedIOException;
+import tools.jackson.core.exc.JacksonIOException;
 import tools.jackson.databind.DeserializationContext;
 import tools.jackson.databind.KeyDeserializer;
 import tools.jackson.datatype.joda.cfg.FormatConfig;
@@ -29,6 +29,6 @@ abstract class JodaKeyDeserializer extends KeyDeserializer
     protected JacksonException _wrapJodaFailure(IOException e) {
         // 18-Jan-2021, tatu: Start by simply reusing functionality of more
         //   general handling, for now
-        return WrappedIOException.construct(e);
+        return JacksonIOException.construct(e);
     }
 }
