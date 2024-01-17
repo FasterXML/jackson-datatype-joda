@@ -129,6 +129,12 @@ public class DateTimeTest extends JodaTestBase
         if (json.contains(",")) {
             json = json.replace(", ", " ");
         }
+        // https://bugs.openjdk.org/browse/JDK-8284840
+        // Java 21 uses NBSP/NNBSP prefixed to AM/PM in time format, instead of a normal space
+        if (json.contains("\u202f")) {
+            json = json.replace("\u202f", " ");
+        }
+
         assertEquals(aposToQuotes("{'date':'1/1/70 12:00 AM'}"), json);
     }
 
