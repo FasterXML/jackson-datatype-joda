@@ -22,8 +22,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # 15-Nov-2023, tatu: Odd fail(s) on JDK 21, can't enable yet
-        java_version: ['8', '11', '17']
+        java_version: ['8', '11', '17', '21']
         joda_version: ['2.9', '2.10.14', '2.12.2']
         os: ['ubuntu-20.04']
     env:
