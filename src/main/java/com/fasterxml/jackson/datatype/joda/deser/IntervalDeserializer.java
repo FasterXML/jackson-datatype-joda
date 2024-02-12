@@ -75,9 +75,9 @@ public class IntervalDeserializer extends JodaDateDeserializerBase<Interval>
             if (hasSlash) {
                 result = Interval.parseWithOffset(value);
             } else {
-                start = Long.valueOf(str);
+                start = Long.parseLong(str);
                 str = value.substring(index + 1);
-                end = Long.valueOf(str);
+                end = Long.parseLong(str);
                 result = new Interval(start, end);
             }
         } catch (NumberFormatException e) {
