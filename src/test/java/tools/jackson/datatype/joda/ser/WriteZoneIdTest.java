@@ -4,6 +4,8 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+
+import tools.jackson.core.json.JsonWriteFeature;
 import tools.jackson.databind.ObjectMapper;
 import tools.jackson.datatype.joda.JodaTestBase;
 
@@ -24,7 +26,9 @@ public class WriteZoneIdTest extends JodaTestBase
 
     public void testJacksonAnnotatedPOJOWithDateWithTimezoneToJson() throws Exception
     {
-        ObjectMapper mapper = mapperWithModule();
+        ObjectMapper mapper = mapperWithModuleBuilder()
+                .disable(JsonWriteFeature.ESCAPE_FORWARD_SLASHES)
+                .build();
         String ZONE_ID = "Asia/Krasnoyarsk";
 
         DummyClassWithDate input = new DummyClassWithDate(new DateTime(2015, 11, 23, 22, 06, 39,

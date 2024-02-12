@@ -3,6 +3,7 @@ package tools.jackson.datatype.joda.ser;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
+import tools.jackson.core.json.JsonWriteFeature;
 import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.ObjectWriter;
 import tools.jackson.databind.SerializationFeature;
@@ -37,6 +38,7 @@ public class JodaSerializationTest extends JodaTestBase
     private final ObjectMapper MAPPER = mapperWithModuleBuilder()
             .enable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS,
                     SerializationFeature.WRITE_DURATIONS_AS_TIMESTAMPS)
+            .disable(JsonWriteFeature.ESCAPE_FORWARD_SLASHES)
             .build();
 
     private final ObjectWriter WRITER = MAPPER.writer();

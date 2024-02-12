@@ -4,6 +4,9 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+
+import tools.jackson.core.json.JsonWriteFeature;
+
 import tools.jackson.databind.*;
 
 // for [datatype-joda#44]
@@ -37,7 +40,9 @@ public class TimeZoneTest extends JodaTestBase
     /**********************************************************
      */
 
-    private final ObjectMapper MAPPER = mapperWithModule();
+    private final ObjectMapper MAPPER = mapperWithModuleBuilder()
+            .disable(JsonWriteFeature.ESCAPE_FORWARD_SLASHES)
+            .build();
 
     public void testSimple() throws Exception
     {

@@ -9,6 +9,8 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+
+import tools.jackson.core.json.JsonWriteFeature;
 import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.SerializationFeature;
 
@@ -79,6 +81,7 @@ public class DateTimeTest extends JodaTestBase
     private final ObjectMapper MAPPER = mapperWithModule();
 
     private final static ObjectMapper STRING_MAPPER = mapperWithModuleBuilder()
+            .disable(JsonWriteFeature.ESCAPE_FORWARD_SLASHES)
             .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
             .build();
 

@@ -11,7 +11,6 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.cfg.CoercionAction;
 import tools.jackson.databind.cfg.CoercionInputShape;
-import tools.jackson.databind.cfg.MapperBuilder;
 import tools.jackson.databind.json.JsonMapper;
 
 import junit.framework.TestCase;
@@ -59,36 +58,36 @@ public abstract class JodaTestBase extends TestCase
     /**********************************************************************
      */
 
-    protected static MapperBuilder<?,?> mapperWithModuleBuilder() {
+    protected static JsonMapper.Builder mapperWithModuleBuilder() {
         return JsonMapper.builder()
                 .addModule(new JodaModule());
     }
 
-    protected static MapperBuilder<?,?> jodaMapperBuilder(DateFormat df) {
+    protected static JsonMapper.Builder jodaMapperBuilder(DateFormat df) {
         return mapperWithModuleBuilder()
                 .defaultDateFormat(df);
     }
     
-    protected static MapperBuilder<?,?> jodaMapperBuilder(TimeZone tz) {
+    protected static JsonMapper.Builder jodaMapperBuilder(TimeZone tz) {
         return mapperWithModuleBuilder()
                 .defaultTimeZone(tz);
     }
 
-    protected static ObjectMapper mapperWithModule() {
+    protected static JsonMapper mapperWithModule() {
         return mapperWithModuleBuilder().build();
     }
 
-    protected static ObjectMapper mapperWithModule(DateFormat df) {
+    protected static JsonMapper mapperWithModule(DateFormat df) {
         return jodaMapperBuilder(df)
                 .build();
     }
 
-    protected static ObjectMapper mapperWithModule(TimeZone tz) {
+    protected static JsonMapper mapperWithModule(TimeZone tz) {
         return jodaMapperBuilder(tz)
                 .build();
     }
 
-    protected static ObjectMapper mapperWithFailFromEmptyString() {
+    protected static JsonMapper mapperWithFailFromEmptyString() {
         return mapperWithModuleBuilder()
                 .withCoercionConfigDefaults(cfg ->
                     cfg.setCoercion(CoercionInputShape.EmptyString, CoercionAction.Fail)

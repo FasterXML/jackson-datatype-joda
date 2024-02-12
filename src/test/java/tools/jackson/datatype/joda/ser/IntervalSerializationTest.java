@@ -7,6 +7,8 @@ import org.joda.time.Interval;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+
+import tools.jackson.core.json.JsonWriteFeature;
 import tools.jackson.databind.*;
 import tools.jackson.datatype.joda.JodaTestBase;
 
@@ -31,6 +33,7 @@ public class IntervalSerializationTest extends JodaTestBase
     private final ObjectMapper MAPPER = mapperWithModuleBuilder()
             .enable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS,
                     SerializationFeature.WRITE_DURATIONS_AS_TIMESTAMPS)
+            .disable(JsonWriteFeature.ESCAPE_FORWARD_SLASHES)
             .build();
 
     private final ObjectWriter WRITER = MAPPER.writer();

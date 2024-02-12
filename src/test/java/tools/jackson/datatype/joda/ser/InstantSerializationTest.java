@@ -5,6 +5,7 @@ import java.text.SimpleDateFormat;
 import org.joda.time.DateTime;
 import org.joda.time.Instant;
 
+import tools.jackson.core.json.JsonWriteFeature;
 import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.SerializationFeature;
 import tools.jackson.datatype.joda.JodaTestBase;
@@ -32,6 +33,7 @@ public class InstantSerializationTest extends JodaTestBase
     {
         final String json = MAPPER.writer()
                 .without(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+                .without(JsonWriteFeature.ESCAPE_FORWARD_SLASHES)
                 .writeValueAsString(new FormattedInstant(new Instant(0L)));
         assertEquals(aposToQuotes(
                 "{'value':'01/01/1970 00_00_00_000'}"), json);
