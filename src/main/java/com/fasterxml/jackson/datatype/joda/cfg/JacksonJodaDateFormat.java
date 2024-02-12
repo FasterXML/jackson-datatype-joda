@@ -1,6 +1,7 @@
 package com.fasterxml.jackson.datatype.joda.cfg;
 
 import java.util.Locale;
+import java.util.Objects;
 import java.util.TimeZone;
 
 import org.joda.time.DateTimeZone;
@@ -131,8 +132,11 @@ public class JacksonJodaDateFormat extends JacksonJodaFormatBase
         format = format.withFormat(ann.getPattern());
         Boolean adjustTZ = ann.getFeature(JsonFormat.Feature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE);
         Boolean writeZoneId = ann.getFeature(JsonFormat.Feature.WRITE_DATES_WITH_ZONE_ID);
-        if ((adjustTZ != _adjustToContextTZOverride)
-                || (writeZoneId != _writeZoneId)) {
+
+        // `null` means no override specified, so only apply if override exists...
+        // and changes current settings:
+        if (((adjustTZ != null) && !adjustTZ.equals(_adjustToContextTZOverride))
+                || ((writeZoneId != null) && !writeZoneId.equals(_writeZoneId))) {
             format = new JacksonJodaDateFormat(format, adjustTZ, writeZoneId);
         }
         return format;
