@@ -56,7 +56,7 @@ jobs:
       run: echo "Run with snapshot/2"
     - name: Snapshot-or-not-1
       if: ${{ matrix.snapshot == '1' }}
-      run: echo "Run with snapshot == 1 : [${{ matrix.snapshot }}]"
+      run: echo "Run with snapshot == 1 : ${{ matrix.snapshot }}"
     - name: Build
       # Note: build separately first with default joda
       run: ./mvnw -B -q -ff -ntp -DskipTests clean package
