@@ -17,7 +17,7 @@ on:
     - "README.md"
     - "release-notes/*"
 env:
-  JODA_DEFAULT: '2.10.14'
+  JODA_DEFAULT: '2.12.7'
   JODA_MIN: '2.9'
   JODA_MAX: '2.12.7'
 jobs:
