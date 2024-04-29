@@ -6,7 +6,7 @@ Project: jackson-datatype-joda
 
 2.18.0 (not yet released)
 
-No changes since 2.17
+- Joda dependency to 2.12.7
 
 2.17.0 (12-Mar-2024)
 
