@@ -49,7 +49,7 @@ jobs:
         # gpg-private-key: ${{ secrets.MAVEN_GPG_PRIVATE_KEY }} # Value of the GPG private key to import
         # gpg-passphrase: MAVEN_GPG_PASSPHRASE # env variable for GPG private key passphrase
     - name: Has SNAPSHOT version and is default build?
-      if: ${{ github.event_name != 'pull_request' && matrix.snapshot }}
+      if: ${{ github.event_name == 'pull_request' && matrix.snapshot }}
       run: echo "Job DOES have 'matrix.snapshot' and has SNAPSHOT as version"
     - name: Build
       # Note: build separately first with default joda
