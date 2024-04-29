@@ -31,7 +31,7 @@ jobs:
         include:
           - java_version: '8'
             joda_version: $JODA_DEFAULT
-            snapshot: 'y'
+            snapshot: 1
     env:
       JAVA_OPTS: "-XX:+TieredCompilation -XX:TieredStopAtLevel=1"
     steps:
