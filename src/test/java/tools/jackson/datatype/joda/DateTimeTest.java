@@ -8,6 +8,7 @@ import org.joda.time.DateTimeZone;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 import tools.jackson.core.json.JsonWriteFeature;
@@ -52,6 +53,7 @@ public class DateTimeTest extends JodaTestBase
         }
     }
 
+    @JsonPropertyOrder({"jodaDateTime", "javaUtilDate" })
     static class Beanie {
         public final DateTime jodaDateTime;
         public final java.util.Date javaUtilDate;
