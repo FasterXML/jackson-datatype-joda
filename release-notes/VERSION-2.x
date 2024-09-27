@@ -4,7 +4,7 @@ Project: jackson-datatype-joda
 === Releases ===
 ------------------------------------------------------------------------
 
-2.18.0 (not yet released)
+2.18.0 (26-Sep-2024)
 
 - Joda dependency to 2.12.7
 
