@@ -8,6 +8,7 @@ Project: jackson-datatype-joda
 
 -
 
+2.18.1 (28-Oct-2024)
 2.18.0 (26-Sep-2024)
 
 - Joda dependency to 2.12.7
