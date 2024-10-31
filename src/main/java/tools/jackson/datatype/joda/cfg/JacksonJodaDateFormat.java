@@ -1,7 +1,6 @@
 package tools.jackson.datatype.joda.cfg;
 
 import java.util.Locale;
-import java.util.Objects;
 import java.util.TimeZone;
 
 import org.joda.time.DateTimeZone;
