@@ -13,13 +13,21 @@ public class DateTimeSerializationWithOffsets146Test extends JodaTestBase
     // [datatype-joda#146]
     public void testDateTimeSerializationWithOffsets146() throws Exception
     {
-        final ObjectMapper MAPPER = mapperWithModuleBuilder()
+        final String inputStr = "2024-12-01T12:00:00+02:00";
+        final DateTime inputValue = DateTime.parse(inputStr);
+        final ObjectMapper mapper = mapperWithModuleBuilder()
                 .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
-                .disable(SerializationFeature.WRITE_DATES_WITH_CONTEXT_TIME_ZONE)
                 .build();
-        final String inputStr = "2024-12-01T00:00:00+02:00";
 
-        DateTime dateTime = DateTime.parse(inputStr);
-        assertEquals(q(inputStr), MAPPER.writeValueAsString(dateTime));
+        // By default, do adjust timezone to UTC
+        final String defaultOutput = mapper.writeValueAsString(inputValue);
+        assertEquals(q("2024-12-01T10:00:00.000Z"), defaultOutput);
+
+        // But if we disable it, no adjustment
+        final String alternateOutput = mapper.writer()
+                .without(SerializationFeature.WRITE_DATES_WITH_CONTEXT_TIME_ZONE)
+                .writeValueAsString(inputValue);
+
+        assertEquals(q(inputStr), alternateOutput);
     }
 }
