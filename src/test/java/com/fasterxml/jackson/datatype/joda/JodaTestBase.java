@@ -1,5 +1,9 @@
 package com.fasterxml.jackson.datatype.joda;
 
+import java.util.Arrays;
+
+import junit.framework.TestCase;
+
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -7,11 +11,6 @@ import com.fasterxml.jackson.databind.cfg.CoercionAction;
 import com.fasterxml.jackson.databind.cfg.CoercionInputShape;
 import com.fasterxml.jackson.databind.cfg.MapperBuilder;
 import com.fasterxml.jackson.databind.json.JsonMapper;
-
-import junit.framework.TestCase;
-
-import java.io.IOException;
-import java.util.Arrays;
 
 import org.joda.time.Instant;
 import org.joda.time.YearMonth;
@@ -102,17 +101,21 @@ public abstract class JodaTestBase extends TestCase
         fail("Expected an exception with one of substrings ("+Arrays.asList(matches)+"): got one with message \""+msg+"\"");
     }
 
-    public String quote(String str) {
+    public String q(String str) {
         return '"'+str+'"';
     }
 
-    protected String aposToQuotes(String json) {
+    // @Deprecated
+    public String quote(String str) {
+        return q(str);
+    }
+
+    protected String a2q(String json) {
         return json.replace("'", "\"");
     }
 
-    protected <T> T readAndMapFromString(ObjectMapper m, String input, Class<T> cls)
-        throws IOException
-    {
-        return (T) m.readValue("\""+input+"\"", cls);
+    // @Deprecated
+    protected String aposToQuotes(String json) {
+        return a2q(json);
     }
 }
