@@ -24,7 +24,7 @@ public class WriteZoneIdTest extends JodaTestBase
 
     public void testJacksonAnnotatedPOJOWithDateWithTimezoneToJson() throws Exception
     {
-        ObjectMapper mapper = jodaMapper();
+        final ObjectMapper mapper = jodaMapper();
         String ZONE_ID = "Asia/Krasnoyarsk";
 
         DummyClassWithDate input = new DummyClassWithDate(new DateTime(2015, 11, 23, 22, 06, 39,
