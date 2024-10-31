@@ -57,7 +57,7 @@ public class JodaSerializationTest extends JodaTestBase
 
         // but we can force it to be a String as well (note: here we assume this is
         // dynamically changeable)
-        assertEquals(quote("2001-05-25"),
+        assertEquals(q("2001-05-25"),
                 WRITER.without(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS).writeValueAsString(date));
 
         // We can also configure beans to not include empty values. In this case,
@@ -103,8 +103,7 @@ public class JodaSerializationTest extends JodaTestBase
         ObjectMapper mapper = mapperWithModuleBuilder()
                 .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
                 .build();
-        assertEquals(quote("13:20:54.000"), mapper.writeValueAsString(date));
-
+        assertEquals(q("13:20:54.000"), mapper.writeValueAsString(date));
     }
 
     public void testLocalTimeSerWithFormatOverride() throws IOException
@@ -120,9 +119,9 @@ public class JodaSerializationTest extends JodaTestBase
                 .addModule(testModule)
                 .build();
 
-        assertEquals(quote("13:20"), mapper.writeValueAsString(date));
+        assertEquals(q("13:20"), mapper.writeValueAsString(date));
 
-        assertEquals(aposToQuotes("{'contents':'13:20'}"), mapper.writeValueAsString(new Container<>(date)));
+        assertEquals(a2q("{'contents':'13:20'}"), mapper.writeValueAsString(new Container<>(date)));
 
     }
 
@@ -140,7 +139,6 @@ public class JodaSerializationTest extends JodaTestBase
                 .build();
         assertEquals("[\"org.joda.time.LocalTime\",\"13:20:54.000\"]",
                 mapper.writeValueAsString(date));
-
     }
 
     /*
@@ -160,7 +158,7 @@ public class JodaSerializationTest extends JodaTestBase
         ObjectMapper mapper = mapperWithModuleBuilder()
                 .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
                 .build();
-        assertEquals(quote("2001-05-25T10:15:30.037"), mapper.writeValueAsString(date));
+        assertEquals(q("2001-05-25T10:15:30.037"), mapper.writeValueAsString(date));
     }
     
     public void testLocalDateTimeSerWithTypeInfo() throws IOException
@@ -187,7 +185,7 @@ public class JodaSerializationTest extends JodaTestBase
     public void testPeriodSer() throws IOException
     {
         Period in = new Period(1, 2, 3, 4);
-        assertEquals(quote("PT1H2M3.004S"), MAPPER.writeValueAsString(in));
+        assertEquals(q("PT1H2M3.004S"), MAPPER.writeValueAsString(in));
     }
     
     public void testPeriodSerWithTypeInfo() throws IOException
@@ -211,7 +209,7 @@ public class JodaSerializationTest extends JodaTestBase
         String json = MAPPER.writeValueAsString(d);
         assertEquals("3123422", json);
 
-        assertEquals(quote("PT3123.422S"), MAPPER.writer()
+        assertEquals(q("PT3123.422S"), MAPPER.writer()
                 .without(SerializationFeature.WRITE_DURATIONS_AS_TIMESTAMPS)
                 .writeValueAsString(d));
     }
@@ -231,24 +229,24 @@ public class JodaSerializationTest extends JodaTestBase
     {
         MonthDay monthDay = new MonthDay(7, 23);
         String json = MAPPER.writeValueAsString(monthDay);
-        assertEquals(quote("--07-23"), json);
+        assertEquals(q("--07-23"), json);
     }
 
     public void testCustomMonthDaySer() throws Exception
     {
         String json = MAPPER.writeValueAsString(new FormattedMonthDay(new MonthDay(7, 23)));
-        assertEquals(aposToQuotes("{'value':'07:23'}"), json);
+        assertEquals(a2q("{'value':'07:23'}"), json);
     }
 
     public void testYearMonthSer() throws Exception
     {
         String json = MAPPER.writeValueAsString(new YearMonth(2013, 8));
-        assertEquals(quote("2013-08"), json);
+        assertEquals(q("2013-08"), json);
     }
 
     public void testCustomYearMonthSer() throws Exception
     {
         String json = MAPPER.writeValueAsString(new FormattedYearMonth(new YearMonth(2013, 8)));
-        assertEquals(aposToQuotes("{'value':'2013/08'}"), json);
+        assertEquals(a2q("{'value':'2013/08'}"), json);
     }
 }

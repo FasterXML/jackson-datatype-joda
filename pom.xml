@@ -96,6 +96,15 @@ Joda (https://www.joda.org/joda-time/) data types.
           </execution>
         </executions>
       </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <excludes>
+            <exclude>tools/jackson/**/failing/*.java</exclude>
+          </excludes>
+        </configuration>
+      </plugin>
       <!--  19-Mar-2019, tatu: Add rudimentary JDK9+ module info. To build with JDK 8
              will have to use `moduleInfoFile` as anything else requires JDK 9+
         -->
