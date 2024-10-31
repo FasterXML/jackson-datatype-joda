@@ -31,11 +31,10 @@ public class JodaSerializationTest extends JodaTestBase
         }
     }
 
-    private final ObjectMapper MAPPER = jodaMapper();
-    {
-        MAPPER.enable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-        MAPPER.enable(SerializationFeature.WRITE_DURATIONS_AS_TIMESTAMPS);
-    }
+    private final ObjectMapper MAPPER = mapperWithModuleBuilder()
+        .enable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+        .enable(SerializationFeature.WRITE_DURATIONS_AS_TIMESTAMPS)
+        .build();
 
     private final ObjectWriter WRITER = MAPPER.writer();
     
@@ -74,9 +73,10 @@ public class JodaSerializationTest extends JodaTestBase
 
         // but we can force it to be a String as well (note: here we assume this is
         // dynamically changeable)
-        ObjectMapper mapper = jodaMapper();
-        mapper.addMixIn(LocalDate.class, ObjectConfiguration.class);
-        mapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);        
+        ObjectMapper mapper = mapperWithModuleBuilder()
+                .addMixIn(LocalDate.class, ObjectConfiguration.class)
+                .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+                .build();
         assertEquals("[\"org.joda.time.LocalDate\",\"2001-05-25\"]", mapper.writeValueAsString(date));
     }
 
@@ -94,8 +94,9 @@ public class JodaSerializationTest extends JodaTestBase
 
         // but we can force it to be a String as well (note: here we assume this is
         // dynamically changeable)
-        ObjectMapper mapper = jodaMapper();
-        mapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);        
+        ObjectMapper mapper = mapperWithModuleBuilder()
+                .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+                .build();
         assertEquals(q("13:20:54.000"), mapper.writeValueAsString(date));
 
     }
@@ -127,9 +128,10 @@ public class JodaSerializationTest extends JodaTestBase
 
         // but we can force it to be a String as well (note: here we assume this is
         // dynamically changeable)
-        ObjectMapper mapper = jodaMapper();
-        mapper.addMixIn(LocalTime.class, ObjectConfiguration.class);
-        mapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);        
+        ObjectMapper mapper = mapperWithModuleBuilder()
+                .addMixIn(LocalTime.class, ObjectConfiguration.class)
+                .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+                .build();
         assertEquals("[\"org.joda.time.LocalTime\",\"13:20:54.000\"]",
                 mapper.writeValueAsString(date));
     }
@@ -148,8 +150,9 @@ public class JodaSerializationTest extends JodaTestBase
         assertEquals("[2001,5,25,10,15,30,37]", MAPPER.writeValueAsString(date));
         // but we can force it to be a String as well (note: here we assume this is
         // dynamically changeable)
-        ObjectMapper mapper = jodaMapper();
-        mapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);        
+        ObjectMapper mapper = mapperWithModuleBuilder()
+                .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+                .build();
         assertEquals(q("2001-05-25T10:15:30.037"), mapper.writeValueAsString(date));
     }
     
@@ -161,10 +164,12 @@ public class JodaSerializationTest extends JodaTestBase
         assertEquals("[2001,5,25,10,15,30,37]", MAPPER.writeValueAsString(date));
         // but we can force it to be a String as well (note: here we assume this is
         // dynamically changeable)
-        ObjectMapper mapper = jodaMapper();
-        mapper.addMixIn(LocalDateTime.class, ObjectConfiguration.class);
-        mapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);        
-        assertEquals("[\"org.joda.time.LocalDateTime\",\"2001-05-25T10:15:30.037\"]", mapper.writeValueAsString(date));
+        ObjectMapper mapper = mapperWithModuleBuilder()
+                .addMixIn(LocalDateTime.class, ObjectConfiguration.class)
+                .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+                .build();
+        assertEquals("[\"org.joda.time.LocalDateTime\",\"2001-05-25T10:15:30.037\"]",
+                mapper.writeValueAsString(date));
     }
 
     /*
@@ -182,8 +187,9 @@ public class JodaSerializationTest extends JodaTestBase
     public void testPeriodSerWithTypeInfo() throws IOException
     {
         Period in = new Period(1, 2, 3, 4);
-        ObjectMapper mapper = jodaMapper();
-        mapper.addMixIn(Period.class, ObjectConfiguration.class);
+        ObjectMapper mapper = mapperWithModuleBuilder()
+                .addMixIn(Period.class, ObjectConfiguration.class)
+                .build();
         assertEquals("[\"org.joda.time.Period\",\"PT1H2M3.004S\"]", mapper.writeValueAsString(in));
     }
 
@@ -207,9 +213,10 @@ public class JodaSerializationTest extends JodaTestBase
     public void testDurationSerWithTypeInfo() throws IOException
     {
         Duration d = new Duration(3123422);
-        ObjectMapper mapper = jodaMapper();
-        mapper.enable(SerializationFeature.WRITE_DURATIONS_AS_TIMESTAMPS);
-        mapper.addMixIn(Duration.class, ObjectConfiguration.class);
+        ObjectMapper mapper = mapperWithModuleBuilder()
+                .enable(SerializationFeature.WRITE_DURATIONS_AS_TIMESTAMPS)
+                .addMixIn(Duration.class, ObjectConfiguration.class)
+                .build();
         String json = mapper.writeValueAsString(d);
         assertEquals("[\"org.joda.time.Duration\",3123422]", json);
     }
@@ -217,32 +224,28 @@ public class JodaSerializationTest extends JodaTestBase
     public void testMonthDaySer() throws Exception
     {
         MonthDay monthDay = new MonthDay(7, 23);
-        ObjectMapper mapper = jodaMapper();
-        String json = mapper.writeValueAsString(monthDay);
+        String json = MAPPER.writeValueAsString(monthDay);
         assertEquals(q("--07-23"), json);
     }
 
     public void testCustomMonthDaySer() throws Exception
     {
         MonthDay monthDay = new MonthDay(7, 23);
-        ObjectMapper mapper = jodaMapper();
-        String json = mapper.writeValueAsString(new FormattedMonthDay(monthDay));
+        String json = MAPPER.writeValueAsString(new FormattedMonthDay(monthDay));
         assertEquals(a2q("{'value':'07:23'}"), json);
     }
 
     public void testYearMonthSer() throws Exception
     {
         YearMonth yearMonth = new YearMonth(2013, 8);
-        ObjectMapper mapper = jodaMapper();
-        String json = mapper.writeValueAsString(yearMonth);
+        String json = MAPPER.writeValueAsString(yearMonth);
         assertEquals(q("2013-08"), json);
     }
 
     public void testCustomYearMonthSer() throws Exception
     {
         YearMonth yearMonth = new YearMonth(2013, 8);
-        ObjectMapper mapper = jodaMapper();
-        String json = mapper.writeValueAsString(new FormattedYearMonth(yearMonth));
+        String json = MAPPER.writeValueAsString(new FormattedYearMonth(yearMonth));
         assertEquals(a2q("{'value':'2013/08'}"), json);
     }
 }
