@@ -7,7 +7,7 @@ import tools.jackson.core.JacksonException;
 import tools.jackson.core.JsonGenerator;
 import tools.jackson.core.JsonToken;
 import tools.jackson.core.type.WritableTypeId;
-import tools.jackson.databind.SerializerProvider;
+import tools.jackson.databind.SerializationContext;
 import tools.jackson.databind.jsontype.TypeSerializer;
 
 import org.joda.time.DateTimeZone;
@@ -17,7 +17,7 @@ public class DateTimeZoneSerializer extends JodaSerializerBase<DateTimeZone>
     public DateTimeZoneSerializer() { super(DateTimeZone.class); }
 
     @Override
-    public void serialize(DateTimeZone value, JsonGenerator g, SerializerProvider ctxt)
+    public void serialize(DateTimeZone value, JsonGenerator g, SerializationContext ctxt)
         throws JacksonException
     {
         g.writeString(value.getID());
@@ -26,7 +26,7 @@ public class DateTimeZoneSerializer extends JodaSerializerBase<DateTimeZone>
     // as per [datatype-joda#82], need to ensure we will indicate nominal, NOT physical type:
     @Override
     public void serializeWithType(DateTimeZone value, JsonGenerator g,
-            SerializerProvider ctxt, TypeSerializer typeSer)
+            SerializationContext ctxt, TypeSerializer typeSer)
         throws JacksonException
     {
         WritableTypeId typeIdDef = typeSer.writeTypePrefix(g, ctxt,

@@ -46,15 +46,15 @@ public abstract class JodaDateSerializerBase<T> extends JodaSerializerBase<T>
             int shapeOverride);
 
     @Override
-    public boolean isEmpty(SerializerProvider prov, T value) {
+    public boolean isEmpty(SerializationContext ctxt, T value) {
         return value == null;
     }
 
     @Override
-    public ValueSerializer<?> createContextual(SerializerProvider prov,
+    public ValueSerializer<?> createContextual(SerializationContext ctxt,
             BeanProperty property)
     {
-        JsonFormat.Value ann = findFormatOverrides(prov, property, handledType());
+        JsonFormat.Value ann = findFormatOverrides(ctxt, property, handledType());
         if (ann != null) {
             int shapeOverride;
             Boolean useTimestamp;
@@ -91,7 +91,7 @@ public abstract class JodaDateSerializerBase<T> extends JodaSerializerBase<T>
     @Override
     public void acceptJsonFormatVisitor(JsonFormatVisitorWrapper visitor, JavaType typeHint)
     {
-        switch (_serializationShape(visitor.getProvider())) {
+        switch (_serializationShape(visitor.getContext())) {
         case FORMAT_TIMESTAMP:
             {
                 JsonIntegerFormatVisitor v2 = visitor.expectIntegerFormat(typeHint);
@@ -126,17 +126,17 @@ public abstract class JodaDateSerializerBase<T> extends JodaSerializerBase<T>
     /**********************************************************
      */
 
-    protected boolean writeWithZoneId(SerializerProvider provider) {
-        return _format.shouldWriteWithZoneId(provider);
+    protected boolean writeWithZoneId(SerializationContext ctxt) {
+        return _format.shouldWriteWithZoneId(ctxt);
     }
 
     /**
      * @since 2.9
      */
-    protected int _serializationShape(SerializerProvider provider) {
+    protected int _serializationShape(SerializationContext ctxt) {
         int shape = _shapeOverride;
         if (shape == 0) {
-            if (_format.useTimestamp(provider, _featureForNumeric)) {
+            if (_format.useTimestamp(ctxt, _featureForNumeric)) {
                 shape = _defaultNumericShape;
             } else {
                 shape = FORMAT_STRING;

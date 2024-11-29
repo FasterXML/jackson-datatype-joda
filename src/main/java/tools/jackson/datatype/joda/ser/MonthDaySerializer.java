@@ -2,8 +2,8 @@ package tools.jackson.datatype.joda.ser;
 
 import tools.jackson.core.*;
 
+import tools.jackson.databind.SerializationContext;
 import tools.jackson.databind.SerializationFeature;
-import tools.jackson.databind.SerializerProvider;
 import tools.jackson.datatype.joda.cfg.FormatConfig;
 import tools.jackson.datatype.joda.cfg.JacksonJodaDateFormat;
 
@@ -28,9 +28,9 @@ public class MonthDaySerializer extends JodaDateSerializerBase<MonthDay>
     }
 
     @Override
-    public void serialize(MonthDay value, JsonGenerator gen, SerializerProvider provider)
+    public void serialize(MonthDay value, JsonGenerator gen, SerializationContext ctxt)
         throws JacksonException
     {
-        gen.writeString(_format.createFormatter(provider).print(value));
+        gen.writeString(_format.createFormatter(ctxt).print(value));
     }
 }

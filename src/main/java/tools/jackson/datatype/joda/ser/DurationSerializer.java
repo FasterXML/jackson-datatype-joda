@@ -3,8 +3,8 @@ package tools.jackson.datatype.joda.ser;
 import tools.jackson.core.JacksonException;
 import tools.jackson.core.JsonGenerator;
 
+import tools.jackson.databind.SerializationContext;
 import tools.jackson.databind.SerializationFeature;
-import tools.jackson.databind.SerializerProvider;
 import tools.jackson.datatype.joda.cfg.FormatConfig;
 import tools.jackson.datatype.joda.cfg.JacksonJodaDateFormat;
 
@@ -41,15 +41,15 @@ public class DurationSerializer
     }
 
     @Override
-    public boolean isEmpty(SerializerProvider prov, Duration value) {
+    public boolean isEmpty(SerializationContext ctxt, Duration value) {
         return (value.getMillis() == 0L);
     }
 
     @Override
-    public void serialize(Duration value, JsonGenerator g, SerializerProvider provider)
+    public void serialize(Duration value, JsonGenerator g, SerializationContext ctxt)
         throws JacksonException
     {
-        if (_serializationShape(provider) == FORMAT_STRING) {
+        if (_serializationShape(ctxt) == FORMAT_STRING) {
             g.writeString(value.toString());
         } else {
             g.writeNumber(value.getMillis());

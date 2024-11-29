@@ -5,8 +5,8 @@ import org.joda.time.LocalTime;
 import tools.jackson.core.JacksonException;
 import tools.jackson.core.JsonGenerator;
 
+import tools.jackson.databind.SerializationContext;
 import tools.jackson.databind.SerializationFeature;
-import tools.jackson.databind.SerializerProvider;
 import tools.jackson.datatype.joda.cfg.FormatConfig;
 import tools.jackson.datatype.joda.cfg.JacksonJodaDateFormat;
 
@@ -42,11 +42,11 @@ public class LocalTimeSerializer
     */
 
     @Override
-    public void serialize(LocalTime value, JsonGenerator g, SerializerProvider provider)
+    public void serialize(LocalTime value, JsonGenerator g, SerializationContext ctxt)
         throws JacksonException
     {
-        if (_serializationShape(provider) == FORMAT_STRING) {
-            g.writeString(_format.createFormatter(provider).print(value));
+        if (_serializationShape(ctxt) == FORMAT_STRING) {
+            g.writeString(_format.createFormatter(ctxt).print(value));
             return;
         }
         // Timestamp here actually means an array of values

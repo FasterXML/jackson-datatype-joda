@@ -4,7 +4,7 @@ import org.joda.time.*;
 
 import tools.jackson.core.*;
 import tools.jackson.databind.SerializationFeature;
-import tools.jackson.databind.SerializerProvider;
+import tools.jackson.databind.SerializationContext;
 import tools.jackson.datatype.joda.cfg.FormatConfig;
 import tools.jackson.datatype.joda.cfg.JacksonJodaDateFormat;
 
@@ -37,18 +37,18 @@ public class LocalDateTimeSerializer // non final since 2.6.1
     */
 
     @Override
-    public void serialize(LocalDateTime value, JsonGenerator gen, SerializerProvider provider)
+    public void serialize(LocalDateTime value, JsonGenerator gen, SerializationContext ctxt)
         throws JacksonException
     {
-        switch (_serializationShape(provider)) {
+        switch (_serializationShape(ctxt)) {
         case FORMAT_STRING:
-            gen.writeString(_format.createFormatter(provider).print(value));
+            gen.writeString(_format.createFormatter(ctxt).print(value));
             break;
         case FORMAT_TIMESTAMP:
             {
                 // copied from `LocalDateTimeDeserializer`...
                 DateTimeZone tz = _format.isTimezoneExplicit() ? _format.getTimeZone()
-                        : DateTimeZone.forTimeZone(provider.getTimeZone());
+                        : DateTimeZone.forTimeZone(ctxt.getTimeZone());
                 gen.writeNumber(value.toDateTime(tz).getMillis());
             }
             break;

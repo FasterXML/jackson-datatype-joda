@@ -2,8 +2,8 @@ package tools.jackson.datatype.joda.ser;
 
 import tools.jackson.core.*;
 
+import tools.jackson.databind.SerializationContext;
 import tools.jackson.databind.SerializationFeature;
-import tools.jackson.databind.SerializerProvider;
 import tools.jackson.datatype.joda.cfg.FormatConfig;
 import tools.jackson.datatype.joda.cfg.JacksonJodaDateFormat;
 
@@ -39,11 +39,11 @@ public class LocalDateSerializer
     */
 
     @Override
-    public void serialize(LocalDate value, JsonGenerator g, SerializerProvider provider)
+    public void serialize(LocalDate value, JsonGenerator g, SerializationContext ctxt)
         throws JacksonException
     {
-        if (_serializationShape(provider) == FORMAT_STRING) {
-            g.writeString(_format.createFormatter(provider).print(value));
+        if (_serializationShape(ctxt) == FORMAT_STRING) {
+            g.writeString(_format.createFormatter(ctxt).print(value));
             return;
         }
         // 28-Jul-2017, tatu: Wrt [dataformat-joda#39]... we could perhaps support timestamps,

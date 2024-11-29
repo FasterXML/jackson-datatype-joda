@@ -4,8 +4,8 @@ import org.joda.time.Instant;
 
 import tools.jackson.core.JacksonException;
 import tools.jackson.core.JsonGenerator;
+import tools.jackson.databind.SerializationContext;
 import tools.jackson.databind.SerializationFeature;
-import tools.jackson.databind.SerializerProvider;
 import tools.jackson.datatype.joda.cfg.FormatConfig;
 import tools.jackson.datatype.joda.cfg.JacksonJodaDateFormat;
 
@@ -30,16 +30,16 @@ public class InstantSerializer
     }
 
     @Override
-    public boolean isEmpty(SerializerProvider prov, Instant value) {
+    public boolean isEmpty(SerializationContext ctxt, Instant value) {
         return (value.getMillis() == 0L);
     }
 
     @Override
-    public void serialize(Instant value, JsonGenerator gen, SerializerProvider provider)
+    public void serialize(Instant value, JsonGenerator gen, SerializationContext ctxt)
         throws JacksonException
     {
-        if (_serializationShape(provider) == FORMAT_STRING) {
-            gen.writeString(_format.createFormatter(provider).print(value));
+        if (_serializationShape(ctxt) == FORMAT_STRING) {
+            gen.writeString(_format.createFormatter(ctxt).print(value));
         } else {
             gen.writeNumber(value.getMillis());
         }

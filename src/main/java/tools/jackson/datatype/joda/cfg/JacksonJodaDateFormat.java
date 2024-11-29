@@ -10,8 +10,8 @@ import org.joda.time.format.DateTimeFormatter;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import tools.jackson.databind.DeserializationContext;
 import tools.jackson.databind.DeserializationFeature;
+import tools.jackson.databind.SerializationContext;
 import tools.jackson.databind.SerializationFeature;
-import tools.jackson.databind.SerializerProvider;
 
 /**
  * Simple container used to encapsulate (some of) gory details of
@@ -236,7 +236,7 @@ public class JacksonJodaDateFormat extends JacksonJodaFormatBase
         return _formatter;
     }
 
-    public DateTimeFormatter createFormatter(SerializerProvider ctxt)
+    public DateTimeFormatter createFormatter(SerializationContext ctxt)
     {
         DateTimeFormatter formatter = createFormatterWithLocale(ctxt);
         if (!_explicitTimezone) {
@@ -248,7 +248,7 @@ public class JacksonJodaDateFormat extends JacksonJodaFormatBase
         return formatter;
     }
 
-    public DateTimeFormatter createFormatterWithLocale(SerializerProvider ctxt)
+    public DateTimeFormatter createFormatterWithLocale(SerializationContext ctxt)
     {
         DateTimeFormatter formatter = _formatter;
         if (!_explicitLocale) {
@@ -296,7 +296,7 @@ public class JacksonJodaDateFormat extends JacksonJodaFormatBase
     /**
      * @since 2.8
      */
-    public boolean shouldWriteWithZoneId(SerializerProvider ctxt) {
+    public boolean shouldWriteWithZoneId(SerializationContext ctxt) {
         return (_writeZoneId != null) ? _writeZoneId :
             ctxt.isEnabled(SerializationFeature.WRITE_DATES_WITH_ZONE_ID);
     }

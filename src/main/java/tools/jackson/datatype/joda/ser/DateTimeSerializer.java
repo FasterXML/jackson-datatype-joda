@@ -36,22 +36,22 @@ public class DateTimeSerializer
     }
 
     @Override
-    public boolean isEmpty(SerializerProvider prov, DateTime value) {
+    public boolean isEmpty(SerializationContext ctxt, DateTime value) {
         return (value.getMillis() == 0L);
     }
 
     @Override
-    public void serialize(DateTime value, JsonGenerator gen, SerializerProvider provider)
+    public void serialize(DateTime value, JsonGenerator gen, SerializationContext ctxt)
         throws JacksonException
     {
-        boolean numeric = (_serializationShape(provider) != FORMAT_STRING);
+        boolean numeric = (_serializationShape(ctxt) != FORMAT_STRING);
 
         // First: simple, non-timezone-included output
-        if (!writeWithZoneId(provider)) {
+        if (!writeWithZoneId(ctxt)) {
             if (numeric) {
                 gen.writeNumber(value.getMillis());
             } else {
-                gen.writeString(_format.createFormatter(provider).print(value));
+                gen.writeString(_format.createFormatter(ctxt).print(value));
             }
         } else {
             // and then as per [datatype-joda#44], optional TimeZone inclusion
@@ -69,7 +69,7 @@ public class DateTimeSerializer
                 return;
             }
             StringBuilder sb = new StringBuilder(40)
-                    .append(_format.createFormatter(provider).withOffsetParsed().print(value));
+                    .append(_format.createFormatter(ctxt).withOffsetParsed().print(value));
             sb = sb.append('[')
                     .append(value.getZone())
                     .append(']');
