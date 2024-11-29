@@ -5,7 +5,7 @@ import tools.jackson.core.JsonGenerator;
 import tools.jackson.core.JsonToken;
 import tools.jackson.core.type.WritableTypeId;
 
-import tools.jackson.databind.SerializerProvider;
+import tools.jackson.databind.SerializationContext;
 import tools.jackson.databind.jsontype.TypeSerializer;
 import tools.jackson.databind.ser.std.StdSerializer;
 
@@ -14,7 +14,7 @@ abstract class JodaSerializerBase<T> extends StdSerializer<T>
     protected JodaSerializerBase(Class<T> cls) { super(cls); }
 
     @Override
-    public void serializeWithType(T value, JsonGenerator g, SerializerProvider ctxt,
+    public void serializeWithType(T value, JsonGenerator g, SerializationContext ctxt,
             TypeSerializer typeSer)
         throws JacksonException
     {

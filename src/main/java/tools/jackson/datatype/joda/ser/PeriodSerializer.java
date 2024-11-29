@@ -43,11 +43,11 @@ public class PeriodSerializer
 
     // Lots of work, although realistically, won't have much or any effect...
     @Override
-    public ValueSerializer<?> createContextual(SerializerProvider prov,
+    public ValueSerializer<?> createContextual(SerializationContext ctxt,
             BeanProperty property)
     {
         if (property != null) {
-            JsonFormat.Value ann = findFormatOverrides(prov, property, handledType());
+            JsonFormat.Value ann = findFormatOverrides(ctxt, property, handledType());
             if (ann != null) {
                 JacksonJodaPeriodFormat format = _format;
 
@@ -80,10 +80,10 @@ public class PeriodSerializer
     }
 
     @Override
-    public void serialize(ReadablePeriod value, JsonGenerator g, SerializerProvider provider)
+    public void serialize(ReadablePeriod value, JsonGenerator g, SerializationContext ctxt)
         throws JacksonException
     {
-        g.writeString(_format.createFormatter(provider).print(value));
+        g.writeString(_format.createFormatter(ctxt).print(value));
     }
 
     @Override

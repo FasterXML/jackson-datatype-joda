@@ -7,7 +7,7 @@ import org.joda.time.Period;
 import org.joda.time.format.PeriodFormatter;
 
 import tools.jackson.databind.DeserializationContext;
-import tools.jackson.databind.SerializerProvider;
+import tools.jackson.databind.SerializationContext;
 
 /**
  * Simple container used to encapsulate (some of) gory details of
@@ -81,12 +81,12 @@ public class JacksonJodaPeriodFormat extends JacksonJodaFormatBase
     /**********************************************************
      */
 
-    public PeriodFormatter createFormatter(SerializerProvider provider)
+    public PeriodFormatter createFormatter(SerializationContext ctxt)
     {
         PeriodFormatter formatter = _formatter;
         
         if (!_explicitLocale) {
-            Locale loc = provider.getLocale();
+            Locale loc = ctxt.getLocale();
             if (loc != null && !loc.equals(_locale)) {
                 formatter = formatter.withLocale(loc);
             }

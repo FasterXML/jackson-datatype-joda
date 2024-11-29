@@ -3,8 +3,8 @@ package tools.jackson.datatype.joda.cfg;
 import java.util.Locale;
 import java.util.TimeZone;
 
+import tools.jackson.databind.SerializationContext;
 import tools.jackson.databind.SerializationFeature;
-import tools.jackson.databind.SerializerProvider;
 
 /**
  * Base object for different formatters (date-time, period, ...)
@@ -78,11 +78,11 @@ abstract class JacksonJodaFormatBase
     /**********************************************************
      */
 
-    public boolean useTimestamp(SerializerProvider provider, SerializationFeature feat)
+    public boolean useTimestamp(SerializationContext ctxt, SerializationFeature feat)
     {
         if (_useTimestamp != null) {
             return _useTimestamp.booleanValue();
         }
-        return provider.isEnabled(feat);
+        return ctxt.isEnabled(feat);
     }
 }
