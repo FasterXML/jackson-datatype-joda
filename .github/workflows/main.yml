@@ -22,7 +22,7 @@ env:
   JODA_MAX: '2.12.7'
 jobs:
   build:
-    runs-on: 'ubuntu-20.04'
+    runs-on: 'ubuntu-22.04'
     strategy:
       fail-fast: false
       matrix:
@@ -56,7 +56,7 @@ jobs:
       run: ./mvnw -B -q -ff -ntp -Dversion.joda=${{ matrix.joda_version }} surefire:test
     - name: Extract project Maven version
       id: projectVersion
-      run: echo "version=$(./mvnw org.apache.maven.plugins:maven-help-plugin:3.3.0:evaluate -DforceStdout -Dexpression=project.version -q)" >> $GITHUB_OUTPUT
+      run: echo "version=$(./mvnw org.apache.maven.plugins:maven-help-plugin:3.5.1:evaluate -DforceStdout -Dexpression=project.version -q)" >> $GITHUB_OUTPUT
     - name: Deploy snapshot
       if: ${{ github.event_name != 'pull_request' && matrix.snapshot && endsWith(steps.projectVersion.outputs.version, '-SNAPSHOT') }}
       env:
