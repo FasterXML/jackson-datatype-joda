@@ -4,7 +4,6 @@ on:
     branches:
     - master
     - "3.0"
-    - "2.19"
     paths-ignore:
     - "README.md"
     - "release-notes/*"
@@ -12,7 +11,6 @@ on:
     branches:
     - master
     - "3.0"
-    - "2.19"
     paths-ignore:
     - "README.md"
     - "release-notes/*"
@@ -26,10 +24,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        java_version: ['8', '17', '21']
+        java_version: ['17', '21']
         joda_version: [$JODA_DEFAULT, $JODA_MIN, $JODA_MAX]
         include:
-          - java_version: '8'
+          - java_version: '17'
             joda_version: $JODA_DEFAULT
             snapshot: 1
     env:
