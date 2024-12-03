@@ -49,6 +49,11 @@ Joda (https://www.joda.org/joda-time/) data types.
     <!-- Configuration properties for the OSGi maven-bundle-plugin -->
     <osgi.export>${project.groupId}.joda.*</osgi.export>
     <osgi.versionpolicy>${range;[===,+);${@}}</osgi.versionpolicy>
+
+    <!-- [databind#4820]: Java 17 baseline -->
+    <javac.src.version>17</javac.src.version>
+    <javac.target.version>17</javac.target.version>
+
   </properties>
 
   <dependencies>
