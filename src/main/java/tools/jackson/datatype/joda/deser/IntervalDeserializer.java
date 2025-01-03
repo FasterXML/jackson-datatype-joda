@@ -32,7 +32,7 @@ public class IntervalDeserializer extends JodaDateDeserializerBase<Interval>
         throws JacksonException
     {
         if (p.hasToken(JsonToken.VALUE_STRING)) {
-            return _fromString(p, ctxt, p.getText());
+            return _fromString(p, ctxt, p.getString());
         }
         // 30-Sep-2020, tatu: New! "Scalar from Object" (mostly for XML)
         if (p.isExpectedStartObjectToken()) {

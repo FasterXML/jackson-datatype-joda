@@ -26,7 +26,7 @@ public class DateTimeZoneDeserializer extends JodaDeserializerBase<DateTimeZone>
             // for fun let's allow use of offsets...
             return _fromOffset(ctxt, p.getIntValue());
         case JsonTokenId.ID_STRING:
-            return _fromString(p, ctxt, p.getText());
+            return _fromString(p, ctxt, p.getString());
         case JsonTokenId.ID_START_OBJECT:
             // 30-Sep-2020, tatu: New! "Scalar from Object" (mostly for XML)
             return _fromString(p, ctxt,

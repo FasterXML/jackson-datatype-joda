@@ -37,7 +37,7 @@ public class LocalDateDeserializer
         case JsonTokenId.ID_NUMBER_INT:
             return _fromTimestamp(ctxt, p.getLongValue());
         case JsonTokenId.ID_STRING:
-            return _fromString(p, ctxt, p.getText());
+            return _fromString(p, ctxt, p.getString());
         case JsonTokenId.ID_START_OBJECT:
             return _fromString(p, ctxt,
                     ctxt.extractScalarFromObject(p, this, handledType()));

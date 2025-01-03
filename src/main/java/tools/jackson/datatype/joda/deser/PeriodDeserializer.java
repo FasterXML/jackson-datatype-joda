@@ -36,7 +36,7 @@ public class PeriodDeserializer
     {
         JsonToken t = p.currentToken();
         if (t == JsonToken.VALUE_STRING) {
-            return _fromString(p, ctxt, p.getText());
+            return _fromString(p, ctxt, p.getString());
         }
         if (t == JsonToken.VALUE_NUMBER_INT) {
             return new Period(p.getLongValue());    
@@ -73,8 +73,8 @@ public class PeriodDeserializer
         //   if we ever hit that.
         
         JsonNode treeNode = p.readValueAsTree();
-        String periodType = treeNode.path("fieldType").path("name").asText();
-        String periodName = treeNode.path("periodType").path("name").asText();
+        String periodType = treeNode.path("fieldType").path("name").asString();
+        String periodName = treeNode.path("periodType").path("name").asString();
         // any "weird" numbers we should worry about?
         int periodValue = treeNode.path(periodType).asInt();
 
