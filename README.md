@@ -30,7 +30,7 @@ To use module on Maven-based projects, use following dependency:
 <dependency>
   <groupId>com.fasterxml.jackson.datatype</groupId>
   <artifactId>jackson-datatype-joda</artifactId>
-  <version>2.17.1</version>
+  <version>3.0.0-SNAPSHOT</version>
 </dependency>    
 ```
 
@@ -79,7 +79,7 @@ Assert.assertEquals(INPUT_JSON, json);
 
 ## Compatibility
 
-Module works with Joda version 2.9 and higher (CI tests compatibility since module version 2.14), even if it declares dependency to a newer version.
+Module works with Joda version 2.10 (as of Jackson 3.0) and higher (CI tests compatibility since module version 2.14), even if it declares dependency to a newer version.
 This means that it is possible to use with older version by using Maven dependency override.
 
 ## More

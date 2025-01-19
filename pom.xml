@@ -42,8 +42,8 @@ Joda (https://www.joda.org/joda-time/) data types.
          Jackson 2.10: Joda 2.9[.9]
          Jackson 2.12: Joda 2.10[.8]
 	 ...
-	 Jackson 3.0: Joda 2.12.7
-          -->
+	    Jackson 3.0: Joda 2.12.7
+      -->
     <version.joda>2.12.7</version.joda>
 
     <!-- Configuration properties for the OSGi maven-bundle-plugin -->
@@ -109,13 +109,6 @@ Joda (https://www.joda.org/joda-time/) data types.
             <exclude>tools/jackson/**/failing/*.java</exclude>
           </excludes>
         </configuration>
-      </plugin>
-      <!--  19-Mar-2019, tatu: Add rudimentary JDK9+ module info. To build with JDK 8
-             will have to use `moduleInfoFile` as anything else requires JDK 9+
-        -->
-      <plugin>
-        <groupId>org.moditect</groupId>
-        <artifactId>moditect-maven-plugin</artifactId>
       </plugin>
       <plugin>
         <groupId>de.jjohannes</groupId>
