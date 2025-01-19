@@ -16,8 +16,8 @@ on:
     - "release-notes/*"
 env:
   JODA_DEFAULT: '2.12.7'
-  JODA_MIN: '2.9'
-  JODA_MAX: '2.12.7'
+  JODA_MIN: '2.10'
+  JODA_MAX: '2.13.0'
 jobs:
   build:
     runs-on: 'ubuntu-22.04'
