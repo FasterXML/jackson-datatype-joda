@@ -1,12 +1,9 @@
-// Last changes:
-//
-// * 2020-11-25 change joda requires from "joda.time" to "org.joda.time"
-//     (Joda 2.10 now has automatic module name)
-//    
-module tools.jackson.datatype.joda {
+// Joda datatype module Main artifact Module descriptor
+module tools.jackson.datatype.joda
+{
     requires com.fasterxml.jackson.annotation;
     requires tools.jackson.core;
-    requires tools.jackson.databind;
+    requires transitive tools.jackson.databind;
     requires org.joda.time;
 
     exports tools.jackson.datatype.joda;
