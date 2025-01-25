@@ -1,6 +1,5 @@
 package com.fasterxml.jackson.datatype.joda.deser;
 
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.joda.JodaTestBase;
 import org.joda.time.Days;
@@ -11,6 +10,10 @@ import org.joda.time.ReadablePeriod;
 import org.joda.time.Seconds;
 import org.joda.time.Weeks;
 import org.joda.time.Years;
+
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class ReadablePeriodDeserializerTest extends JodaTestBase
 {

@@ -1,5 +1,7 @@
 package com.fasterxml.jackson.datatype.joda;
 
+import org.junit.jupiter.api.Test;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -8,6 +10,8 @@ import com.fasterxml.jackson.datatype.joda.ser.DateTimeSerializer;
 
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class AnnotationTest extends DateTimeTest
 {
@@ -25,6 +29,7 @@ public class AnnotationTest extends DateTimeTest
         }
     }
 
+    @Test
     public void testDateTimeViaAnnotation() throws Exception {
         ObjectMapper objectMapper = new ObjectMapper();
         AClass initialObject = new AClass();

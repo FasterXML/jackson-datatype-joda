@@ -9,8 +9,12 @@ import org.joda.time.DateTime;
 import org.joda.time.Instant;
 import org.joda.time.ReadableInstant;
 
+import org.junit.jupiter.api.Test;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.joda.JodaTestBase;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class InstantDeserTest extends JodaTestBase
 {
@@ -22,6 +26,7 @@ public class InstantDeserTest extends JodaTestBase
 
     private final ObjectMapper MAPPER = jodaMapper();
 
+    @Test
     public void testDeserReadableInstant() throws IOException {
         ReadableInstant date = MAPPER.readValue(quote("1972-12-28T12:00:01.000+0000"), ReadableInstant.class);
         assertNotNull(date);
@@ -30,6 +35,7 @@ public class InstantDeserTest extends JodaTestBase
         assertNull(MAPPER.readValue(quote(""), ReadableInstant.class));
     }
 
+    @Test
     public void testDeserInstantWithTypeInfo() throws IOException
     {
         ObjectMapper mapper = jodaMapper();
@@ -40,6 +46,7 @@ public class InstantDeserTest extends JodaTestBase
         assertEquals("1972-12-28T12:00:01.000Z", date.toString());
     }
 
+    @Test
     public void testDeserInstantFromNumber() throws IOException
     {
         Calendar cal = new GregorianCalendar(TimeZone.getTimeZone("UTC"));
@@ -51,6 +58,7 @@ public class InstantDeserTest extends JodaTestBase
         assertEquals(timepoint, instant.getMillis());
     }
 
+    @Test
     public void testDeserInstant() throws IOException
     {
         Instant date = MAPPER.readValue(quote("1972-12-28T12:00:01.000Z"), Instant.class);
@@ -60,6 +68,7 @@ public class InstantDeserTest extends JodaTestBase
         assertNull(MAPPER.readValue(quote(""), Instant.class));
     }
 
+    @Test
     public void testDeserInstantCustomFormat() throws IOException
     {
         FormattedInstant input = MAPPER.readValue(aposToQuotes(

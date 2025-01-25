@@ -5,10 +5,14 @@ import java.util.TimeZone;
 import org.joda.time.MonthDay;
 import org.joda.time.chrono.ISOChronology;
 
+import org.junit.jupiter.api.Test;
+
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.exc.MismatchedInputException;
 import com.fasterxml.jackson.datatype.joda.JodaTestBase;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class MonthDayDeserTest extends JodaTestBase
 {
@@ -20,6 +24,7 @@ public class MonthDayDeserTest extends JodaTestBase
 
     private final ObjectMapper MAPPER = jodaMapper();
 
+    @Test
     public void testDeserMonthDay() throws Exception
     {
         String monthDayString = new MonthDay(7, 23).toString();
@@ -27,6 +32,7 @@ public class MonthDayDeserTest extends JodaTestBase
         assertEquals(new MonthDay(7, 23), monthDay);
     }
 
+    @Test
     public void testDeserMonthDayWithTimeZone() throws Exception
     {
         MAPPER.setTimeZone(TimeZone.getTimeZone("Europe/Paris"));
@@ -38,12 +44,14 @@ public class MonthDayDeserTest extends JodaTestBase
         assertEquals(ISOChronology.getInstanceUTC(), monthDay.getChronology());
     }
     
+    @Test
     public void testDeserMonthDayFromEmptyString() throws Exception
     {
         MonthDay monthDay = MAPPER.readValue(quote(""), MonthDay.class);
         assertNull(monthDay);
     }
 
+    @Test
     public void testDeserMonthDayFailsForUnexpectedType() throws Exception
     {
         try {
@@ -55,6 +63,7 @@ public class MonthDayDeserTest extends JodaTestBase
         }
     }
 
+    @Test
     public void testDeserMonthDayCustomFormat() throws Exception
     {
         FormattedMonthDay input = MAPPER.readValue(aposToQuotes(
@@ -65,6 +74,7 @@ public class MonthDayDeserTest extends JodaTestBase
         assertEquals(20, monthDay.getDayOfMonth());
     }
 
+    @Test
     public void testDeserMonthDayConfigOverride() throws Exception
     {
         ObjectMapper mapper = jodaMapper();

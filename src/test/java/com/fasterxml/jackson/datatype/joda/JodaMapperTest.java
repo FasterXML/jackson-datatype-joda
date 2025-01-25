@@ -1,23 +1,24 @@
 package com.fasterxml.jackson.datatype.joda;
 
-import com.fasterxml.jackson.databind.SerializationFeature;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.CoreMatchers.is;
+import com.fasterxml.jackson.databind.SerializationFeature;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class JodaMapperTest
 {
+
     @Test
     public void test_writeDatesAsTimestamps_property()
     {
         JodaMapper objectUnderTest = new JodaMapper();
 
         objectUnderTest.setWriteDatesAsTimestamps(true);
-        assertThat(objectUnderTest.getWriteDatesAsTimestamps(), is(true));
+        assertTrue(objectUnderTest.getWriteDatesAsTimestamps());
 
         objectUnderTest.setWriteDatesAsTimestamps(false);
-        assertThat(objectUnderTest.getWriteDatesAsTimestamps(), is(false));
+        assertFalse(objectUnderTest.getWriteDatesAsTimestamps());
     }
 
     @Test
@@ -27,6 +28,6 @@ public class JodaMapperTest
 
         objectUnderTest.setWriteDatesAsTimestamps(true);
 
-        assertThat(objectUnderTest.isEnabled(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS), is(true));
+        assertTrue(objectUnderTest.isEnabled(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS));
     }
 }

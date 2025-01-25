@@ -1,5 +1,7 @@
 package com.fasterxml.jackson.datatype.joda.ser;
 
+import org.junit.jupiter.api.Test;
+
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -12,6 +14,8 @@ import org.joda.time.*;
 import org.joda.time.format.ISODateTimeFormat;
 
 import java.io.IOException;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class JodaSerializationTest extends JodaTestBase
 {
@@ -44,6 +48,7 @@ public class JodaSerializationTest extends JodaTestBase
     /**********************************************************
      */
     
+    @Test
     public void testLocalDateSer() throws IOException
     {
         LocalDate date = new LocalDate(2001, 5, 25);
@@ -65,6 +70,7 @@ public class JodaSerializationTest extends JodaTestBase
         assertEquals("{}", mapper.writeValueAsString(new Container<LocalDate>(null)));
     }
 
+    @Test
     public void testLocalDateSerWithTypeInfo() throws IOException
     {
         LocalDate date = new LocalDate(2001, 5, 25);
@@ -86,6 +92,7 @@ public class JodaSerializationTest extends JodaTestBase
     /**********************************************************
      */
 
+    @Test
     public void testLocalTimeSer() throws IOException
     {
         LocalTime date = new LocalTime(13,20,54);
@@ -101,6 +108,7 @@ public class JodaSerializationTest extends JodaTestBase
 
     }
 
+    @Test
     public void testLocalTimeSerWithFormatOverride() throws IOException
     {
         LocalTime date = new LocalTime(13,20,54);
@@ -120,6 +128,7 @@ public class JodaSerializationTest extends JodaTestBase
 
     }
 
+    @Test
     public void testLocalTimeSerWithTypeInfo() throws IOException
     {
         LocalTime date = new LocalTime(13,20,54);
@@ -142,6 +151,7 @@ public class JodaSerializationTest extends JodaTestBase
     /**********************************************************
      */
     
+    @Test
     public void testLocalDateTimeSer() throws IOException
     {
         LocalDateTime date = new LocalDateTime(2001, 5, 25,
@@ -156,6 +166,7 @@ public class JodaSerializationTest extends JodaTestBase
         assertEquals(q("2001-05-25T10:15:30.037"), mapper.writeValueAsString(date));
     }
     
+    @Test
     public void testLocalDateTimeSerWithTypeInfo() throws IOException
     {
         LocalDateTime date = new LocalDateTime(2001, 5, 25,
@@ -178,12 +189,14 @@ public class JodaSerializationTest extends JodaTestBase
     /**********************************************************
      */
 
+    @Test
     public void testPeriodSer() throws IOException
     {
         Period in = new Period(1, 2, 3, 4);
         assertEquals(q("PT1H2M3.004S"), MAPPER.writeValueAsString(in));
     }
     
+    @Test
     public void testPeriodSerWithTypeInfo() throws IOException
     {
         Period in = new Period(1, 2, 3, 4);
@@ -199,6 +212,7 @@ public class JodaSerializationTest extends JodaTestBase
     /**********************************************************
      */
 
+    @Test
     public void testDurationSer() throws IOException
     {
         Duration d = new Duration(3123422);
@@ -210,6 +224,7 @@ public class JodaSerializationTest extends JodaTestBase
                 .writeValueAsString(d));
     }
     
+    @Test
     public void testDurationSerWithTypeInfo() throws IOException
     {
         Duration d = new Duration(3123422);
@@ -221,6 +236,7 @@ public class JodaSerializationTest extends JodaTestBase
         assertEquals("[\"org.joda.time.Duration\",3123422]", json);
     }
 
+    @Test
     public void testMonthDaySer() throws Exception
     {
         MonthDay monthDay = new MonthDay(7, 23);
@@ -228,6 +244,7 @@ public class JodaSerializationTest extends JodaTestBase
         assertEquals(q("--07-23"), json);
     }
 
+    @Test
     public void testCustomMonthDaySer() throws Exception
     {
         MonthDay monthDay = new MonthDay(7, 23);
@@ -235,6 +252,7 @@ public class JodaSerializationTest extends JodaTestBase
         assertEquals(a2q("{'value':'07:23'}"), json);
     }
 
+    @Test
     public void testYearMonthSer() throws Exception
     {
         YearMonth yearMonth = new YearMonth(2013, 8);
@@ -242,6 +260,7 @@ public class JodaSerializationTest extends JodaTestBase
         assertEquals(q("2013-08"), json);
     }
 
+    @Test
     public void testCustomYearMonthSer() throws Exception
     {
         YearMonth yearMonth = new YearMonth(2013, 8);

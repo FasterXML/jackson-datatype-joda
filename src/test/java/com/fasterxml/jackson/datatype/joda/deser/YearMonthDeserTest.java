@@ -6,11 +6,15 @@ import java.util.TimeZone;
 import org.joda.time.YearMonth;
 import org.joda.time.chrono.ISOChronology;
 
+import org.junit.jupiter.api.Test;
+
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.fasterxml.jackson.datatype.joda.JodaTestBase;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class YearMonthDeserTest extends JodaTestBase
 {
@@ -23,6 +27,7 @@ public class YearMonthDeserTest extends JodaTestBase
     private final ObjectMapper MAPPER = jodaMapper();
     private final ObjectReader READER = MAPPER.readerFor(YearMonth.class);
 
+    @Test
     public void testDeserYearMonth() throws Exception
     {
         String yearMonthString = new YearMonth(2013, 8).toString();
@@ -30,6 +35,7 @@ public class YearMonthDeserTest extends JodaTestBase
         assertEquals(new YearMonth(2013, 8), yearMonth);
     }
 
+    @Test
     public void testDeserYearMonthWithTimeZone() throws Exception
     {
         MAPPER.setTimeZone(TimeZone.getTimeZone("America/Los_Angeles"));
@@ -40,6 +46,7 @@ public class YearMonthDeserTest extends JodaTestBase
         assertEquals(ISOChronology.getInstanceUTC(), yearMonth.getChronology());
     }
 
+    @Test
     public void testDeserYearMonthFailsForUnexpectedType() throws IOException
     {
         try {
@@ -51,6 +58,7 @@ public class YearMonthDeserTest extends JodaTestBase
         }
     }
 
+    @Test
     public void testDeserYearMonthCustomFormat() throws IOException
     {
         FormattedYearMonth input = MAPPER.readValue(aposToQuotes(
@@ -68,6 +76,7 @@ public class YearMonthDeserTest extends JodaTestBase
      */
 
     // @since 2.12
+    @Test
     public void testReadFromEmptyString() throws Exception
     {
         // By default, fine to deser from empty or blank

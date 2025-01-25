@@ -3,8 +3,12 @@ package com.fasterxml.jackson.datatype.joda;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
+import org.junit.jupiter.api.Test;
+
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.*;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 // for [datatype-joda#44]
 public class TimeZoneTest extends JodaTestBase
@@ -39,6 +43,7 @@ public class TimeZoneTest extends JodaTestBase
 
     private final ObjectMapper MAPPER = jodaMapper();
 
+    @Test
     public void testSimple() throws Exception
     {
         // First, no zone id included
@@ -73,6 +78,7 @@ public class TimeZoneTest extends JodaTestBase
      *
      * https://github.com/FasterXML/jackson-datatype-joda/issues/73
      */
+    @Test
     public void testWriteDatesWithZoneIdAndConsistentZoneOffset() throws Exception
     {
         ObjectWriter w = MAPPER.writer();
@@ -84,6 +90,7 @@ public class TimeZoneTest extends JodaTestBase
                         .writeValueAsString(DATE_JAN_1_1970_UTC_IN_AMERICA_LA));
     }
 
+    @Test
     public void testRoundTrip()  throws Exception
     {
         ObjectWriter w = MAPPER.writer()
@@ -99,14 +106,14 @@ public class TimeZoneTest extends JodaTestBase
         ObjectMapper mapper = jodaMapper();
         mapper.disable(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE);
         result = mapper.readValue(json, DateTime.class);
-        assertEquals("Actual timepoints differ", input.getMillis(), result.getMillis());
-        assertEquals("TimeZones differ", input, result);
+        assertEquals(input.getMillis(), result.getMillis(), "Actual timepoints differ");
+        assertEquals(input, result, "TimeZones differ");
 
         // Then timestamp: will not currently (2.6) write out timezone id
         json = w.with(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
                 .writeValueAsString(input);
         result = mapper.readValue(json, DateTime.class);
-        assertEquals("Actual timepoints differ", input.getMillis(), result.getMillis());
+        assertEquals(input.getMillis(), result.getMillis(), "Actual timepoints differ");
         
         // .. meaning we can not test this:
 //        assertEquals("TimeZones differ", input, result);
@@ -116,6 +123,7 @@ public class TimeZoneTest extends JodaTestBase
      * Test that de/serializing an ambiguous time (e.g. a 'fall back' DST transition) works and preserves the proper
      * instants in time and time zones.
      */
+    @Test
     public void testFallBackTransition() throws Exception
     {
         DateTime firstOneAmUtc = new DateTime(FALL_BACK_YEAR, FALL_BACK_MONTH, FALL_BACK_DAY, FIRST_FALL_BACK_HOUR, 0, 0,
@@ -139,13 +147,14 @@ public class TimeZoneTest extends JodaTestBase
         DateTime firstRoundTrip = mapper.readValue(firstOneAmStr, DateTime.class);
         DateTime secondRoundTrip = mapper.readValue(secondOneAmStr, DateTime.class);
 
-        assertEquals("Actual timepoints differ", firstOneAm.getMillis(), firstRoundTrip.getMillis());
-        assertEquals("TimeZones differ", firstOneAm, firstRoundTrip);
+        assertEquals(firstOneAm.getMillis(), firstRoundTrip.getMillis(), "Actual timepoints differ");
+        assertEquals(firstOneAm, firstRoundTrip, "TimeZones differ");
 
-        assertEquals("Actual timepoints differ", secondOneAm.getMillis(), secondRoundTrip.getMillis());
-        assertEquals("TimeZones differ", secondOneAm, secondRoundTrip);
+        assertEquals(secondOneAm.getMillis(), secondRoundTrip.getMillis(), "Actual timepoints differ");
+        assertEquals(secondOneAm, secondRoundTrip, "TimeZones differ");
     }
 
+    @Test
     public void testSerializationWithTypeInfo() throws Exception
     {
         // but if re-configured to include the time zone

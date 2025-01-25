@@ -6,9 +6,13 @@ import java.util.TimeZone;
 import org.joda.time.LocalDate;
 import org.joda.time.chrono.ISOChronology;
 
+import org.junit.jupiter.api.Test;
+
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.joda.JodaTestBase;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class LocalDateDeserTest extends JodaTestBase
 {
@@ -30,6 +34,7 @@ public class LocalDateDeserTest extends JodaTestBase
     /**********************************************************
      */
 
+    @Test
     public void testLocalDateDeser() throws IOException
     {
         // couple of acceptable formats, so:
@@ -47,6 +52,7 @@ public class LocalDateDeserTest extends JodaTestBase
         assertNull(MAPPER.readValue(quote(""), LocalDate.class));
     }
 
+    @Test
     public void testLocalDateDeserWithTimeZone() throws IOException
     {
         final String trickyInstant = "1238558582001";
@@ -85,6 +91,7 @@ public class LocalDateDeserTest extends JodaTestBase
         assertEquals(ISOChronology.getInstanceUTC(), date4.getChronology());
     }
 
+    @Test
     public void testLocalDateDeserWithTypeInfo() throws IOException
     {
         ObjectMapper mapper = jodaMapper();
@@ -102,6 +109,7 @@ public class LocalDateDeserTest extends JodaTestBase
         assertEquals(13, date2.getDayOfMonth());
     }
 
+    @Test
     public void testLocalDateDeserWithPartsAsString() throws IOException
     {
         // couple of acceptable formats, so:

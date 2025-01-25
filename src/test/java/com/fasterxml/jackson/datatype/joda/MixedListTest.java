@@ -5,13 +5,18 @@ import java.util.*;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
+import org.junit.jupiter.api.Test;
+
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class MixedListTest extends JodaTestBase
 {
     private final ObjectMapper MAPPER = jodaMapper();
 
+    @Test
     public void testMixedList() throws Exception
     {
         final Map<String, Object> map = new HashMap<String, Object>();

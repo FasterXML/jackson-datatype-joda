@@ -5,12 +5,17 @@ import java.util.TimeZone;
 
 import org.joda.time.*;
 
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.*;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.joda.JodaTestBase;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 @SuppressWarnings("deprecation") // because DateMidnight deprecated by Joda
 public class DateMidnightTest extends JodaTestBase
@@ -54,6 +59,7 @@ public class DateMidnightTest extends JodaTestBase
     /**********************************************************
      */
 
+    @Test
     public void testDateMidnightDeserWithTimeZone() throws IOException
     {
         MAPPER.setTimeZone(TimeZone.getTimeZone("Europe/Paris"));
@@ -87,6 +93,7 @@ public class DateMidnightTest extends JodaTestBase
         assertNull(MAPPER.readValue(quote(""), DateMidnight.class));
     }
     
+    @Test
     public void testDateMidnightDeser() throws IOException
     {
         // couple of acceptable formats, so:
@@ -104,6 +111,7 @@ public class DateMidnightTest extends JodaTestBase
         assertNull(MAPPER.readValue(quote(""), DateMidnight.class));
     }
 
+    @Test
     public void testDateMidnightDeserWithTypeInfo() throws IOException
     {
         ObjectMapper mapper = jodaMapper();
@@ -127,6 +135,7 @@ public class DateMidnightTest extends JodaTestBase
     /**********************************************************
      */
 
+    @Test
     public void testSerializeAsTimestamp() throws Exception
     {
         assertEquals(aposToQuotes("{'value':0}"),
@@ -134,6 +143,7 @@ public class DateMidnightTest extends JodaTestBase
                         new DateMidnight(0, DateTimeZone.UTC))));
     }
 
+    @Test
     public void testDateMidnightSer() throws IOException
     {
         ObjectMapper mapper = jodaMapper()
@@ -162,6 +172,7 @@ public class DateMidnightTest extends JodaTestBase
     /**********************************************************
      */
 
+    @Test
     public void testDeserWithCustomFormat() throws Exception
     {
         String STR = "2015-06-19";
@@ -179,6 +190,7 @@ public class DateMidnightTest extends JodaTestBase
         assertEquals(inputDate, output.value);
     }
     
+    @Test
     public void testWithTimeZoneOverride() throws Exception
     {
         ObjectMapper mapper = jodaMapper();
