@@ -6,7 +6,8 @@ Project: jackson-datatype-joda
 
 2.19.0 (not yet released)
 
--
+#152: Unify testing structure/tools [JSTEP-10]
+ (contributed by Joo-Hyuk K)
 
 2.18.2 (27-Nov-2024)
 2.18.1 (28-Oct-2024)
