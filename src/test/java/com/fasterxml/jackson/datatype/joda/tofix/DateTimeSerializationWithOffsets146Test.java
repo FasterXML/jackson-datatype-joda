@@ -1,9 +1,10 @@
-package com.fasterxml.jackson.datatype.joda.failing;
+package com.fasterxml.jackson.datatype.joda.tofix;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
 import com.fasterxml.jackson.datatype.joda.JodaTestBase;
+import com.fasterxml.jackson.datatype.joda.testutil.failure.JacksonTestFailureExpected;
 
 import org.joda.time.*;
 
@@ -15,6 +16,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class DateTimeSerializationWithOffsets146Test extends JodaTestBase
 {
     // [datatype-joda#146]
+    @JacksonTestFailureExpected
     @Test
     public void testLocalDateSerDefault() throws Exception
     {
