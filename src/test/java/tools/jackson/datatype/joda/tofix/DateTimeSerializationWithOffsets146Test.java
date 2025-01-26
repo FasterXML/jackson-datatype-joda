@@ -1,9 +1,11 @@
-package tools.jackson.datatype.joda.failing;
+package tools.jackson.datatype.joda.tofix;
 
 import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.SerializationFeature;
 
 import tools.jackson.datatype.joda.JodaTestBase;
+
+import tools.jackson.datatype.joda.testutil.failure.JacksonTestFailureExpected;
 
 import org.joda.time.*;
 
@@ -15,6 +17,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class DateTimeSerializationWithOffsets146Test extends JodaTestBase
 {
     // [datatype-joda#146]
+    @JacksonTestFailureExpected
     @Test
     public void testDateTimeSerializationWithOffsets146() throws Exception
     {

@@ -15,6 +15,7 @@ module tools.jackson.datatype.joda
     // Further, need to open up test packages for JUnit et al
     opens tools.jackson.datatype.joda;
     opens tools.jackson.datatype.joda.deser;
-    opens tools.jackson.datatype.joda.failing;
     opens tools.jackson.datatype.joda.ser;
+    opens tools.jackson.datatype.joda.tofix;
+    opens tools.jackson.datatype.joda.testutil.failure;
 }

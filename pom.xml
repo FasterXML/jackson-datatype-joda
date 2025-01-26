@@ -107,15 +107,6 @@ Joda (https://www.joda.org/joda-time/) data types.
         </executions>
       </plugin>
       <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <configuration>
-          <excludes>
-            <exclude>tools/jackson/**/failing/*.java</exclude>
-          </excludes>
-        </configuration>
-      </plugin>
-      <plugin>
         <groupId>de.jjohannes</groupId>
         <artifactId>gradle-module-metadata-maven-plugin</artifactId>
       </plugin>
