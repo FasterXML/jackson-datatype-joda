@@ -3,9 +3,13 @@ package com.fasterxml.jackson.datatype.joda.ser;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
+import org.junit.jupiter.api.Test;
+
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.joda.JodaTestBase;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class WriteZoneIdTest extends JodaTestBase
 {
@@ -22,6 +26,7 @@ public class WriteZoneIdTest extends JodaTestBase
         }
     }
 
+    @Test
     public void testJacksonAnnotatedPOJOWithDateWithTimezoneToJson() throws Exception
     {
         final ObjectMapper mapper = jodaMapper();

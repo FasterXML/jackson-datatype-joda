@@ -2,8 +2,6 @@ package com.fasterxml.jackson.datatype.joda;
 
 import java.util.Arrays;
 
-import junit.framework.TestCase;
-
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -16,9 +14,9 @@ import org.joda.time.Instant;
 import org.joda.time.YearMonth;
 import org.joda.time.MonthDay;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
-public abstract class JodaTestBase extends TestCase
+public abstract class JodaTestBase
 {
     protected static class FormattedInstant {
         @JsonFormat(pattern = "dd/MM/yyyy HH_mm_ss_SSS")
@@ -78,10 +76,7 @@ public abstract class JodaTestBase extends TestCase
     /**********************************************************
      */
 
-    protected void assertEquals(int[] exp, int[] act) {
-        assertArrayEquals(exp, act);
-    }
-    
+
     /*
     /**********************************************************
     /* Helper methods

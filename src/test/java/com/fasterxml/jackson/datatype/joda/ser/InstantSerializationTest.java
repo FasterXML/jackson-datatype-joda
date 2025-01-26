@@ -5,9 +5,13 @@ import java.text.SimpleDateFormat;
 import org.joda.time.DateTime;
 import org.joda.time.Instant;
 
+import org.junit.jupiter.api.Test;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.joda.JodaTestBase;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class InstantSerializationTest extends JodaTestBase
 {
@@ -16,6 +20,7 @@ public class InstantSerializationTest extends JodaTestBase
         .enable(SerializationFeature.WRITE_DURATIONS_AS_TIMESTAMPS)
         .build();
 
+    @Test
     public void testInstantSer() throws Exception {
         Instant instant = new Instant(0L);
 
@@ -28,6 +33,7 @@ public class InstantSerializationTest extends JodaTestBase
                 .writeValueAsString(instant));
     }
 
+    @Test
     public void testCustomFormatInstantSer() throws Exception
     {
         final String json = MAPPER.writer()
@@ -38,6 +44,7 @@ public class InstantSerializationTest extends JodaTestBase
     }
 
     // [datatype-joda#60]
+    @Test
     public void testInstantConversion() throws Exception
     {
         final ObjectMapper mapper = mapperWithModuleBuilder()

@@ -5,6 +5,8 @@ import java.io.IOException;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
+import org.junit.jupiter.api.Test;
+
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -12,6 +14,8 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class DateTimeTest extends JodaTestBase
 {
@@ -91,6 +95,7 @@ public class DateTimeTest extends JodaTestBase
      * First: let's ensure that serialization does not fail
      * with an error (see [JACKSON-157]).
      */
+    @Test
     public void testSerializationDefaultAsTimestamp() throws IOException
     {
         // let's use epoch time (Jan 1, 1970, UTC)
@@ -98,6 +103,7 @@ public class DateTimeTest extends JodaTestBase
         assertEquals("0", MAPPER.writeValueAsString(DATE_JAN_1_1970_UTC));
     }
 
+    @Test
     public void testSerializationFeatureNoTimestamp() throws IOException
     {
 		String json = MAPPER.writer()
@@ -106,6 +112,7 @@ public class DateTimeTest extends JodaTestBase
         assertEquals(quote("1970-01-01T00:00:00.000Z"), json);
     }
 
+    @Test
     public void testAnnotationAsText() throws IOException
     {
         ObjectMapper m = jodaMapper();
@@ -116,12 +123,14 @@ public class DateTimeTest extends JodaTestBase
     }
 
     // for [datatype-joda#70]
+    @Test
     public void testAsTextNoMilliseconds() throws Exception
     {
     	DateTime value = MAPPER.readValue(quote("2015-07-27T08:11:07-07:00"), DateTime.class);
     	assertNotNull(value);
     }
     
+    @Test
     public void testCustomPatternStyle() throws IOException
     {
         // or, using annotations
@@ -140,6 +149,7 @@ public class DateTimeTest extends JodaTestBase
         assertEquals(aposToQuotes("{'date':'1/1/70 12:00 AM'}"), json);
     }
 
+    @Test
     public void testSerializationWithTypeInfo() throws IOException
     {
         // let's use epoch time (Jan 1, 1970, UTC)
@@ -155,6 +165,7 @@ public class DateTimeTest extends JodaTestBase
                 m.writeValueAsString(dt));
     }
 
+    @Test
     public void testIso8601ThroughJoda() throws Exception {
         ObjectMapper mapper = new ObjectMapper()
             .registerModule(new JodaModule())
@@ -181,6 +192,7 @@ public class DateTimeTest extends JodaTestBase
 //        assertEquals(expectedBean.jodaDateTime, actualBean.jodaDateTime);
       }
 
+    @Test
     public void testCustomFormat() throws Exception
     {
         String STR = "2015-06-19T19:05Z";
@@ -199,6 +211,7 @@ public class DateTimeTest extends JodaTestBase
         assertEquals(inputDate.getMillis(), output.date.getMillis());
     }
     
+    @Test
     public void testWithTimeZoneOverride() throws Exception
     {
         DateTime date = MAPPER.readValue(quote("2014-01-20T08:59:01.000-0500"),
@@ -223,6 +236,7 @@ public class DateTimeTest extends JodaTestBase
     }
 
     // since 2.8
+    @Test
     public void testConfigOverrides() throws Exception
     {
         ObjectMapper mapper = jodaMapper();
@@ -244,6 +258,7 @@ public class DateTimeTest extends JodaTestBase
     }
 
     // [datatype-joda#113] (NPE)
+    @Test
     public void testWithoutLeniency() throws Exception
     {
         ObjectMapper mapper = mapperWithModuleBuilder()
