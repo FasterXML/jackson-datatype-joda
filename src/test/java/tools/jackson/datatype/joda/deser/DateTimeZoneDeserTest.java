@@ -4,12 +4,16 @@ import java.util.TimeZone;
 
 import org.joda.time.DateTimeZone;
 
+import org.junit.jupiter.api.Test;
+
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.ObjectReader;
 import tools.jackson.databind.exc.InvalidFormatException;
 import tools.jackson.datatype.joda.JodaTestBase;
 import tools.jackson.datatype.joda.deser.DateTimeDeserTest.DateTimeZoneWrapper;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class DateTimeZoneDeserTest extends JodaTestBase
 {
@@ -27,6 +31,7 @@ public class DateTimeZoneDeserTest extends JodaTestBase
      */
 
     // [datatype-joda#82]
+    @Test
     public void testSimpleDateTimeZone() throws Exception
     {
         TimeZone timeZone = TimeZone.getTimeZone("GMT-6");
@@ -56,6 +61,7 @@ public class DateTimeZoneDeserTest extends JodaTestBase
      */
 
     // @since 2.12
+    @Test
     public void testReadFromEmptyString() throws Exception
     {
         // By default, fine to deser from empty or blank

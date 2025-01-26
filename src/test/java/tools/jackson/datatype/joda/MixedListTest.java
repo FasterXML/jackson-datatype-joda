@@ -2,16 +2,21 @@ package tools.jackson.datatype.joda;
 
 import java.util.*;
 
+import org.junit.jupiter.api.Test;
+
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
 import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.ObjectMapper;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 public class MixedListTest extends JodaTestBase
 {
     private final ObjectMapper MAPPER = mapperWithModule();
 
+    @Test
     public void testMixedList() throws Exception
     {
         final Map<String, Object> map = new HashMap<String, Object>();

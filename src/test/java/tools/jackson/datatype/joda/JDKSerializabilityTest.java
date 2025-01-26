@@ -2,13 +2,18 @@ package tools.jackson.datatype.joda;
 
 import java.io.*;
 
+import org.junit.jupiter.api.Test;
+
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
 import tools.jackson.databind.*;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 public class JDKSerializabilityTest extends JodaTestBase
 {
+    @Test
     public void testMapperWithModule() throws Exception {
         final DateTime input = new DateTime(0L, DateTimeZone.UTC);
         ObjectMapper mapper = mapperWithModule();

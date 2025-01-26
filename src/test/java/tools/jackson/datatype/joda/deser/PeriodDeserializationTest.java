@@ -5,10 +5,14 @@ import java.util.Map;
 
 import org.joda.time.Period;
 
+import org.junit.jupiter.api.Test;
+
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.ObjectMapper;
 import tools.jackson.datatype.joda.JodaTestBase;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class PeriodDeserializationTest extends JodaTestBase
 {
@@ -24,6 +28,7 @@ public class PeriodDeserializationTest extends JodaTestBase
     /**********************************************************
      */
 
+    @Test
     public void testPeriodDeser() throws IOException
     {
         Period out = MAPPER.readValue(quote("PT1H2M3.004S"), Period.class);
@@ -42,6 +47,7 @@ public class PeriodDeserializationTest extends JodaTestBase
         assertEquals(0, out.getMillis());
     }
 
+    @Test
     public void testPeriodDeserWithTypeInfo() throws IOException
     {
         ObjectMapper mapper = mapperWithModuleBuilder()
@@ -70,6 +76,7 @@ public class PeriodDeserializationTest extends JodaTestBase
     /**********************************************************
      */
 
+    @Test
     public void testPeriodKeyDeserialize() throws IOException {
 
         final String json = "{" + quote("PT1H2M3.004S") + ":0}";

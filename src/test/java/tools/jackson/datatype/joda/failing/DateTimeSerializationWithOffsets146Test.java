@@ -8,9 +8,14 @@ import tools.jackson.datatype.joda.JodaTestBase;
 import org.joda.time.*;
 
 // [datatype-joda#146]: disable overwriting of timezone
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.*;
+
 public class DateTimeSerializationWithOffsets146Test extends JodaTestBase
 {
     // [datatype-joda#146]
+    @Test
     public void testDateTimeSerializationWithOffsets146() throws Exception
     {
         final String inputStr = "2024-12-01T12:00:00+02:00";

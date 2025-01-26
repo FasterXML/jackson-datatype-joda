@@ -5,8 +5,11 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.TimeZone;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import org.joda.time.*;
+
+import org.junit.jupiter.api.Test;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import tools.jackson.databind.DeserializationFeature;
@@ -14,6 +17,8 @@ import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.ObjectReader;
 import tools.jackson.databind.exc.InvalidFormatException;
 import tools.jackson.datatype.joda.JodaTestBase;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Unit tests for verifying limited interoperability for Joda time.
@@ -67,6 +72,7 @@ public class DateTimeDeserTest extends JodaTestBase
      * Ok, then: should be able to convert from JSON String or Number,
      * with standard deserializer we provide.
      */
+    @Test
     public void testDeserFromNumber() throws IOException
     {
         Calendar cal = new GregorianCalendar(TimeZone.getTimeZone("GMT"));
@@ -83,6 +89,7 @@ public class DateTimeDeserTest extends JodaTestBase
         assertEquals("1972-12-28T12:00:01.000Z", dt.toString());
     }
 
+    @Test
     public void testDeserReadableDateTime() throws IOException
     {
         ReadableDateTime date = MAPPER.readValue(quote("1972-12-28T12:00:01.000+0000"),
@@ -91,6 +98,7 @@ public class DateTimeDeserTest extends JodaTestBase
     }
 
     // [datatype-joda#8]
+    @Test
     public void testDeserReadableDateTimeWithTimeZoneInfo() throws IOException
     {
         TimeZone timeZone = TimeZone.getTimeZone("GMT-6");
@@ -109,6 +117,7 @@ public class DateTimeDeserTest extends JodaTestBase
         assertNull(mapper.readValue(quote(""), ReadableDateTime.class));
     }
 
+    @Test
     public void testDeserReadableDateTimeWithTimeZoneFromData() throws IOException {
         ObjectMapper mapper = jodaMapperBuilder(TimeZone.getTimeZone("GMT-6"))
             .disable(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE)
@@ -118,6 +127,7 @@ public class DateTimeDeserTest extends JodaTestBase
         assertEquals(DateTimeZone.forOffsetHours(-5), date.getZone());
     }
 
+    @Test
     public void testDeserReadableDateTimeWithContextTZOverride() throws IOException {
         ObjectMapper mapper = jodaMapperBuilder(TimeZone.getTimeZone("UTC"))
             .disable(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE)
@@ -128,6 +138,7 @@ public class DateTimeDeserTest extends JodaTestBase
         assertEquals(expected, date.time);
     }
 
+    @Test
     public void testDeserReadableDateTimeWithoutContextTZOverride() throws IOException {
         ObjectMapper mapper = jodaMapperBuilder(TimeZone.getTimeZone("UTC"))
             .enable(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE)
@@ -138,6 +149,7 @@ public class DateTimeDeserTest extends JodaTestBase
         assertEquals(expected, date.time);
     }
 
+    @Test
     public void test_enable_ADJUST_DATES_TO_CONTEXT_TIME_ZONE() throws Exception
     {
         ObjectMapper mapper = mapperWithModuleBuilder()
@@ -148,6 +160,7 @@ public class DateTimeDeserTest extends JodaTestBase
         assertEquals(new DateTime(2016, 12, 31, 17, 1, 1, DateTimeZone.UTC), result);
     }
 
+    @Test
     public void test_disable_ADJUST_DATES_TO_CONTEXT_TIME_ZONE() throws Exception
     {
         ObjectMapper mapper = mapperWithModuleBuilder()
@@ -167,6 +180,7 @@ public class DateTimeDeserTest extends JodaTestBase
      */
 
     // @since 2.12
+    @Test
     public void testReadFromEmptyString() throws Exception
     {
         // By default, fine to deser from empty or blank

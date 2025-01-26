@@ -4,9 +4,13 @@ import java.io.IOException;
 
 import org.joda.time.LocalTime;
 
+import org.junit.jupiter.api.Test;
+
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import tools.jackson.databind.ObjectMapper;
 import tools.jackson.datatype.joda.JodaTestBase;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class LocalTimeDeserTest extends JodaTestBase
 {
@@ -28,6 +32,7 @@ public class LocalTimeDeserTest extends JodaTestBase
     /**********************************************************
      */
 
+    @Test
     public void testLocalTimeDeser() throws IOException
     {
         // couple of acceptable formats, so:
@@ -47,6 +52,7 @@ public class LocalTimeDeserTest extends JodaTestBase
         assertNull(MAPPER.readValue(quote(""), LocalTime.class));
     }
 
+    @Test
     public void testLocalTimeDeserWithTypeInfo() throws IOException
     {
         ObjectMapper mapper = mapperWithModuleBuilder()

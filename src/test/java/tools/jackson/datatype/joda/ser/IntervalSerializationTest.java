@@ -1,5 +1,7 @@
 package tools.jackson.datatype.joda.ser;
 
+import org.junit.jupiter.api.Test;
+
 import org.joda.time.DateTimeZone;
 import org.joda.time.Interval;
 
@@ -9,6 +11,8 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import tools.jackson.core.json.JsonWriteFeature;
 import tools.jackson.databind.*;
 import tools.jackson.datatype.joda.JodaTestBase;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class IntervalSerializationTest extends JodaTestBase
 {
@@ -36,6 +40,7 @@ public class IntervalSerializationTest extends JodaTestBase
 
     private final ObjectWriter WRITER = MAPPER.writer();
 
+    @Test
     public void testIntervalSerBasic() throws Exception
     {
         Interval interval = new Interval(1396439982, 1396440001);
@@ -47,6 +52,7 @@ public class IntervalSerializationTest extends JodaTestBase
                         .writeValueAsString(interval));
     }
 
+    @Test
     public void testIntervalSerWithTypeInfo() throws Exception
     {
         Interval interval = new Interval(1396439982, 1396440001);
@@ -58,6 +64,7 @@ public class IntervalSerializationTest extends JodaTestBase
                 mapper.writeValueAsString(interval));
     }
 
+    @Test
     public void testWithTimeZoneOverride() throws Exception
     {
         Interval int1 = new Interval(1396439982, 1396440001);

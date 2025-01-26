@@ -2,6 +2,8 @@ package tools.jackson.datatype.joda.deser;
 
 import java.util.TimeZone;
 
+import org.junit.jupiter.api.Test;
+
 import org.joda.time.MonthDay;
 import org.joda.time.chrono.ISOChronology;
 
@@ -9,6 +11,8 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.exc.MismatchedInputException;
 import tools.jackson.datatype.joda.JodaTestBase;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class MonthDayDeserTest extends JodaTestBase
 {
@@ -19,7 +23,8 @@ public class MonthDayDeserTest extends JodaTestBase
      */
 
     private final ObjectMapper MAPPER = mapperWithModule();
-    
+
+    @Test
     public void testDeserMonthDay() throws Exception
     {
         String monthDayString = new MonthDay(7, 23).toString();
@@ -27,6 +32,7 @@ public class MonthDayDeserTest extends JodaTestBase
         assertEquals(new MonthDay(7, 23), monthDay);
     }
 
+    @Test
     public void testDeserMonthDayWithTimeZone() throws Exception
     {
         final ObjectMapper mapper = mapperWithModule(TimeZone.getTimeZone("Europe/Paris"));
@@ -38,12 +44,14 @@ public class MonthDayDeserTest extends JodaTestBase
         assertEquals(ISOChronology.getInstanceUTC(), monthDay.getChronology());
     }
     
+    @Test
     public void testDeserMonthDayFromEmptyString() throws Exception
     {
         MonthDay monthDay = MAPPER.readValue(quote(""), MonthDay.class);
         assertNull(monthDay);
     }
 
+    @Test
     public void testDeserMonthDayFailsForUnexpectedType() throws Exception
     {
         try {
@@ -55,6 +63,7 @@ public class MonthDayDeserTest extends JodaTestBase
         }
     }
 
+    @Test
     public void testDeserMonthDayCustomFormat() throws Exception
     {
         FormattedMonthDay input = MAPPER.readValue(aposToQuotes(
@@ -65,6 +74,7 @@ public class MonthDayDeserTest extends JodaTestBase
         assertEquals(20, monthDay.getDayOfMonth());
     }
 
+    @Test
     public void testDeserMonthDayConfigOverride() throws Exception
     {
         ObjectMapper mapper = mapperWithModuleBuilder()

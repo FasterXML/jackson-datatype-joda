@@ -4,7 +4,9 @@ import java.text.DateFormat;
 import java.util.Arrays;
 import java.util.TimeZone;
 
-import junit.framework.TestCase;
+import org.joda.time.Instant;
+import org.joda.time.YearMonth;
+import org.joda.time.MonthDay;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
@@ -13,13 +15,9 @@ import tools.jackson.databind.cfg.CoercionAction;
 import tools.jackson.databind.cfg.CoercionInputShape;
 import tools.jackson.databind.json.JsonMapper;
 
-import org.joda.time.Instant;
-import org.joda.time.YearMonth;
-import org.joda.time.MonthDay;
+import static org.junit.jupiter.api.Assertions.*;
 
-import static org.junit.Assert.*;
-
-public abstract class JodaTestBase extends TestCase
+public abstract class JodaTestBase
 {
     protected static class FormattedInstant {
         @JsonFormat(pattern = "dd/MM/yyyy HH_mm_ss_SSS")
@@ -98,10 +96,7 @@ public abstract class JodaTestBase extends TestCase
     /**********************************************************************
      */
 
-    protected void assertEquals(int[] exp, int[] act) {
-        assertArrayEquals(exp, act);
-    }
-    
+
     /*
     /**********************************************************************
     /* Helper methods

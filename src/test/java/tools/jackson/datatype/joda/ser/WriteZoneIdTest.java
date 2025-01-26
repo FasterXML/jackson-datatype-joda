@@ -3,11 +3,15 @@ package tools.jackson.datatype.joda.ser;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
+import org.junit.jupiter.api.Test;
+
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 import tools.jackson.core.json.JsonWriteFeature;
 import tools.jackson.databind.ObjectMapper;
 import tools.jackson.datatype.joda.JodaTestBase;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class WriteZoneIdTest extends JodaTestBase
 {
@@ -24,6 +28,7 @@ public class WriteZoneIdTest extends JodaTestBase
         }
     }
 
+    @Test
     public void testJacksonAnnotatedPOJOWithDateWithTimezoneToJson() throws Exception
     {
         ObjectMapper mapper = mapperWithModuleBuilder()

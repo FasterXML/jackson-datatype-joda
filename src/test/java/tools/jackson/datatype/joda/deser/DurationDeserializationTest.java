@@ -5,6 +5,8 @@ import java.util.Map;
 
 import org.joda.time.Duration;
 
+import org.junit.jupiter.api.Test;
+
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 import tools.jackson.core.type.TypeReference;
@@ -14,6 +16,8 @@ import tools.jackson.databind.ObjectReader;
 import tools.jackson.databind.exc.InvalidFormatException;
 import tools.jackson.databind.exc.MismatchedInputException;
 import tools.jackson.datatype.joda.JodaTestBase;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class DurationDeserializationTest extends JodaTestBase
 {
@@ -30,24 +34,28 @@ public class DurationDeserializationTest extends JodaTestBase
     private final ObjectMapper MAPPER = mapperWithModule();
     private final ObjectReader READER = MAPPER.readerFor(Duration.class);
 
+    @Test
     public void testDurationDeserFromInt() throws IOException
     {
         Duration d = READER.readValue("1234");
         assertEquals(1234, d.getMillis());
     }
 
+    @Test
     public void testDurationDeserFromString() throws IOException
     {
         Duration d = READER.readValue(quote("PT1.234S"));
         assertEquals(1234, d.getMillis());
     }
 
+    @Test
     public void testDurationRoundtrip() throws IOException
     {
         Duration d = new Duration(5513);
         assertEquals(d, READER.readValue(MAPPER.writeValueAsString(d)));
     }
 
+    @Test
     public void testDurationFailsDeserializingUnexpectedType() throws IOException
     {
         try {
@@ -59,6 +67,7 @@ public class DurationDeserializationTest extends JodaTestBase
         }
     }
 
+    @Test
     public void testDurationDeserFromIntWithTypeInfo() throws IOException
     {
         ObjectMapper mapper = mapperWithModuleBuilder()
@@ -74,6 +83,7 @@ public class DurationDeserializationTest extends JodaTestBase
     /**********************************************************
      */
 
+    @Test
     public void testDurationKeyDeserialize() throws IOException
     {
         final String json = "{" + quote("PT60s") + ":0}";
@@ -91,6 +101,7 @@ public class DurationDeserializationTest extends JodaTestBase
 
     // [datatype-joda#90]: Possibly support wider set of representations
 
+    @Test
     public void testDurationAltFromString() throws IOException
     {
         Duration d = MAPPER.readValue(quote("PT1H"), Duration.class);
@@ -100,6 +111,7 @@ public class DurationDeserializationTest extends JodaTestBase
         assertEquals(4 * 60 + 30, d.getStandardMinutes());
     }
 
+    @Test
     public void testDurationAltKeyDeserialize() throws IOException
     {
         final String json = "{" + quote("PT4H30M") + ":0}";
@@ -116,6 +128,7 @@ public class DurationDeserializationTest extends JodaTestBase
      */
 
     // @since 2.12
+    @Test
     public void testReadFromEmptyString() throws Exception
     {
         // By default, fine to deser from empty or blank

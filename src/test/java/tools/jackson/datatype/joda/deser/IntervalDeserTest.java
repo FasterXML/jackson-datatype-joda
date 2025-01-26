@@ -8,9 +8,13 @@ import org.joda.time.DateTimeZone;
 import org.joda.time.Interval;
 import org.joda.time.chrono.ISOChronology;
 
+import org.junit.jupiter.api.Test;
+
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import tools.jackson.databind.ObjectMapper;
 import tools.jackson.datatype.joda.JodaTestBase;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class IntervalDeserTest extends JodaTestBase
 {
@@ -24,6 +28,7 @@ public class IntervalDeserTest extends JodaTestBase
     /**********************************************************
      */
 
+    @Test
     public void testIntervalDeser() throws IOException
     {
         final ObjectMapper mapper = mapperWithModule();
@@ -39,6 +44,7 @@ public class IntervalDeserTest extends JodaTestBase
         assertEquals(ISOChronology.getInstance(DateTimeZone.UTC), interval.getChronology());
     }
 
+    @Test
     public void testIntervalDeserWithTimeZone() throws IOException
     {
         ObjectMapper mapper = mapperWithModule(TimeZone.getTimeZone("Europe/Paris"));
@@ -56,6 +62,7 @@ public class IntervalDeserTest extends JodaTestBase
         assertEquals(ISOChronology.getInstance(DateTimeZone.forID("America/Los_Angeles")), interval.getChronology());
     }
     
+    @Test
     public void testIntervalDeserWithTypeInfo() throws IOException
     {
         ObjectMapper mapper = mapperWithModuleBuilder()
@@ -66,6 +73,7 @@ public class IntervalDeserTest extends JodaTestBase
         assertEquals(1396440001, interval.getEndMillis());
     }
 
+    @Test
     public void testIntervalDeserFromIso8601WithTimezoneWithContextTimeZone() throws IOException
     {
         final ObjectMapper mapper = mapperWithModuleBuilder()
@@ -79,6 +87,7 @@ public class IntervalDeserTest extends JodaTestBase
         assertEquals(expectedInterval, actualInterval);
     }
 
+    @Test
     public void testIntervalDeserFromIso8601WithTimezoneWithoutContextTimeZone() throws IOException
     {
         final ObjectMapper mapper = mapperWithModuleBuilder()
@@ -91,6 +100,7 @@ public class IntervalDeserTest extends JodaTestBase
         assertEquals(expectedInterval, actualInterval);
     }
 
+    @Test
     public void testIntervalDeserFromIso8601WithTimezoneWithDefaultTimeZone() throws IOException
     {
         final ObjectMapper mapper = mapperWithModuleBuilder()
