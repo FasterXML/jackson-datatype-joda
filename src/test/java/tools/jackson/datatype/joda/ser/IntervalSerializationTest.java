@@ -17,15 +17,15 @@ import static org.junit.jupiter.api.Assertions.*;
 public class IntervalSerializationTest extends JodaTestBase
 {
     @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.WRAPPER_ARRAY, property = "@class")
-    private static interface ObjectConfiguration {
+    public static interface ObjectConfiguration {
     }
 
-    static class FormattedInterval
+    public static class FormattedInterval
     {
         @JsonFormat(timezone="EST")
         public Interval interval;
     }
-    
+ 
     /*
     /**********************************************************
     /* Test methods
@@ -58,6 +58,7 @@ public class IntervalSerializationTest extends JodaTestBase
         Interval interval = new Interval(1396439982, 1396440001);
 
         ObjectMapper mapper = mapperWithModuleBuilder()
+                .enable(SerializationFeature.WRITE_DURATIONS_AS_TIMESTAMPS)
                 .addMixIn(Interval.class, ObjectConfiguration.class)
                 .build();
         assertEquals("[\"org.joda.time.Interval\"," + q("1396439982-1396440001") + "]",
