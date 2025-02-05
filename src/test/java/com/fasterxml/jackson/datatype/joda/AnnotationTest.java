@@ -13,9 +13,10 @@ import org.joda.time.DateTimeZone;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class AnnotationTest extends DateTimeTest
+public class AnnotationTest extends JodaTestBase
 {
-    static class AClass{
+    static class AClass
+    {
         @JsonSerialize(using = DateTimeSerializer.class)
         @JsonDeserialize(using = DateTimeDeserializer.class)
         private DateTime createdOn = DateTime.now(DateTimeZone.UTC);
