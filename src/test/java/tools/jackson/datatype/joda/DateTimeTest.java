@@ -21,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class DateTimeTest extends JodaTestBase
 {
-    static class DateAsText {
+    public static class DateAsText {
         @JsonFormat(shape=JsonFormat.Shape.STRING)
         public DateTime date;
 
@@ -30,14 +30,14 @@ public class DateTimeTest extends JodaTestBase
         }
     }
 
-    static class DateTimeWrapper {
+    public static class DateTimeWrapper {
         public DateTime value;
 
         public DateTimeWrapper(DateTime v) { value = v; }
-        protected DateTimeWrapper() { }
+        public DateTimeWrapper() { }
     }
 
-    static class CustomDate {
+    public static class CustomDate {
         // note: 'SS' means 'short representation'
         @JsonFormat(shape=JsonFormat.Shape.STRING, pattern="SS", locale="en")
         public DateTime date;
@@ -47,7 +47,7 @@ public class DateTimeTest extends JodaTestBase
         }
     }
 
-    static class EuroDate {
+    public static class EuroDate {
         @JsonFormat(shape=JsonFormat.Shape.STRING, pattern="dd.MM.YYYY' 'HH:mm")
         public DateTime date;
 
@@ -58,7 +58,7 @@ public class DateTimeTest extends JodaTestBase
     }
 
     @JsonPropertyOrder({"jodaDateTime", "javaUtilDate" })
-    static class Beanie {
+    public static class Beanie {
         public final DateTime jodaDateTime;
         public final java.util.Date javaUtilDate;
         @JsonCreator
@@ -69,13 +69,13 @@ public class DateTimeTest extends JodaTestBase
         }
     }
     
-    static class FormattedDateTime {
+    public static class FormattedDateTime {
         @JsonFormat(timezone="EST")
         public DateTime dateTime;
     }
 
     @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.WRAPPER_ARRAY, property = "@class")
-    private static interface TypeInfoMixIn {
+    public interface TypeInfoMixIn {
     }
 
     /*
@@ -102,7 +102,9 @@ public class DateTimeTest extends JodaTestBase
     {
         // let's use epoch time (Jan 1, 1970, UTC)
         // by default, dates use timestamp, so:
-        assertEquals("0", MAPPER.writeValueAsString(DATE_JAN_1_1970_UTC));
+        assertEquals("0", MAPPER.writer()
+                .with(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+                .writeValueAsString(DATE_JAN_1_1970_UTC));
     }
 
     @Test
@@ -158,7 +160,8 @@ public class DateTimeTest extends JodaTestBase
         // let's use epoch time (Jan 1, 1970, UTC)
         DateTime dt = new DateTime(0L, DateTimeZone.UTC);
         // by default, dates use timestamp, so:
-        assertEquals("0", MAPPER.writeValueAsString(dt));
+        assertEquals("0", MAPPER.writer()
+                .with(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS).writeValueAsString(dt));
 
         // but if re-configured, as regular ISO-8601 string
         ObjectMapper m = mapperWithModuleBuilder()
