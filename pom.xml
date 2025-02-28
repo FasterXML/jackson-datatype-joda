@@ -94,15 +94,9 @@ Joda (https://www.joda.org/joda-time/) data types.
         <!-- Inherited from oss-base. Generate PackageVersion.java.-->
         <groupId>com.google.code.maven-replacer-plugin</groupId>
         <artifactId>replacer</artifactId>
-        <executions>
-          <execution>
-            <id>process-packageVersion</id>
-            <phase>generate-sources</phase>
-          </execution>
-        </executions>
       </plugin>
       <plugin>
-        <groupId>de.jjohannes</groupId>
+        <groupId>org.gradlex</groupId>
         <artifactId>gradle-module-metadata-maven-plugin</artifactId>
       </plugin>
     </plugins>
