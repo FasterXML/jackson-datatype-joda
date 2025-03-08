@@ -5,7 +5,7 @@ Major version: 3 (for earlier, see VERSION-2.x)
 === Releases ===
 ------------------------------------------------------------------------
 
-3.0.0 (not yet released)
+3.0.0-rc1 (07-Mar-2025)
 
 #130: Remove support of `org.joda.time.DateMidnight` from Jackson 3.x
 #153: Change 3.0 to use `module-info.java` directly [JSTEP-11]
