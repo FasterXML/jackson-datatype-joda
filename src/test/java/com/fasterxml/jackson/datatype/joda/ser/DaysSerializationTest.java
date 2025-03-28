@@ -3,7 +3,6 @@ package com.fasterxml.jackson.datatype.joda.ser;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.joda.time.DateTime;
 import org.joda.time.Days;
 import org.junit.jupiter.api.Test;
 
@@ -12,7 +11,7 @@ import com.fasterxml.jackson.datatype.joda.JodaTestBase;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class PeriodSerializationTest extends JodaTestBase
+public class DaysSerializationTest extends JodaTestBase
 {
     final ObjectMapper MAPPER = mapperWithModuleBuilder().build();
 

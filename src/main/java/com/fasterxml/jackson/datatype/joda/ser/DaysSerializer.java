@@ -7,6 +7,11 @@ import org.joda.time.Days;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
 
+/**
+ * Serializer for Joda {@link Days} class.
+ *
+ * @since 2.19
+ */
 public class DaysSerializer
     extends JodaSerializerBase<Days>
 {
