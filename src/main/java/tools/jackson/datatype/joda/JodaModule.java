@@ -30,7 +30,6 @@ public class JodaModule extends JacksonModule
         return PackageVersion.VERSION;
     }
 
-    @SuppressWarnings("deprecation")
     @Override
     public void setupModule(SetupContext context)
     {
@@ -60,6 +59,7 @@ public class JodaModule extends JacksonModule
         context.addSerializers(new SimpleSerializers()
                 .addSerializer(DateTime.class, new DateTimeSerializer())
                 .addSerializer(DateTimeZone.class, new DateTimeZoneSerializer())
+                .addSerializer(Days.class, new DaysSerializer())
                 .addSerializer(Duration.class, new DurationSerializer())
                 .addSerializer(Instant.class, new InstantSerializer())
                 .addSerializer(LocalDateTime.class, new LocalDateTimeSerializer())
