@@ -4,6 +4,12 @@ Project: jackson-datatype-joda
 === Releases ===
 ------------------------------------------------------------------------
 
+2.18.4 (not yet released)
+
+#160: Cannot serialize `org.joda.time.Days`
+ (reported by @bestbugwriter)
+ (fixed by Joo-Hyuk K)
+
 2.18.3 (28-Feb-2025)
 2.18.2 (27-Nov-2024)
 2.18.1 (28-Oct-2024)
