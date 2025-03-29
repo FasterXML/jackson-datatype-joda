@@ -110,3 +110,6 @@ Stephane Paulus (StephanePaulus@github)
   * Contributed #129: Add gradle-module-metadata-maven-plugin
   (2.14.0)
 
+Joo Hyuk Kim (@JooHyukKim)
+  * Fixed #160: Cannot serialize `org.joda.time.Days`
+  (2.18.4)
