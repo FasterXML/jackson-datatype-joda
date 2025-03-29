@@ -37,6 +37,7 @@ public class JodaModule extends SimpleModule
         // then serializers:
         addSerializer(DateTime.class, new DateTimeSerializer());
         addSerializer(DateTimeZone.class, new DateTimeZoneSerializer());
+        addSerializer(Days.class, new DaysSerializer()); // 2.18.4
         addSerializer(Duration.class, new DurationSerializer());
         addSerializer(Instant.class, new InstantSerializer());
         addSerializer(LocalDateTime.class, new LocalDateTimeSerializer());
@@ -46,7 +47,6 @@ public class JodaModule extends SimpleModule
         addSerializer(Interval.class, new IntervalSerializer());
         addSerializer(MonthDay.class, new MonthDaySerializer());
         addSerializer(YearMonth.class, new YearMonthSerializer());
-        addSerializer(Days.class, new DaysSerializer());
 
         // then key deserializers
         addKeyDeserializer(DateTime.class, new DateTimeKeyDeserializer());
