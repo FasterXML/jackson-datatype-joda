@@ -1,15 +1,14 @@
 package com.fasterxml.jackson.datatype.joda.ser;
 
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.Map;
 
 import org.joda.time.Days;
-import org.junit.jupiter.api.Test;
+
+import org.junit.Test;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.joda.JodaTestBase;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class DaysSerializationTest extends JodaTestBase
 {
@@ -19,13 +18,8 @@ public class DaysSerializationTest extends JodaTestBase
     public void testPeriodSerialization()
         throws Exception
     {
-        Days days = Days.days(7);
-        Map<String, Object> map = new HashMap<>();
-        map.put("days", days);
+        Map<String, Object> map = Collections.singletonMap("days", Days.days(7));
 
-        String json = MAPPER.writeValueAsString(map);
-
-        assertEquals("{\"days\":7}", json);
+        assertEquals("{\"days\":7}", MAPPER.writeValueAsString(map));
     }
-
 }
