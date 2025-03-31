@@ -113,3 +113,7 @@ Stephane Paulus (StephanePaulus@github)
 Joo Hyuk Kim (@JooHyukKim)
   * Fixed #160: Cannot serialize `org.joda.time.Days`
   (2.18.4)
+
+Joo Hyuk Kim (@JooHyukKim)
+  * Fixed #161: Cannot serialize `org.joda.time.Hours\Minutes\Seconds\Months\Years\Weeks`
+  (2.18.4)
