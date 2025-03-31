@@ -15,8 +15,6 @@ import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.joda.JodaTestBase;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 @SuppressWarnings("deprecation") // because DateMidnight deprecated by Joda
 public class DateMidnightTest extends JodaTestBase
 {
