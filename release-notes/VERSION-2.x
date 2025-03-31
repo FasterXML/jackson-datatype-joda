@@ -9,6 +9,9 @@ Project: jackson-datatype-joda
 #160: Cannot serialize `org.joda.time.Days`
  (reported by @bestbugwriter)
  (fixed by Joo-Hyuk K)
+#162: Cannot serialize `org.joda.time.Hours\Minutes\Seconds\Months\Years\Weeks`
+ (reported by @bestbugwriter)
+ (fixed by Joo-Hyuk K)
 
 2.18.3 (28-Feb-2025)
 2.18.2 (27-Nov-2024)
