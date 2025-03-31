@@ -10,7 +10,7 @@ import com.fasterxml.jackson.databind.SerializerProvider;
 /**
  * Serializer for Joda {@link Years} class.
  *
- * @since 2.19
+ * @since 2.18.4
  */
 public class YearsSerializer
     extends JodaSerializerBase<Years>

@@ -10,7 +10,7 @@ import com.fasterxml.jackson.databind.SerializerProvider;
 /**
  * Serializer for Joda {@link Minutes} class.
  *
- * @since 2.19
+ * @since 2.18.4
  */
 public class MinutesSerializer
     extends JodaSerializerBase<Minutes>
