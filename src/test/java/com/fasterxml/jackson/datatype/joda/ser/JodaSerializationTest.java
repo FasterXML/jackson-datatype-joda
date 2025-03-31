@@ -14,6 +14,7 @@ import org.joda.time.*;
 import org.joda.time.format.ISODateTimeFormat;
 
 import java.io.IOException;
+import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -267,4 +268,53 @@ public class JodaSerializationTest extends JodaTestBase
         String json = MAPPER.writeValueAsString(new FormattedYearMonth(yearMonth));
         assertEquals(a2q("{'value':'2013/08'}"), json);
     }
+
+    @Test
+    public void testHoursSer() throws Exception
+    {
+        Hours hours = Hours.hours(1);
+        String json = MAPPER.writeValueAsString(hours);
+        assertEquals("1", json);
+    }
+
+    @Test
+    public void testMinutesSer() throws Exception
+    {
+        Minutes minutes = Minutes.minutes(2);
+        String json = MAPPER.writeValueAsString(minutes);
+        assertEquals("2", json);
+    }
+
+    @Test
+    public void testSecondsSer() throws Exception
+    {
+        Seconds seconds = Seconds.seconds(3);
+        String json = MAPPER.writeValueAsString(seconds);
+        assertEquals("3", json);
+    }
+
+    @Test
+    public void testMonthsSer() throws Exception
+    {
+        Months months = Months.months(4);
+        String json = MAPPER.writeValueAsString(months);
+        assertEquals("4", json);
+    }
+
+    @Test
+    public void testYearsSer() throws Exception
+    {
+        Years years = Years.years(5);
+        String json = MAPPER.writeValueAsString(years);
+        assertEquals("5", json);
+    }
+
+    @Test
+    public void testWeeksSer() throws Exception
+    {
+        Weeks weeks = Weeks.weeks(6);
+        String json = MAPPER.writeValueAsString(weeks);
+        assertEquals("6", json);
+    }
+
 }
