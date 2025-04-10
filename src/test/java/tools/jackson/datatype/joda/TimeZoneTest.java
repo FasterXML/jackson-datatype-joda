@@ -10,6 +10,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import tools.jackson.core.json.JsonWriteFeature;
 
 import tools.jackson.databind.*;
+import tools.jackson.databind.cfg.DateTimeFeature;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -53,18 +54,18 @@ public class TimeZoneTest extends JodaTestBase
     {
         // First, no zone id included
         ObjectWriter w = MAPPER.writer()
-                .without(SerializationFeature.WRITE_DATES_WITH_ZONE_ID);
+                .without(DateTimeFeature.WRITE_DATES_WITH_ZONE_ID);
         
         assertEquals("0",
-                w.with(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+                w.with(DateTimeFeature.WRITE_DATES_AS_TIMESTAMPS)
                     .writeValueAsString(DATE_JAN_1_1970_UTC));
         assertEquals(quote("1970-01-01T00:00:00.000Z"),
-                w.without(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+                w.without(DateTimeFeature.WRITE_DATES_AS_TIMESTAMPS)
                     .writeValueAsString(DATE_JAN_1_1970_UTC));
 
         // then with zone id
 
-        w = w.with(SerializationFeature.WRITE_DATES_WITH_ZONE_ID);
+        w = w.with(DateTimeFeature.WRITE_DATES_WITH_ZONE_ID);
 
         // 12-Jul-2015, tatu: Despite initial plans, support for timezone id with timestamps
         //    was not included in 2.6.0 final.
@@ -74,7 +75,7 @@ public class TimeZoneTest extends JodaTestBase
                 .writeValueAsString(DATE_JAN_1_1970_UTC));
                 */
         assertEquals(quote("1970-01-01T00:00:00.000Z[UTC]"),
-                w.without(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+                w.without(DateTimeFeature.WRITE_DATES_AS_TIMESTAMPS)
                 .writeValueAsString(DATE_JAN_1_1970_UTC));
     }
 
@@ -88,10 +89,10 @@ public class TimeZoneTest extends JodaTestBase
     {
         ObjectWriter w = MAPPER.writer();
 
-        w = w.with(SerializationFeature.WRITE_DATES_WITH_ZONE_ID);
+        w = w.with(DateTimeFeature.WRITE_DATES_WITH_ZONE_ID);
 
         assertEquals(quote("1969-12-31T16:00:00.000-08:00[America/Los_Angeles]"),
-                w.without(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+                w.without(DateTimeFeature.WRITE_DATES_AS_TIMESTAMPS)
                         .writeValueAsString(DATE_JAN_1_1970_UTC_IN_AMERICA_LA));
     }
 
@@ -99,13 +100,13 @@ public class TimeZoneTest extends JodaTestBase
     public void testRoundTrip()  throws Exception
     {
         ObjectWriter w = MAPPER.writer()
-                .with(SerializationFeature.WRITE_DATES_WITH_ZONE_ID);
+                .with(DateTimeFeature.WRITE_DATES_WITH_ZONE_ID);
         DateTime input = new DateTime(2014, 8, 24, 5, 17, 45, DateTimeZone.forID("America/Chicago")); // arbitrary
         String json;
         DateTime result;
 
         // Time zone id only supported as regular text
-        json = w.without(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+        json = w.without(DateTimeFeature.WRITE_DATES_AS_TIMESTAMPS)
                 .writeValueAsString(input);
 
         ObjectMapper mapper = mapperWithModuleBuilder()
@@ -116,7 +117,7 @@ public class TimeZoneTest extends JodaTestBase
         assertEquals(input, result, "TimeZones differ");
 
         // Then timestamp: will not currently (2.6) write out timezone id
-        json = w.with(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+        json = w.with(DateTimeFeature.WRITE_DATES_AS_TIMESTAMPS)
                 .writeValueAsString(input);
         result = mapper.readValue(json, DateTime.class);
         assertEquals(input.getMillis(), result.getMillis(), "Actual timepoints differ");
@@ -141,8 +142,8 @@ public class TimeZoneTest extends JodaTestBase
         DateTime secondOneAm = new DateTime(secondOneAmUtc, AMERICA_LOS_ANGELES);
 
         ObjectWriter w = MAPPER.writer()
-                .without(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
-                .with(SerializationFeature.WRITE_DATES_WITH_ZONE_ID);
+                .without(DateTimeFeature.WRITE_DATES_AS_TIMESTAMPS)
+                .with(DateTimeFeature.WRITE_DATES_WITH_ZONE_ID);
 
         String firstOneAmStr = w.writeValueAsString(firstOneAm);
         String secondOneAmStr = w.writeValueAsString(secondOneAm);
@@ -166,8 +167,8 @@ public class TimeZoneTest extends JodaTestBase
     {
         // but if re-configured to include the time zone
         ObjectMapper m = mapperWithModuleBuilder()
-                .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
-                .enable(SerializationFeature.WRITE_DATES_WITH_ZONE_ID)
+                .disable(DateTimeFeature.WRITE_DATES_AS_TIMESTAMPS)
+                .enable(DateTimeFeature.WRITE_DATES_WITH_ZONE_ID)
                 .addMixIn(DateTime.class, TypeInfoMixIn.class)
                 .build();
         assertEquals("[\"org.joda.time.DateTime\",\"1970-01-01T00:00:00.000Z[UTC]\"]",

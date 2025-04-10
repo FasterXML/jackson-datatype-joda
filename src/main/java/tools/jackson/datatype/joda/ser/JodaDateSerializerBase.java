@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import tools.jackson.core.JsonParser;
 
 import tools.jackson.databind.*;
+import tools.jackson.databind.cfg.DateTimeFeature;
 import tools.jackson.databind.jsonFormatVisitors.*;
 import tools.jackson.datatype.joda.cfg.JacksonJodaDateFormat;
 
@@ -15,7 +16,7 @@ public abstract class JodaDateSerializerBase<T> extends JodaSerializerBase<T>
 
     protected final JacksonJodaDateFormat _format;
 
-    protected final SerializationFeature _featureForNumeric;
+    protected final DateTimeFeature _featureForNumeric;
 
     /**
      * Shape to use for generic "use numeric" feature (instead of more specific
@@ -29,7 +30,7 @@ public abstract class JodaDateSerializerBase<T> extends JodaSerializerBase<T>
     protected final int _shapeOverride;
 
     protected JodaDateSerializerBase(Class<T> type, JacksonJodaDateFormat format,
-            SerializationFeature numericFeature,
+            DateTimeFeature numericFeature,
             int defaultNumericShape, int shapeOverride)
     {
         super(type);

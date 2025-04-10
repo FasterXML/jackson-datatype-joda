@@ -10,6 +10,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 import tools.jackson.core.json.JsonWriteFeature;
 import tools.jackson.databind.*;
+import tools.jackson.databind.cfg.DateTimeFeature;
 import tools.jackson.datatype.joda.JodaTestBase;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -33,8 +34,8 @@ public class IntervalSerializationTest extends JodaTestBase
      */
     
     private final ObjectMapper MAPPER = mapperWithModuleBuilder()
-            .enable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS,
-                    SerializationFeature.WRITE_DURATIONS_AS_TIMESTAMPS)
+            .enable(DateTimeFeature.WRITE_DATES_AS_TIMESTAMPS,
+                    DateTimeFeature.WRITE_DURATIONS_AS_TIMESTAMPS)
             .disable(JsonWriteFeature.ESCAPE_FORWARD_SLASHES)
             .build();
 
@@ -48,7 +49,7 @@ public class IntervalSerializationTest extends JodaTestBase
 
         // related to #48
         assertEquals(q("1970-01-17T03:53:59.982Z/1970-01-17T03:54:00.001Z"),
-                WRITER.without(SerializationFeature.WRITE_DURATIONS_AS_TIMESTAMPS)
+                WRITER.without(DateTimeFeature.WRITE_DURATIONS_AS_TIMESTAMPS)
                         .writeValueAsString(interval));
     }
 
@@ -58,7 +59,7 @@ public class IntervalSerializationTest extends JodaTestBase
         Interval interval = new Interval(1396439982, 1396440001);
 
         ObjectMapper mapper = mapperWithModuleBuilder()
-                .enable(SerializationFeature.WRITE_DURATIONS_AS_TIMESTAMPS)
+                .enable(DateTimeFeature.WRITE_DURATIONS_AS_TIMESTAMPS)
                 .addMixIn(Interval.class, ObjectConfiguration.class)
                 .build();
         assertEquals("[\"org.joda.time.Interval\"," + q("1396439982-1396440001") + "]",

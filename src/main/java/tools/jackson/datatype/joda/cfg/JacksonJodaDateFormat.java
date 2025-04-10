@@ -12,6 +12,7 @@ import tools.jackson.databind.DeserializationContext;
 import tools.jackson.databind.DeserializationFeature;
 import tools.jackson.databind.SerializationContext;
 import tools.jackson.databind.SerializationFeature;
+import tools.jackson.databind.cfg.DateTimeFeature;
 
 /**
  * Simple container used to encapsulate (some of) gory details of
@@ -298,7 +299,7 @@ public class JacksonJodaDateFormat extends JacksonJodaFormatBase
      */
     public boolean shouldWriteWithZoneId(SerializationContext ctxt) {
         return (_writeZoneId != null) ? _writeZoneId :
-            ctxt.isEnabled(SerializationFeature.WRITE_DATES_WITH_ZONE_ID);
+            ctxt.isEnabled(DateTimeFeature.WRITE_DATES_WITH_ZONE_ID);
     }
 
     /**

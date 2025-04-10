@@ -4,6 +4,7 @@ import tools.jackson.core.JacksonException;
 import tools.jackson.core.JsonGenerator;
 
 import tools.jackson.databind.*;
+import tools.jackson.databind.cfg.DateTimeFeature;
 import tools.jackson.datatype.joda.cfg.FormatConfig;
 import tools.jackson.datatype.joda.cfg.JacksonJodaDateFormat;
 
@@ -25,7 +26,7 @@ public class DateTimeSerializer
     {
         // false -> no arrays (numbers)
         super(DateTime.class, format,
-                SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, FORMAT_TIMESTAMP,
+                DateTimeFeature.WRITE_DATES_AS_TIMESTAMPS, FORMAT_TIMESTAMP,
                 shapeOverride);
     }
 

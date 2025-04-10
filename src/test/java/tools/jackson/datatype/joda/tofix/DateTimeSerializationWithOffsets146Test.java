@@ -1,8 +1,7 @@
 package tools.jackson.datatype.joda.tofix;
 
 import tools.jackson.databind.ObjectMapper;
-import tools.jackson.databind.SerializationFeature;
-
+import tools.jackson.databind.cfg.DateTimeFeature;
 import tools.jackson.datatype.joda.JodaTestBase;
 
 import tools.jackson.datatype.joda.testutil.failure.JacksonTestFailureExpected;
@@ -24,7 +23,7 @@ public class DateTimeSerializationWithOffsets146Test extends JodaTestBase
         final String inputStr = "2024-12-01T12:00:00+02:00";
         final DateTime inputValue = DateTime.parse(inputStr);
         final ObjectMapper mapper = mapperWithModuleBuilder()
-                .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+                .disable(DateTimeFeature.WRITE_DATES_AS_TIMESTAMPS)
                 .build();
 
         // By default, do adjust timezone to UTC
@@ -33,7 +32,7 @@ public class DateTimeSerializationWithOffsets146Test extends JodaTestBase
 
         // But if we disable it, no adjustment
         final String alternateOutput = mapper.writer()
-                .without(SerializationFeature.WRITE_DATES_WITH_CONTEXT_TIME_ZONE)
+                .without(DateTimeFeature.WRITE_DATES_WITH_CONTEXT_TIME_ZONE)
                 .writeValueAsString(inputValue);
 
         assertEquals(q(inputStr), alternateOutput);

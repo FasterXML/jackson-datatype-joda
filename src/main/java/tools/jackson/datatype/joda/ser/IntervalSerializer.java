@@ -4,7 +4,7 @@ import tools.jackson.core.JacksonException;
 import tools.jackson.core.JsonGenerator;
 
 import tools.jackson.databind.SerializationContext;
-import tools.jackson.databind.SerializationFeature;
+import tools.jackson.databind.cfg.DateTimeFeature;
 import tools.jackson.datatype.joda.cfg.FormatConfig;
 import tools.jackson.datatype.joda.cfg.JacksonJodaDateFormat;
 
@@ -19,7 +19,7 @@ public class IntervalSerializer extends JodaDateSerializerBase<Interval>
     }
     public IntervalSerializer(JacksonJodaDateFormat format,
             int shapeOverride) {
-        super(Interval.class, format, SerializationFeature.WRITE_DURATIONS_AS_TIMESTAMPS,
+        super(Interval.class, format, DateTimeFeature.WRITE_DURATIONS_AS_TIMESTAMPS,
                 FORMAT_TIMESTAMP, shapeOverride);
     }
 

@@ -3,7 +3,7 @@ package tools.jackson.datatype.joda.ser;
 import tools.jackson.core.*;
 
 import tools.jackson.databind.SerializationContext;
-import tools.jackson.databind.SerializationFeature;
+import tools.jackson.databind.cfg.DateTimeFeature;
 import tools.jackson.datatype.joda.cfg.FormatConfig;
 import tools.jackson.datatype.joda.cfg.JacksonJodaDateFormat;
 
@@ -17,7 +17,7 @@ public class YearMonthSerializer extends JodaDateSerializerBase<YearMonth>
     }
     public YearMonthSerializer(JacksonJodaDateFormat format,
                                int shapeOverride) {
-        super(YearMonth.class, format, SerializationFeature.WRITE_DATES_AS_TIMESTAMPS,
+        super(YearMonth.class, format, DateTimeFeature.WRITE_DATES_AS_TIMESTAMPS,
                 FORMAT_STRING, shapeOverride);
     }
 

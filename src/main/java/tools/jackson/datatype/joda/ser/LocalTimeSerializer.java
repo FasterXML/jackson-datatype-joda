@@ -6,7 +6,7 @@ import tools.jackson.core.JacksonException;
 import tools.jackson.core.JsonGenerator;
 
 import tools.jackson.databind.SerializationContext;
-import tools.jackson.databind.SerializationFeature;
+import tools.jackson.databind.cfg.DateTimeFeature;
 import tools.jackson.datatype.joda.cfg.FormatConfig;
 import tools.jackson.datatype.joda.cfg.JacksonJodaDateFormat;
 
@@ -23,7 +23,7 @@ public class LocalTimeSerializer
 
     public LocalTimeSerializer(JacksonJodaDateFormat format,
             int shapeOverride) {
-        super(LocalTime.class, format, SerializationFeature.WRITE_DATES_AS_TIMESTAMPS,
+        super(LocalTime.class, format, DateTimeFeature.WRITE_DATES_AS_TIMESTAMPS,
                 FORMAT_ARRAY, shapeOverride);
     }
 

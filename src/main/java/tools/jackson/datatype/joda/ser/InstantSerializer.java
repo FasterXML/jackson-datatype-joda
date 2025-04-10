@@ -4,8 +4,9 @@ import org.joda.time.Instant;
 
 import tools.jackson.core.JacksonException;
 import tools.jackson.core.JsonGenerator;
+
 import tools.jackson.databind.SerializationContext;
-import tools.jackson.databind.SerializationFeature;
+import tools.jackson.databind.cfg.DateTimeFeature;
 import tools.jackson.datatype.joda.cfg.FormatConfig;
 import tools.jackson.datatype.joda.cfg.JacksonJodaDateFormat;
 
@@ -19,7 +20,7 @@ public class InstantSerializer
 
     public InstantSerializer(JacksonJodaDateFormat format,
             int shapeOverride) {
-        super(Instant.class, format, SerializationFeature.WRITE_DATES_AS_TIMESTAMPS,
+        super(Instant.class, format, DateTimeFeature.WRITE_DATES_AS_TIMESTAMPS,
                 FORMAT_TIMESTAMP, shapeOverride);
     }
 

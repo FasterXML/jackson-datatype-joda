@@ -9,7 +9,7 @@ import org.joda.time.DateTimeZone;
 
 import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.ObjectMapper;
-import tools.jackson.databind.SerializationFeature;
+import tools.jackson.databind.cfg.DateTimeFeature;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -26,7 +26,7 @@ public class MixedListTest extends JodaTestBase
         map.put("B", 0);
     	
 	    final String json = MAPPER.writer()
-	            .with(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+	            .with(DateTimeFeature.WRITE_DATES_AS_TIMESTAMPS)
 	            .writeValueAsString(map);
 	    // by default, timestamps should come out as longs...
 	    

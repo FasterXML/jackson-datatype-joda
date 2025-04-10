@@ -9,7 +9,7 @@ import org.joda.time.Instant;
 
 import tools.jackson.core.json.JsonWriteFeature;
 import tools.jackson.databind.ObjectMapper;
-import tools.jackson.databind.SerializationFeature;
+import tools.jackson.databind.cfg.DateTimeFeature;
 import tools.jackson.datatype.joda.JodaTestBase;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -17,8 +17,8 @@ import static org.junit.jupiter.api.Assertions.*;
 public class InstantSerializationTest extends JodaTestBase
 {
     private final ObjectMapper MAPPER = mapperWithModuleBuilder()
-        .enable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
-        .enable(SerializationFeature.WRITE_DURATIONS_AS_TIMESTAMPS)
+        .enable(DateTimeFeature.WRITE_DATES_AS_TIMESTAMPS)
+        .enable(DateTimeFeature.WRITE_DURATIONS_AS_TIMESTAMPS)
         .build();
 
     @Test
@@ -30,7 +30,7 @@ public class InstantSerializationTest extends JodaTestBase
 
         // but if re-configured, as regular ISO-8601 string
         assertEquals(q("1970-01-01T00:00:00.000Z"), MAPPER.writer()
-                .without(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+                .without(DateTimeFeature.WRITE_DATES_AS_TIMESTAMPS)
                 .writeValueAsString(instant));
     }
 
@@ -38,7 +38,7 @@ public class InstantSerializationTest extends JodaTestBase
     public void testCustomFormatInstantSer() throws Exception
     {
         final String json = MAPPER.writer()
-                .without(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+                .without(DateTimeFeature.WRITE_DATES_AS_TIMESTAMPS)
                 .without(JsonWriteFeature.ESCAPE_FORWARD_SLASHES)
                 .writeValueAsString(new FormattedInstant(new Instant(0L)));
         assertEquals(a2q(
@@ -51,7 +51,7 @@ public class InstantSerializationTest extends JodaTestBase
     {
         final ObjectMapper mapper = mapperWithModuleBuilder()
                 // Configure Date Formatting
-                .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+                .disable(DateTimeFeature.WRITE_DATES_AS_TIMESTAMPS)
                 .defaultDateFormat(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'"))
                 .build();
 

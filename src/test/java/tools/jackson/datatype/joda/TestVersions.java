@@ -1,7 +1,5 @@
 package tools.jackson.datatype.joda;
 
-import java.io.*;
-
 import org.junit.jupiter.api.Test;
 
 import tools.jackson.core.Versioned;

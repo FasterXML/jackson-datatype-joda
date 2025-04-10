@@ -3,7 +3,7 @@ package tools.jackson.datatype.joda.ser;
 import tools.jackson.core.*;
 
 import tools.jackson.databind.SerializationContext;
-import tools.jackson.databind.SerializationFeature;
+import tools.jackson.databind.cfg.DateTimeFeature;
 import tools.jackson.datatype.joda.cfg.FormatConfig;
 import tools.jackson.datatype.joda.cfg.JacksonJodaDateFormat;
 
@@ -18,7 +18,7 @@ public class LocalDateSerializer
     }
     public LocalDateSerializer(JacksonJodaDateFormat format,
             int shapeOverride) {
-        super(LocalDate.class, format, SerializationFeature.WRITE_DATES_AS_TIMESTAMPS,
+        super(LocalDate.class, format, DateTimeFeature.WRITE_DATES_AS_TIMESTAMPS,
                 FORMAT_ARRAY, shapeOverride);
     }
 

@@ -7,15 +7,11 @@ import org.joda.time.DateTimeZone;
 
 import org.junit.jupiter.api.Test;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.annotation.*;
 
 import tools.jackson.core.json.JsonWriteFeature;
 import tools.jackson.databind.ObjectMapper;
-import tools.jackson.databind.SerializationFeature;
+import tools.jackson.databind.cfg.DateTimeFeature;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -88,7 +84,7 @@ public class DateTimeTest extends JodaTestBase
 
     private final static ObjectMapper STRING_MAPPER = mapperWithModuleBuilder()
             .disable(JsonWriteFeature.ESCAPE_FORWARD_SLASHES)
-            .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
+            .configure(DateTimeFeature.WRITE_DATES_AS_TIMESTAMPS, false)
             .build();
 
     private final DateTime DATE_JAN_1_1970_UTC = new DateTime(0L, DateTimeZone.UTC);
@@ -103,7 +99,7 @@ public class DateTimeTest extends JodaTestBase
         // let's use epoch time (Jan 1, 1970, UTC)
         // by default, dates use timestamp, so:
         assertEquals("0", MAPPER.writer()
-                .with(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+                .with(DateTimeFeature.WRITE_DATES_AS_TIMESTAMPS)
                 .writeValueAsString(DATE_JAN_1_1970_UTC));
     }
 
@@ -111,7 +107,7 @@ public class DateTimeTest extends JodaTestBase
     public void testSerializationFeatureNoTimestamp() throws IOException
     {
 		String json = MAPPER.writer()
-				.without(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+				.without(DateTimeFeature.WRITE_DATES_AS_TIMESTAMPS)
 				.writeValueAsString(DATE_JAN_1_1970_UTC);
         assertEquals(quote("1970-01-01T00:00:00.000Z"), json);
     }
@@ -120,7 +116,7 @@ public class DateTimeTest extends JodaTestBase
     public void testAnnotationAsText() throws IOException
     {
         ObjectMapper m = mapperWithModuleBuilder()
-                .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
+                .configure(DateTimeFeature.WRITE_DATES_AS_TIMESTAMPS, false)
                 .build();
         // with annotations, doesn't matter if mapper configured to use timestamps
         assertEquals(aposToQuotes("{'date':'1970-01-01T00:00:00.000Z'}"),
@@ -161,11 +157,11 @@ public class DateTimeTest extends JodaTestBase
         DateTime dt = new DateTime(0L, DateTimeZone.UTC);
         // by default, dates use timestamp, so:
         assertEquals("0", MAPPER.writer()
-                .with(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS).writeValueAsString(dt));
+                .with(DateTimeFeature.WRITE_DATES_AS_TIMESTAMPS).writeValueAsString(dt));
 
         // but if re-configured, as regular ISO-8601 string
         ObjectMapper m = mapperWithModuleBuilder()
-                .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
+                .configure(DateTimeFeature.WRITE_DATES_AS_TIMESTAMPS, false)
                 .addMixIn(DateTime.class, TypeInfoMixIn.class)
                 .build();
         assertEquals("[\"org.joda.time.DateTime\",\"1970-01-01T00:00:00.000Z\"]",
@@ -175,7 +171,7 @@ public class DateTimeTest extends JodaTestBase
     @Test
     public void testIso8601ThroughJoda() throws Exception {
         ObjectMapper mapper = mapperWithModuleBuilder()
-                .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+                .disable(DateTimeFeature.WRITE_DATES_AS_TIMESTAMPS)
                 .build();
 
         java.text.DateFormat df = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss zzz");
@@ -271,7 +267,7 @@ public class DateTimeTest extends JodaTestBase
     {
         ObjectMapper mapper = mapperWithModuleBuilder()
                 .defaultLeniency(false)
-                .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+                .disable(DateTimeFeature.WRITE_DATES_AS_TIMESTAMPS)
                 .build();
         String json = mapper.writeValueAsString(DATE_JAN_1_1970_UTC);
         assertEquals(quote("1970-01-01T00:00:00.000Z"), json);

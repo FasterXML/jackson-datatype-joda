@@ -5,6 +5,7 @@ import java.util.TimeZone;
 
 import tools.jackson.databind.SerializationContext;
 import tools.jackson.databind.SerializationFeature;
+import tools.jackson.databind.cfg.DateTimeFeature;
 
 /**
  * Base object for different formatters (date-time, period, ...)
@@ -78,7 +79,7 @@ abstract class JacksonJodaFormatBase
     /**********************************************************
      */
 
-    public boolean useTimestamp(SerializationContext ctxt, SerializationFeature feat)
+    public boolean useTimestamp(SerializationContext ctxt, DateTimeFeature feat)
     {
         if (_useTimestamp != null) {
             return _useTimestamp.booleanValue();
