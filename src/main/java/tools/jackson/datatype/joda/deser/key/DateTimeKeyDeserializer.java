@@ -8,7 +8,7 @@ import org.joda.time.DateTimeZone;
 import tools.jackson.core.JacksonException;
 
 import tools.jackson.databind.DeserializationContext;
-import tools.jackson.databind.DeserializationFeature;
+import tools.jackson.databind.cfg.DateTimeFeature;
 
 public class DateTimeKeyDeserializer extends JodaKeyDeserializer
 {
@@ -16,7 +16,7 @@ public class DateTimeKeyDeserializer extends JodaKeyDeserializer
     protected DateTime deserialize(String key, DeserializationContext ctxt)
             throws JacksonException
     {
-        if (ctxt.isEnabled(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE)) {
+        if (ctxt.isEnabled(DateTimeFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE)) {
             TimeZone tz = ctxt.getTimeZone();
             DateTimeZone dtz = (tz == null) ? DateTimeZone.UTC : DateTimeZone.forTimeZone(tz);
             return new DateTime(key, dtz);

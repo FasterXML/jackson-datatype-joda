@@ -3,15 +3,16 @@ package tools.jackson.datatype.joda.deser;
 import java.io.IOException;
 import java.util.TimeZone;
 
-import tools.jackson.databind.DeserializationFeature;
+import org.junit.jupiter.api.Test;
+
 import org.joda.time.DateTimeZone;
 import org.joda.time.Interval;
 import org.joda.time.chrono.ISOChronology;
 
-import org.junit.jupiter.api.Test;
-
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+
 import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.cfg.DateTimeFeature;
 import tools.jackson.datatype.joda.JodaTestBase;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -78,7 +79,7 @@ public class IntervalDeserTest extends JodaTestBase
     {
         final ObjectMapper mapper = mapperWithModuleBuilder()
                 .defaultTimeZone(TimeZone.getTimeZone("GMT-2:00"))
-                .enable(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE)
+                .enable(DateTimeFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE)
                 .build();
         final Interval expectedInterval = new Interval(1000, 2000, DateTimeZone.forOffsetHours(-2));
         final Interval actualInterval =
@@ -91,7 +92,7 @@ public class IntervalDeserTest extends JodaTestBase
     public void testIntervalDeserFromIso8601WithTimezoneWithoutContextTimeZone() throws IOException
     {
         final ObjectMapper mapper = mapperWithModuleBuilder()
-                .disable(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE)
+                .disable(DateTimeFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE)
                 .build();
         final Interval expectedInterval = new Interval(1000, 2000, DateTimeZone.forOffsetHours(6));
         final Interval actualInterval =
@@ -104,7 +105,7 @@ public class IntervalDeserTest extends JodaTestBase
     public void testIntervalDeserFromIso8601WithTimezoneWithDefaultTimeZone() throws IOException
     {
         final ObjectMapper mapper = mapperWithModuleBuilder()
-                .enable(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE)
+                .enable(DateTimeFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE)
                 .build();
         final Interval expectedInterval = new Interval(1000, 2000, DateTimeZone.UTC);
         final Interval actualInterval =

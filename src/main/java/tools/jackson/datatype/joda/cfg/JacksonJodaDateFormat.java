@@ -8,10 +8,9 @@ import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+
 import tools.jackson.databind.DeserializationContext;
-import tools.jackson.databind.DeserializationFeature;
 import tools.jackson.databind.SerializationContext;
-import tools.jackson.databind.SerializationFeature;
 import tools.jackson.databind.cfg.DateTimeFeature;
 
 /**
@@ -291,7 +290,7 @@ public class JacksonJodaDateFormat extends JacksonJodaFormatBase
      */
     public boolean shouldAdjustToContextTimeZone(DeserializationContext ctxt) {
         return (_adjustToContextTZOverride != null) ? _adjustToContextTZOverride :
-            ctxt.isEnabled(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE);
+            ctxt.isEnabled(DateTimeFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE);
     }
 
     /**
