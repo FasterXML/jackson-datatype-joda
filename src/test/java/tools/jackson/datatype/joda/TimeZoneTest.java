@@ -110,7 +110,7 @@ public class TimeZoneTest extends JodaTestBase
                 .writeValueAsString(input);
 
         ObjectMapper mapper = mapperWithModuleBuilder()
-                .disable(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE)
+                .disable(DateTimeFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE)
                 .build();
         result = mapper.readValue(json, DateTime.class);
         assertEquals(input.getMillis(), result.getMillis(), "Actual timepoints differ");
@@ -134,9 +134,9 @@ public class TimeZoneTest extends JodaTestBase
     public void testFallBackTransition() throws Exception
     {
         DateTime firstOneAmUtc = new DateTime(FALL_BACK_YEAR, FALL_BACK_MONTH, FALL_BACK_DAY, FIRST_FALL_BACK_HOUR, 0, 0,
-                                              DateTimeZone.UTC);
+                DateTimeZone.UTC);
         DateTime secondOneAmUtc = new DateTime(FALL_BACK_YEAR, FALL_BACK_MONTH, FALL_BACK_DAY, SECOND_FALL_BACK_HOUR, 0, 0,
-                                               DateTimeZone.UTC);
+                DateTimeZone.UTC);
 
         DateTime firstOneAm = new DateTime(firstOneAmUtc, AMERICA_LOS_ANGELES);
         DateTime secondOneAm = new DateTime(secondOneAmUtc, AMERICA_LOS_ANGELES);
@@ -149,7 +149,7 @@ public class TimeZoneTest extends JodaTestBase
         String secondOneAmStr = w.writeValueAsString(secondOneAm);
 
         ObjectMapper mapper = mapperWithModuleBuilder()
-                .disable(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE)
+                .disable(DateTimeFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE)
                 .build();
 
         DateTime firstRoundTrip = mapper.readValue(firstOneAmStr, DateTime.class);
