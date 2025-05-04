@@ -1,26 +1,25 @@
-package com.fasterxml.jackson.datatype.joda.tofix;
+package com.fasterxml.jackson.datatype.joda.ser;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
 import com.fasterxml.jackson.datatype.joda.JodaTestBase;
-import com.fasterxml.jackson.datatype.joda.testutil.failure.JacksonTestFailureExpected;
 
 import org.joda.time.*;
 
-// [datatype-joda#146]: disable overwriting of timezone
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class DateTimeSerializationWithOffsets146Test extends JodaTestBase
+// [datatype-joda#146]: disable overwriting of timezone
+public class DateTimeSerializationWithOffsets146Test
+    extends JodaTestBase
 {
     // [datatype-joda#146]
-    @JacksonTestFailureExpected
     @Test
     public void testLocalDateSerDefault() throws Exception
     {
-        final String inputStr = "2024-12-01T12:00:00+02:00";
+        final String inputStr = "2024-12-01T12:00:00.000+02:00";
         final DateTime inputValue = DateTime.parse(inputStr);
         final ObjectMapper mapper = mapperWithModuleBuilder()
                 .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
