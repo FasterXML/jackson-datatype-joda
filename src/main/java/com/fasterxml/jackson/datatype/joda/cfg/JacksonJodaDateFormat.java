@@ -242,16 +242,12 @@ public class JacksonJodaDateFormat extends JacksonJodaFormatBase
         return _formatter;
     }
 
+    /**
+     * @deprecated since 2.19.1 Use {@link #createFormatter(SerializerProvider, DateTimeZone)} instead
+     */
     public DateTimeFormatter createFormatter(SerializerProvider ctxt)
     {
-        DateTimeFormatter formatter = createFormatterWithLocale(ctxt);
-        if (!_explicitTimezone) {
-            TimeZone tz = ctxt.getTimeZone();
-            if ((tz != null) && !tz.equals(_jdkTimezone)) {
-                formatter = formatter.withZone(DateTimeZone.forTimeZone(tz));
-            }
-        }
-        return formatter;
+        return createFormatter(ctxt, null);
     }
 
     /**
