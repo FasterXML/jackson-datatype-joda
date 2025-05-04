@@ -162,6 +162,12 @@ public class JacksonJodaDateFormat extends JacksonJodaFormatBase
         if (_locale != null) {
             formatter = formatter.withLocale(_locale);
         }
+
+        // [datatype-joda#98] Since 2.19.1, fix `@JsonFormat.timezone` not taking effect
+        // [If a timezone was explicitly set earlier, retain it on the new formatter
+        if (_explicitTimezone && _jdkTimezone != null) {
+            formatter = formatter.withZone(DateTimeZone.forTimeZone(_jdkTimezone));
+        }
         return new JacksonJodaDateFormat(this, formatter);
     }
 
