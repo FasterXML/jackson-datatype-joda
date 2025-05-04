@@ -260,8 +260,10 @@ public class JacksonJodaDateFormat extends JacksonJodaFormatBase
                 formatter = formatter.withZone(DateTimeZone.forTimeZone(tz));
             }
         }
-        if (valueTimeZone != null && !valueTimeZone.equals(_jdkTimezone)) {
-            formatter = formatter.withZone(valueTimeZone);
+        if (!ctxt.isEnabled(SerializationFeature.WRITE_DATES_WITH_CONTEXT_TIME_ZONE)) {
+            if (valueTimeZone != null && !valueTimeZone.equals(_jdkTimezone)) {
+                formatter = formatter.withZone(valueTimeZone);
+            }
         }
         return formatter;
     }

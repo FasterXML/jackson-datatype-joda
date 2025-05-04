@@ -22,18 +22,18 @@ public class DateTimeOwnZoneSerialization92Test
     public void dateTimeShouldRetainItsOwnZone() throws Exception {
         DateTime jodaZonedDateTime = new DateTime(2023, 10, 1, 12, 2, 3, 123, DateTimeZone.forID("Asia/Shanghai"));
 
-        // with WRITE_DATES_WITH_CONTEXT_TIME_ZONE
-        assertEquals("\"2023-10-01T12:02:03.123+08:00\"",
-                MAPPER.writer()
-                .with(TimeZone.getTimeZone("UTC"))
-                .with(SerializationFeature.WRITE_DATES_WITH_CONTEXT_TIME_ZONE)
-                .writeValueAsString(jodaZonedDateTime));
-
         // without WRITE_DATES_WITH_CONTEXT_TIME_ZONE
         assertEquals("\"2023-10-01T12:02:03.123+08:00\"",
                 MAPPER.writer()
                         .with(TimeZone.getTimeZone("UTC"))
                         .without(SerializationFeature.WRITE_DATES_WITH_CONTEXT_TIME_ZONE)
+                        .writeValueAsString(jodaZonedDateTime));
+
+        // with WRITE_DATES_WITH_CONTEXT_TIME_ZONE
+        assertEquals("\"2023-10-01T04:02:03.123Z\"",
+                MAPPER.writer()
+                        .with(TimeZone.getTimeZone("UTC"))
+                        .with(SerializationFeature.WRITE_DATES_WITH_CONTEXT_TIME_ZONE)
                         .writeValueAsString(jodaZonedDateTime));
     }
 
