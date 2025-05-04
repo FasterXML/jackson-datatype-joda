@@ -4,6 +4,9 @@ import java.util.TimeZone;
 
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
+import org.joda.time.LocalDate;
+import org.joda.time.LocalDateTime;
+import org.joda.time.LocalTime;
 import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -27,31 +30,49 @@ public class JsonFormatTimeZoneWithPattern98Test extends JodaTestBase {
         }
 
     }
-
     private final ObjectMapper MAPPER = mapperWithModuleBuilder()
             .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
             .build();
 
     @Test
-    public void patternShouldNotEraseTimeZone()
-            throws Exception {
-        // Explicity set with Timezone
-        _testSerializationOutput(
-                /* expectedHour */ "12",
-                new Wrapper(new DateTime(2018, 1, 1, 12, 1, 2, 3,
-                        DateTimeZone.forTimeZone(TimeZone.getTimeZone("Europe/Budapest")))));
-        // Using @JsonFormat
-        _testSerializationOutput(
-                /* expectedHour */ "13",
-                new Wrapper(new DateTime(2018, 1, 1, 12, 1, 2, 3,
-                        DateTimeZone.forTimeZone(TimeZone.getTimeZone("UTC")))));
+    public void patternShouldNotEraseTimeZone() throws Exception
+    {
+        // DateTime already in Europe/Budapest zone (no shift)
+        _testSerialization(
+                "{\"value\":\"2018-01-01T12:01:02.003 Europe/Budapest\"}",
+                new Wrapper<>(new DateTime(2018,1,1,12,1,2,3,
+                        DateTimeZone.forTimeZone(TimeZone.getTimeZone("Europe/Budapest"))))
+        );
+
+        // DateTime in UTC, should shift +1h
+        _testSerialization(
+                "{\"value\":\"2018-01-01T13:01:02.003 Europe/Budapest\"}",
+                new Wrapper<>(new DateTime(2018,1,1,12,1,2,3,
+                        DateTimeZone.forTimeZone(TimeZone.getTimeZone("UTC"))))
+        );
+
+        // LocalDate
+        _testSerialization(
+                "{\"value\":\"2018-01-01T��:��:��.000 \"}",
+                new Wrapper<>(new LocalDate(2018,1,1))
+        );
+
+        // LocalTime
+        _testSerialization(
+                "{\"value\":\"����-��-��T12:01:02.003 \"}",
+                new Wrapper<>(new LocalTime(12,1,2,3))
+        );
+
+        // LocalDateTime
+        _testSerialization(
+                "{\"value\":\"2018-01-01T12:01:02.003 \"}",
+                new Wrapper<>(new LocalDateTime(2018,1,1,12,1,2,3))
+        );
     }
 
-    private <T> void _testSerializationOutput(String expectedHour, Wrapper<T> wrapper)
-            throws Exception {
+    private void _testSerialization(String expectedJson, Object wrapper) throws Exception {
         String actual = MAPPER.writeValueAsString(wrapper);
-        String exp = "{\"value\":\"2018-01-01T" + expectedHour + ":01:02.003 Europe/Budapest\"}";
-        assertEquals(exp, actual);
+        assertEquals(expectedJson, actual);
     }
 
 }
