@@ -243,8 +243,9 @@ public class JacksonJodaDateFormat extends JacksonJodaFormatBase
     }
 
     /**
-     * @deprecated since 2.19.1 Use {@link #createFormatter(SerializerProvider, DateTimeZone)} instead
+     * @deprecated since 2.20 Use {@link #createFormatter(SerializerProvider, DateTimeZone)} instead
      */
+    @Deprecated // since 2.20
     public DateTimeFormatter createFormatter(SerializerProvider ctxt)
     {
         return createFormatter(ctxt, null);
@@ -255,7 +256,7 @@ public class JacksonJodaDateFormat extends JacksonJodaFormatBase
      *
      * [dataformat-joda#92] DateTime serialization result is not same as Java 8 ZonedDateTime
      *
-     * @since 2.19.1
+     * @since 2.20
      */
     public DateTimeFormatter createFormatter(SerializerProvider ctxt, DateTimeZone valueTimeZone)
     {

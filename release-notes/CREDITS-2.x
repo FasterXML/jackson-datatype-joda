@@ -123,3 +123,8 @@ Joo Hyuk Kim (@JooHyukKim)
   (2.18.4)
   * Fixed #98: `JsonFormat` timezone attribute effect overwritten if pattern attribute present
    (2.19.1)
+  * Fixed #92: `DateTime` serialization result is not same as Java 8 `ZonedDateTime`
+   (2.20.0)
+  * Fixed #146: `DateTime` can't be serialized with its own zone
+   (2.20.0)
+

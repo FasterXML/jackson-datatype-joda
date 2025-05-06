@@ -6,6 +6,11 @@ Project: jackson-datatype-joda
 
 2.20.0 (not yet released)
 
+#92: `DateTime` serialization result is not same as Java 8 `ZonedDateTime`
+ (fixed by Joo-Hyuk K)
+#146: `DateTime` can't be serialized with its own zone
+  (`WRITE_DATES_WITH_CONTEXT_TIME_ZONE` not respected)
+ (fixed by Joo-Hyuk K)
 - Generate SBOMs [JSTEP-14]
 
 2.19.1 (not yet released)
