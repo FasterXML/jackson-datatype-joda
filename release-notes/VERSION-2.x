@@ -8,6 +8,11 @@ Project: jackson-datatype-joda
 
 - Generate SBOMs [JSTEP-14]
 
+2.19.1 (not yet released)
+
+#98: `JsonFormat` timezone attribute effect overwritten if pattern attribute present
+ (contributed by Joo-Hyuk K)
+
 2.19.0 (24-Apr-2025)
 
 #152: Unify testing structure/tools [JSTEP-10]

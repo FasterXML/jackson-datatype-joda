@@ -2,7 +2,13 @@ Here are people who have contributed to the development of Jackson JSON processo
 Joda datatype module.
 (version numbers in brackets indicate release in which the problem was fixed)
 
-Tatu Saloranta, tatu.saloranta@iki.fi: author
+Author: Tatu Saloranta, tatu.saloranta@iki.fi: author
+
+Co-Authors (with only partial listings below):
+
+* Joo Hyuk Kim (@JooHyukKim)
+
+----------------------------------------------------------------------------
 
 ncjones@github.com:
  * Contributed #19:  Add support for `MonthDay` and `YearMonth`
@@ -112,5 +118,8 @@ Stephane Paulus (StephanePaulus@github)
 
 Joo Hyuk Kim (@JooHyukKim)
   * Fixed #160: Cannot serialize `org.joda.time.Days`
+  (2.18.4)
   * Fixed #162: Cannot serialize `org.joda.time.Hours\Minutes\Seconds\Months\Years\Weeks`
   (2.18.4)
+  * Fixed #98: `JsonFormat` timezone attribute effect overwritten if pattern attribute present
+   (2.19.1)
