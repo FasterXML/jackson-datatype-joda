@@ -268,7 +268,8 @@ public class JacksonJodaDateFormat extends JacksonJodaFormatBase
             }
         }
         if (!ctxt.isEnabled(SerializationFeature.WRITE_DATES_WITH_CONTEXT_TIME_ZONE)) {
-            if (valueTimeZone != null && !valueTimeZone.equals(_jdkTimezone)) {
+            if ((valueTimeZone != null)
+                    && ((_jdkTimezone == null) || !valueTimeZone.toTimeZone().equals(_jdkTimezone))) {
                 formatter = formatter.withZone(valueTimeZone);
             }
         }
