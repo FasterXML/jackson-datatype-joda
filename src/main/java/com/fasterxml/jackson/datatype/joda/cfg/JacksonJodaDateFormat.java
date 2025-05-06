@@ -243,12 +243,11 @@ public class JacksonJodaDateFormat extends JacksonJodaFormatBase
     }
 
     /**
-     * @deprecated since 2.20 Use {@link #createFormatter(SerializerProvider, DateTimeZone)} instead
+     * Creates a formatter with settings this format object has.
      */
-    @Deprecated // since 2.20
     public DateTimeFormatter createFormatter(SerializerProvider ctxt)
     {
-        return createFormatter(ctxt, null);
+        return createFormatterWithTimeZoneOverride(ctxt, null);
     }
 
     /**
@@ -258,7 +257,7 @@ public class JacksonJodaDateFormat extends JacksonJodaFormatBase
      *
      * @since 2.20
      */
-    public DateTimeFormatter createFormatter(SerializerProvider ctxt, DateTimeZone valueTimeZone)
+    public DateTimeFormatter createFormatterWithTimeZoneOverride(SerializerProvider ctxt, DateTimeZone tzOverride)
     {
         DateTimeFormatter formatter = createFormatterWithLocale(ctxt);
         if (!_explicitTimezone) {
@@ -267,10 +266,11 @@ public class JacksonJodaDateFormat extends JacksonJodaFormatBase
                 formatter = formatter.withZone(DateTimeZone.forTimeZone(tz));
             }
         }
-        if (!ctxt.isEnabled(SerializationFeature.WRITE_DATES_WITH_CONTEXT_TIME_ZONE)) {
-            if ((valueTimeZone != null)
-                    && ((_jdkTimezone == null) || !valueTimeZone.toTimeZone().equals(_jdkTimezone))) {
-                formatter = formatter.withZone(valueTimeZone);
+        if (tzOverride != null) {
+            if (!ctxt.isEnabled(SerializationFeature.WRITE_DATES_WITH_CONTEXT_TIME_ZONE)) {
+                if ((_jdkTimezone == null) || !tzOverride.toTimeZone().equals(_jdkTimezone)) {
+                    formatter = formatter.withZone(tzOverride);
+                }
             }
         }
         return formatter;
