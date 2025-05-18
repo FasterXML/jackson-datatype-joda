@@ -39,8 +39,13 @@ public class LocalDateTimeDeserializer
         case JsonTokenId.ID_STRING:
             return _fromString(p, ctxt, p.getText());
         case JsonTokenId.ID_START_OBJECT:
-            return _fromString(p, ctxt,
-                    ctxt.extractScalarFromObject(p, this, handledType()));
+            // 30-Sep-2020, tatu: New! "Scalar from Object" (mostly for XML)
+            String str = ctxt.extractScalarFromObject(p, this, handledType());
+            // 17-May-2025, tatu: [databind#4656] need to check for `null`
+            if (str != null) {
+                return _fromString(p, ctxt, str);
+            }
+            // fall through
         default:
         }
         if (p.isExpectedStartArrayToken()) {

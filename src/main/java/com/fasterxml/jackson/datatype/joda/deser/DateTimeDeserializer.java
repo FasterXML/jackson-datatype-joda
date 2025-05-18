@@ -60,8 +60,12 @@ public class DateTimeDeserializer
             return _fromString(p, ctxt, p.getText());
         case JsonTokenId.ID_START_OBJECT:
             // 30-Sep-2020, tatu: New! "Scalar from Object" (mostly for XML)
-            return _fromString(p, ctxt,
-                    ctxt.extractScalarFromObject(p, this, handledType()));
+            String str = ctxt.extractScalarFromObject(p, this, handledType());
+            // 17-May-2025, tatu: [databind#4656] need to check for `null`
+            if (str != null) {
+                return _fromString(p, ctxt, str);
+            }
+            // fall through
         }
         return _handleNotNumberOrString(p, ctxt);
     }

@@ -42,8 +42,13 @@ public class MonthDayDeserializer extends JodaDateDeserializerBase<MonthDay>
         }
         // 30-Sep-2020, tatu: New! "Scalar from Object" (mostly for XML)
         if (p.isExpectedStartObjectToken()) {
-            return _fromString(p, ctxt,
-                    ctxt.extractScalarFromObject(p, this, handledType()));
+            // 30-Sep-2020, tatu: New! "Scalar from Object" (mostly for XML)
+            String str = ctxt.extractScalarFromObject(p, this, handledType());
+            // 17-May-2025, tatu: [databind#4656] need to check for `null`
+            if (str != null) {
+                return _fromString(p, ctxt, str);
+            }
+            // fall through
         }
         return (MonthDay) ctxt.handleUnexpectedToken(handledType(), p.currentToken(), p,
                 "expected JSON String");
