@@ -11,6 +11,7 @@ Project: jackson-datatype-joda
 #146: `DateTime` can't be serialized with its own zone
   (`WRITE_DATES_WITH_CONTEXT_TIME_ZONE` not respected)
  (fixed by Joo-Hyuk K)
+- Add unit test to verify goodness of SPI metadata for Modules
 - Generate SBOMs [JSTEP-14]
 
 2.19.1 (not yet released)
