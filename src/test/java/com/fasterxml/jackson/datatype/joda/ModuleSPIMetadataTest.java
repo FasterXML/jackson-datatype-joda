@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.util.ServiceLoader;
 
 public class ModuleSPIMetadataTest
+    extends JodaTestBase
 {
     @Test
     void testModuleSPIMetadata() {
