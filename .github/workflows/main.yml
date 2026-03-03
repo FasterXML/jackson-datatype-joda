@@ -12,21 +12,19 @@ on:
 permissions:
   contents: read
 
-env:
-  JODA_DEFAULT: '2.12.7'
-  JODA_MIN: '2.10'
-  JODA_MAX: '2.13.0'
 jobs:
   build:
     runs-on: 'ubuntu-24.04'
     strategy:
       fail-fast: false
       matrix:
-        java_version: ['17', '21']
-        joda_version: [$JODA_DEFAULT, $JODA_MIN, $JODA_MAX]
+        java_version: ['17', '21', '25']
+        # NOTE: would ideally use vars/constants but those do not display well
+        # hence hard-cded as: DEFAULT, MIN, MAX -- publish SNAPSHOT with DEFAULT
+        joda_version: ['2.12.7', '2.10', '2.13.0']
         include:
           - java_version: '17'
-            joda_version: $JODA_DEFAULT
+            joda_version: '2.12.7'
             snapshot: 1
     env:
       JAVA_OPTS: "-XX:+TieredCompilation -XX:TieredStopAtLevel=1"
