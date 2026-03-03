@@ -4,4 +4,15 @@ Cersion numbers in brackets indicate release in which the problem was fixed.
 
 (note: for older credits, see `CREDITS-2.x` instead)
 
-Tatu Saloranta, tatu.saloranta@iki.fi: author
+Author: Tatu Saloranta, tatu.saloranta@iki.fi
+
+Co-Authors (with only partial listings below):
+
+* Joo Hyuk Kim (@JooHyukKim)
+
+----------------------------------------------------------------------------
+
+
+Jooyoung Pyoung (@anthologia)
+ * Reported #175: `JodaModule` SPI metadata removed in 3.0.0-rc6
+  [3.1.1]
