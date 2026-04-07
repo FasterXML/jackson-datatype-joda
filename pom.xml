@@ -43,8 +43,9 @@ Joda (https://www.joda.org/joda-time/) data types.
          Jackson 2.12: Joda 2.10[.8]
 	 ...
 	    Jackson 3.0: Joda 2.12.7
+	    Jackson 3.2: Joda 2.14.1
       -->
-    <version.joda>2.12.7</version.joda>
+    <version.joda>2.14.1</version.joda>
 
     <!-- Configuration properties for the OSGi maven-bundle-plugin -->
     <osgi.export>${project.groupId}.joda.*</osgi.export>
