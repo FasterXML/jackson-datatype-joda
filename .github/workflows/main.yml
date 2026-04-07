@@ -21,11 +21,11 @@ jobs:
       matrix:
         java_version: ['17', '21', '25']
         # NOTE: would ideally use vars/constants but those do not display well
-        # hence hard-cded as: DEFAULT, MIN, MAX -- publish SNAPSHOT with DEFAULT
-        joda_version: ['2.12.7', '2.10', '2.13.0']
+        # hence hard-coded as: DEFAULT, MIN, MAX -- publish SNAPSHOT with DEFAULT
+        joda_version: ['2.12.7', '2.10', '2.14.1']
         include:
           - java_version: '17'
-            joda_version: '2.12.7'
+            joda_version: '2.14.1'
             snapshot: 1
     env:
       JAVA_OPTS: "-XX:+TieredCompilation -XX:TieredStopAtLevel=1"
