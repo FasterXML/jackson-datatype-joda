@@ -24,6 +24,7 @@ No changes since 2.19.1
 #152: Unify testing structure/tools [JSTEP-10]
  (contributed by Joo-Hyuk K)
 
+2.18.7 (24-Apr-2026)
 2.18.6 (22-Feb-2026)
 2.18.5 (27-Oct-2025)
 
