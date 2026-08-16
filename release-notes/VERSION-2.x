@@ -4,6 +4,17 @@ Project: jackson-datatype-joda
 === Releases ===
 ------------------------------------------------------------------------
 
+2.22.2 (16-Aug-2026)
+2.22.1 (07-Jul-2026)
+2.22.0 (31-May-2026)
+
+No changes since 2.21
+
+2.21.6 (14-Aug-2026)
+2.21.5 (06-Jul-2026)
+2.21.4 (28-May-2026)
+2.21.3 (28-Apr-2026)
+2.21.2 (20-Mar-2026)
 2.21.1 (22-Feb-2026)
 
 No changes since 2.21.0
@@ -43,6 +54,10 @@ No changes since 2.19.1
 #152: Unify testing structure/tools [JSTEP-10]
  (contributed by Joo-Hyuk K)
 
+2.18.10 (15-Aug-2026)
+2.18.9 (07-Jul-2026)
+2.18.8 (28-May-2026)
+2.18.7 (24-Apr-2026)
 2.18.6 (22-Feb-2026)
 2.18.5 (27-Oct-2025)
 
