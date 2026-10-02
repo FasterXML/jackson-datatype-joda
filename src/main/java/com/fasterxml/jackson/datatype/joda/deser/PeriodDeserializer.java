@@ -70,8 +70,15 @@ public class PeriodDeserializer
         JsonNode treeNode = p.readValueAsTree();
         String periodType = treeNode.path("fieldType").path("name").asText();
         String periodName = treeNode.path("periodType").path("name").asText();
-        // any "weird" numbers we should worry about?
-        int periodValue = treeNode.path(periodType).asInt();
+        JsonNode valueNode = treeNode.path(periodType);
+        // must not let `asInt()` silently truncate values outside of `int` range
+        if (valueNode.isNumber() && !valueNode.canConvertToInt()) {
+            ctxt.reportInputMismatch(handledType(),
+                    "Numeric value (%s) of '%s' out of range of int (%d - %d)",
+                    valueNode.asText(), periodType, Integer.MIN_VALUE, Integer.MAX_VALUE);
+            return null; // never gets here
+        }
+        int periodValue = valueNode.asInt();
 
         ReadablePeriod rp;
 
