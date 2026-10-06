@@ -6,8 +6,8 @@ Project: jackson-datatype-joda
 
 2.23.0 (not yet released)
 
-#190: Reject out-of-range int values in `PeriodDeserializer` object form
-  (instead of silently truncating)
+#190: `PeriodDeserializer` silently truncates out-of-range and invalid values
+  (instead of failing)
  (fixed by @arfa-21)
 
 2.22.3 (21-Sep-2026)

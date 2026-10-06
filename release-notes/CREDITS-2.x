@@ -129,5 +129,5 @@ Joo Hyuk Kim (@JooHyukKim)
    (2.20.0)
 
 @arfa-21
-  * Fixed #190: Reject out-of-range int values in `PeriodDeserializer` object form
+  * Fixed #190: `PeriodDeserializer` silently truncates out-of-range and invalid values
    (2.23.0)

@@ -100,6 +100,12 @@ public class JacksonJodaPeriodFormat extends JacksonJodaFormatBase
      */
     public Period parsePeriod(DeserializationContext ctxt, String str) throws IOException
     {
-        return _formatter.parsePeriod(str);
+        try {
+            return _formatter.parsePeriod(str);
+        } catch (IllegalArgumentException | ArithmeticException e) {
+            // includes `NumberFormatException` for out-of-range components
+            return (Period) ctxt.handleWeirdStringValue(Period.class, str,
+                    "Invalid Period value: %s", e.getMessage());
+        }
     }
 }

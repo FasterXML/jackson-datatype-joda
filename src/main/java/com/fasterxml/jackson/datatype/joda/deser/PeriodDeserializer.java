@@ -38,7 +38,12 @@ public class PeriodDeserializer
             return _fromString(p, ctxt, p.getText());
         }
         if (t == JsonToken.VALUE_NUMBER_INT) {
-            return new Period(p.getLongValue());    
+            try {
+                return new Period(p.getLongValue());
+            } catch (ArithmeticException e) {
+                return (ReadablePeriod) ctxt.handleWeirdNumberValue(handledType(), p.getNumberValue(),
+                        "Invalid Period value: %s", e.getMessage());
+            }
         }
         if (t != JsonToken.START_OBJECT && t != JsonToken.FIELD_NAME) {
             return (ReadablePeriod) ctxt.handleUnexpectedToken(handledType(), t, p,
@@ -70,15 +75,19 @@ public class PeriodDeserializer
         JsonNode treeNode = p.readValueAsTree();
         String periodType = treeNode.path("fieldType").path("name").asText();
         String periodName = treeNode.path("periodType").path("name").asText();
+        // 05-Oct-2026: must not use lenient `asInt()` as it silently truncates
+        //   out-of-range and fractional values, and coerces non-numbers
         JsonNode valueNode = treeNode.path(periodType);
-        // must not let `asInt()` silently truncate values outside of `int` range
-        if (valueNode.isNumber() && !valueNode.canConvertToInt()) {
+        if (valueNode.isMissingNode()) {
             ctxt.reportInputMismatch(handledType(),
-                    "Numeric value (%s) of '%s' out of range of int (%d - %d)",
-                    valueNode.asText(), periodType, Integer.MIN_VALUE, Integer.MAX_VALUE);
+                    "Missing value property '%s' for %s", periodType, handledType().getName());
             return null; // never gets here
         }
-        int periodValue = valueNode.asInt();
+        final int periodValue;
+        try (JsonParser vp = valueNode.traverse(p.getCodec())) {
+            vp.nextToken();
+            periodValue = _parseIntPrimitive(vp, ctxt);
+        }
 
         ReadablePeriod rp;
 
