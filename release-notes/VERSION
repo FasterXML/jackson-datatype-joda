@@ -9,6 +9,12 @@ Major version: 3 (for earlier, see VERSION-2.x)
 
 No changes since 3.1
 
+3.1.8 (not yet released)
+
+#190: `PeriodDeserializer` silently truncates out-of-range and invalid values
+  (instead of failing)
+ (fixed by @arfa-21)
+
 3.1.7 (21-Sep-2026)
 
 No changes since 3.1.6
