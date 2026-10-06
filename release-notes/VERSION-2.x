@@ -4,6 +4,12 @@ Project: jackson-datatype-joda
 === Releases ===
 ------------------------------------------------------------------------
 
+2.23.0 (not yet released)
+
+#190: Reject out-of-range int values in `PeriodDeserializer` object form
+  (instead of silently truncating)
+ (fixed by @arfa-21)
+
 2.22.3 (21-Sep-2026)
 2.22.2 (16-Aug-2026)
 2.22.1 (07-Jul-2026)
