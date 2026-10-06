@@ -128,3 +128,6 @@ Joo Hyuk Kim (@JooHyukKim)
   * Fixed #146: `DateTime` can't be serialized with its own zone
    (2.20.0)
 
+@arfa-21
+  * Fixed #190: `PeriodDeserializer` silently truncates out-of-range and invalid values
+   (2.23.0)
