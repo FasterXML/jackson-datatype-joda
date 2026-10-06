@@ -1,10 +1,13 @@
 package com.fasterxml.jackson.datatype.joda.deser;
 
+import java.util.Map;
+
 import org.junit.jupiter.api.Test;
 
 import org.joda.time.*;
 
 import com.fasterxml.jackson.core.exc.InputCoercionException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
@@ -125,6 +128,34 @@ public class ReadablePeriodDeserializerTest extends JodaTestBase
             fail("Should not pass");
         } catch (MismatchedInputException e) {
             verifyException(e, "Missing value property 'days'");
+        }
+    }
+
+    @Test
+    public void testDeserializeMissingFieldTypeFails() throws Exception
+    {
+        for (String json : new String[] {
+                "{\"days\":5,\"periodType\":{\"name\":\"Days\"}}",
+                "{\"fieldType\":{\"name\":\"\"},\"days\":5,\"periodType\":{\"name\":\"Days\"}}" }) {
+            try {
+                MAPPER.readValue(json, ReadablePeriod.class);
+                fail("Should not pass for: "+json);
+            } catch (MismatchedInputException e) {
+                verifyException(e, "Missing or empty 'fieldType.name'");
+            }
+        }
+    }
+
+    @Test
+    public void testDeserializeOutOfRangeKeyFails() throws Exception
+    {
+        try {
+            MAPPER.readValue("{\"P4294967297D\":1}",
+                    new TypeReference<Map<Period, Integer>>() { });
+            fail("Should not pass");
+        } catch (InvalidFormatException e) {
+            verifyException(e, "Cannot deserialize Map key of type `org.joda.time.Period`");
+            verifyException(e, "Invalid Period value");
         }
     }
 

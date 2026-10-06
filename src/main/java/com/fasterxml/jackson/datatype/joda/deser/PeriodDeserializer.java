@@ -61,7 +61,13 @@ public class PeriodDeserializer
         if (value.isEmpty()) {
             return _fromEmptyString(p, ctxt, value);
         }
-        return _format.parsePeriod(ctxt, value);
+        try {
+            return _format.parsePeriod(ctxt, value);
+        } catch (IllegalArgumentException | ArithmeticException e) {
+            // includes `NumberFormatException` for out-of-range components
+            return (ReadablePeriod) ctxt.handleWeirdStringValue(handledType(), value,
+                    "Invalid Period value: %s", e.getMessage());
+        }
     }
 
     // @since 2.12
@@ -74,6 +80,11 @@ public class PeriodDeserializer
         
         JsonNode treeNode = p.readValueAsTree();
         String periodType = treeNode.path("fieldType").path("name").asText();
+        if (periodType.isEmpty()) {
+            ctxt.reportInputMismatch(handledType(),
+                    "Missing or empty 'fieldType.name' property for %s", handledType().getName());
+            return null; // never gets here
+        }
         String periodName = treeNode.path("periodType").path("name").asText();
         // 05-Oct-2026: must not use lenient `asInt()` as it silently truncates
         //   out-of-range and fractional values, and coerces non-numbers
