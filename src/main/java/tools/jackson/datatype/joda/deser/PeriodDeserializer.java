@@ -39,7 +39,12 @@ public class PeriodDeserializer
             return _fromString(p, ctxt, p.getString());
         }
         if (t == JsonToken.VALUE_NUMBER_INT) {
-            return new Period(p.getLongValue());    
+            try {
+                return new Period(p.getLongValue());
+            } catch (ArithmeticException e) {
+                return (ReadablePeriod) ctxt.handleWeirdNumberValue(handledType(), p.getNumberValue(),
+                        "Invalid Period value: %s", e.getMessage());
+            }
         }
         if (t != JsonToken.START_OBJECT && t != JsonToken.PROPERTY_NAME) {
             return (ReadablePeriod) ctxt.handleUnexpectedToken(getValueType(ctxt), t, p,
@@ -61,6 +66,10 @@ public class PeriodDeserializer
             return _format.parsePeriod(ctxt, value);
         } catch (IOException e) {
             throw _wrapJodaFailure(ctxt, e);
+        } catch (IllegalArgumentException | ArithmeticException e) {
+            // includes `NumberFormatException` for out-of-range components
+            return (ReadablePeriod) ctxt.handleWeirdStringValue(handledType(), value,
+                    "Invalid Period value: %s", e.getMessage());
         }
     }
 
@@ -74,9 +83,25 @@ public class PeriodDeserializer
         
         JsonNode treeNode = p.readValueAsTree();
         String periodType = treeNode.path("fieldType").path("name").asString();
+        if (periodType.isEmpty()) {
+            ctxt.reportInputMismatch(handledType(),
+                    "Missing or empty 'fieldType.name' property for %s", handledType().getName());
+            return null; // never gets here
+        }
         String periodName = treeNode.path("periodType").path("name").asString();
-        // any "weird" numbers we should worry about?
-        int periodValue = treeNode.path(periodType).asInt();
+        // 05-Oct-2026: must not use `asInt()` as it would coerce non-numbers;
+        //   need same handling as for regular `int` values
+        JsonNode valueNode = treeNode.path(periodType);
+        if (valueNode.isMissingNode()) {
+            ctxt.reportInputMismatch(handledType(),
+                    "Missing value property '%s' for %s", periodType, handledType().getName());
+            return null; // never gets here
+        }
+        final int periodValue;
+        try (JsonParser vp = valueNode.traverse(ctxt)) {
+            vp.nextToken();
+            periodValue = _parseIntPrimitive(vp, ctxt);
+        }
 
         ReadablePeriod rp;
 
