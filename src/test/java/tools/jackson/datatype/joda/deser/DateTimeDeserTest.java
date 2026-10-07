@@ -16,6 +16,7 @@ import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.ObjectReader;
 import tools.jackson.databind.cfg.DateTimeFeature;
 import tools.jackson.databind.exc.InvalidFormatException;
+import tools.jackson.databind.exc.MismatchedInputException;
 import tools.jackson.datatype.joda.JodaTestBase;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -171,6 +172,26 @@ public class DateTimeDeserTest extends JodaTestBase
 
         DateTimeZone expTZ = DateTimeZone.forID("Asia/Shanghai");
         assertEquals(new DateTime(2017, 1, 1, 1, 1, 1, expTZ), result);
+    }
+
+    @Test
+    public void testDeserFailsForMalformedZoneIdSuffix() throws Exception
+    {
+        // well-formed suffix is what we write, and still reads back:
+        assertEquals(new DateTime(2017, 1, 1, 1, 1, 1, DateTimeZone.UTC),
+                READER.readValue(quote("2017-01-01T01:01:01.000Z[UTC]")));
+
+        for (String doc : new String[] {
+                "2017-01-01T01:01:01.000Z[UTC]x",
+                "2017-01-01T01:01:01.000Z[UTC"
+        }) {
+            try {
+                READER.readValue(quote(doc));
+                fail("Should not pass for '"+doc+"'");
+            } catch (MismatchedInputException e) {
+                verifyException(e, "Malformed DateTimeZone id suffix");
+            }
+        }
     }
 
     /*

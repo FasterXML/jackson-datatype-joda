@@ -81,10 +81,14 @@ public class DateTimeDeserializer
         int ix = value.indexOf('[');
         if (ix > 0) {
             DateTimeZone tz;
-            int ix2 = value.lastIndexOf(']');
-            String tzId = (ix2 < ix)
-                    ? value.substring(ix+1)
-                    : value.substring(ix+1, ix2);
+            // 07-Oct-2026: zone id has to close the value; before this both a missing
+            //   ']' and any content past it were silently dropped
+            if (value.charAt(value.length() - 1) != ']') {
+                ctxt.reportInputMismatch(getValueType(ctxt),
+                        "Malformed DateTimeZone id suffix in '%s': no closing ']' at the end",
+                        value);
+            }
+            String tzId = value.substring(ix+1, value.length() - 1);
             try {
                 tz = DateTimeZone.forID(tzId);
             } catch (IllegalArgumentException e) {
