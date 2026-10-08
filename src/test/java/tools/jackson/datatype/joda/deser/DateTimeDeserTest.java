@@ -12,11 +12,12 @@ import org.junit.jupiter.api.Test;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
+import tools.jackson.databind.DeserializationContext;
 import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.ObjectReader;
 import tools.jackson.databind.cfg.DateTimeFeature;
+import tools.jackson.databind.deser.DeserializationProblemHandler;
 import tools.jackson.databind.exc.InvalidFormatException;
-import tools.jackson.databind.exc.MismatchedInputException;
 import tools.jackson.datatype.joda.JodaTestBase;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -48,6 +49,16 @@ public class DateTimeDeserTest extends JodaTestBase
     static class ReadableDateTimeWithContextTZOverride {
         @JsonFormat(with = JsonFormat.Feature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE)
         public ReadableDateTime time;
+    }
+
+    static class BracketPatternBean {
+        @JsonFormat(pattern = "yyyy-MM-dd'['HH']'", timezone = "UTC")
+        public DateTime value;
+    }
+
+    static class BracketInMiddlePatternBean {
+        @JsonFormat(pattern = "yyyy'['MM']'dd", timezone = "UTC")
+        public DateTime value;
     }
 
     static class Issue93Bean {
@@ -181,17 +192,67 @@ public class DateTimeDeserTest extends JodaTestBase
         assertEquals(new DateTime(2017, 1, 1, 1, 1, 1, DateTimeZone.UTC),
                 READER.readValue(quote("2017-01-01T01:01:01.000Z[UTC]")));
 
-        for (String doc : new String[] {
-                "2017-01-01T01:01:01.000Z[UTC]x",
-                "2017-01-01T01:01:01.000Z[UTC"
-        }) {
-            try {
-                READER.readValue(quote(doc));
-                fail("Should not pass for '"+doc+"'");
-            } catch (MismatchedInputException e) {
-                verifyException(e, "Malformed DateTimeZone id suffix");
-            }
+        _verifyMalformedSuffix("2017-01-01T01:01:01.000Z[UTC]x",
+                "unexpected content after closing ']'");
+        _verifyMalformedSuffix("2017-01-01T01:01:01.000Z[UTC",
+                "missing closing ']'");
+    }
+
+    private void _verifyMalformedSuffix(String doc, String expMsg) throws Exception
+    {
+        try {
+            READER.readValue(quote(doc));
+            fail("Should not pass for '"+doc+"'");
+        } catch (InvalidFormatException e) {
+            verifyException(e, "Malformed DateTimeZone id suffix");
+            verifyException(e, expMsg);
+            assertEquals(doc, e.getValue());
         }
+    }
+
+    // [datatype-joda#191]: problem handler gets to deal with malformed suffix
+    @Test
+    public void testMalformedZoneIdSuffixWithProblemHandler() throws Exception
+    {
+        final DateTime fallback = new DateTime(0L, DateTimeZone.UTC);
+        ObjectMapper mapper = mapperWithModuleBuilder()
+                .addHandler(new DeserializationProblemHandler() {
+                    @Override
+                    public Object handleWeirdStringValue(DeserializationContext ctxt,
+                            Class<?> targetType, String valueToConvert, String failureMsg) {
+                        return fallback;
+                    }
+                })
+                .build();
+        assertEquals(fallback, mapper.readValue(quote("2017-01-01T01:01:01.000Z[UTC"),
+                DateTime.class));
+    }
+
+    // [datatype-joda#191]: custom patterns with literal brackets must still work
+    @Test
+    public void testZoneIdSuffixWithBracketPattern() throws Exception
+    {
+        ObjectMapper mapper = mapperWithModuleBuilder()
+                .enable(DateTimeFeature.WRITE_DATES_WITH_ZONE_ID)
+                .build();
+        BracketPatternBean input = new BracketPatternBean();
+        input.value = new DateTime(2017, 1, 1, 10, 0, DateTimeZone.UTC);
+        String json = mapper.writeValueAsString(input);
+        assertEquals(a2q("{'value':'2017-01-01[10][UTC]'}"), json);
+        BracketPatternBean result = mapper.readValue(json, BracketPatternBean.class);
+        assertEquals(input.value, result.value);
+    }
+
+    @Test
+    public void testBracketPatternWithoutZoneIdSuffix() throws Exception
+    {
+        ObjectMapper mapper = mapperWithModuleBuilder().build();
+        BracketInMiddlePatternBean input = new BracketInMiddlePatternBean();
+        input.value = new DateTime(2017, 1, 1, 0, 0, DateTimeZone.UTC);
+        String json = mapper.writeValueAsString(input);
+        assertEquals(a2q("{'value':'2017[01]01'}"), json);
+        BracketInMiddlePatternBean result = mapper.readValue(json, BracketInMiddlePatternBean.class);
+        assertEquals(input.value, result.value);
     }
 
     /*

@@ -78,16 +78,11 @@ public class DateTimeDeserializer
         }
         // 08-Jul-2015, tatu: as per [datatype-joda#44], optional TimeZone inclusion
         // NOTE: on/off feature only for serialization; on deser should accept both
-        int ix = value.indexOf('[');
+        // 07-Oct-2026: [datatype-joda#191] zone id suffix has to close the value;
+        //   and is the LAST '[...]' (custom patterns may contain literal brackets)
+        int ix = value.endsWith("]") ? value.lastIndexOf('[') : -1;
         if (ix > 0) {
             DateTimeZone tz;
-            // 07-Oct-2026: zone id has to close the value; before this both a missing
-            //   ']' and any content past it were silently dropped
-            if (value.charAt(value.length() - 1) != ']') {
-                ctxt.reportInputMismatch(getValueType(ctxt),
-                        "Malformed DateTimeZone id suffix in '%s': no closing ']' at the end",
-                        value);
-            }
             String tzId = value.substring(ix+1, value.length() - 1);
             try {
                 tz = DateTimeZone.forID(tzId);
@@ -127,6 +122,19 @@ public class DateTimeDeserializer
 
         // Not sure if it should use timezone or not...
         // 15-Sep-2015, tatu: impl of 'createParser()' SHOULD handle all timezone/locale setup
+        final int openIx = value.indexOf('[');
+        if (openIx > 0) {
+            // 07-Oct-2026: [datatype-joda#191] Not a valid zone id suffix, but may still
+            //   be valid for a custom pattern with literal '['
+            try {
+                return _format.createParser(ctxt).parseDateTime(value);
+            } catch (IllegalArgumentException e) {
+                final String msg = (value.indexOf(']', openIx) < 0)
+                        ? "Malformed DateTimeZone id suffix: missing closing ']'"
+                        : "Malformed DateTimeZone id suffix: unexpected content after closing ']'";
+                return (ReadableInstant) ctxt.handleWeirdStringValue(handledType(), value, msg);
+            }
+        }
         return _format.createParser(ctxt).parseDateTime(value);
     }
 
