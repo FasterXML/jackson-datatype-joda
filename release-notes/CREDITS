@@ -20,3 +20,5 @@ Jooyoung Pyoung (@anthologia)
 @arfa-21
  * Fixed #190: `PeriodDeserializer` silently truncates out-of-range and invalid values
   [3.1.8]
+ * Fixed #191: `DateTimeDeserializer` accepts malformed zone id suffix
+  [3.3.0]

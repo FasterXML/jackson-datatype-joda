@@ -78,19 +78,19 @@ public class DateTimeDeserializer
         }
         // 08-Jul-2015, tatu: as per [datatype-joda#44], optional TimeZone inclusion
         // NOTE: on/off feature only for serialization; on deser should accept both
-        int ix = value.indexOf('[');
+        // 07-Oct-2026: [datatype-joda#191] zone id suffix has to close the value;
+        //   and is the LAST '[...]' (custom patterns may contain literal brackets)
+        int ix = value.endsWith("]") ? value.lastIndexOf('[') : -1;
         if (ix > 0) {
             DateTimeZone tz;
-            int ix2 = value.lastIndexOf(']');
-            String tzId = (ix2 < ix)
-                    ? value.substring(ix+1)
-                    : value.substring(ix+1, ix2);
+            String tzId = value.substring(ix+1, value.length() - 1);
             try {
                 tz = DateTimeZone.forID(tzId);
             } catch (IllegalArgumentException e) {
                 ctxt.reportInputMismatch(getValueType(ctxt), "Unknown DateTimeZone id '%s'", tzId);
                 tz = null; // never gets here
             }
+            final String fullValue = value;
             value = value.substring(0, ix);
 
             // 12-Jul-2015, tatu: Initially planned to support "timestamp[zone-id]"
@@ -104,10 +104,17 @@ public class DateTimeDeserializer
             }
             */
 
-            DateTime result = _format.createParser(ctxt)
-                    .withZone(tz)
-                    .parseDateTime(value)
-                    ;
+            DateTime result;
+            try {
+                result = _format.createParser(ctxt)
+                        .withZone(tz)
+                        .parseDateTime(value)
+                        ;
+            } catch (IllegalArgumentException e) {
+                // 07-Oct-2026: [datatype-joda#191] do not let raw Joda exception escape
+                return (ReadableInstant) ctxt.handleWeirdStringValue(handledType(), fullValue,
+                        "Invalid date/time before DateTimeZone id suffix: %s", e.getMessage());
+            }
             // 23-Jul-2017, tatu: As per [datatype-joda#93] only override tz if allowed to
             if (_format.shouldAdjustToContextTimeZone(ctxt)) {
                 result = result.withZone(_format.getTimeZone());
@@ -123,6 +130,19 @@ public class DateTimeDeserializer
 
         // Not sure if it should use timezone or not...
         // 15-Sep-2015, tatu: impl of 'createParser()' SHOULD handle all timezone/locale setup
+        final int openIx = value.indexOf('[');
+        if (openIx > 0) {
+            // 07-Oct-2026: [datatype-joda#191] Not a valid zone id suffix, but may still
+            //   be valid for a custom pattern with literal '['
+            try {
+                return _format.createParser(ctxt).parseDateTime(value);
+            } catch (IllegalArgumentException e) {
+                final String msg = (value.indexOf(']', openIx) < 0)
+                        ? "Malformed DateTimeZone id suffix: missing closing ']'"
+                        : "Malformed DateTimeZone id suffix: unexpected content after closing ']'";
+                return (ReadableInstant) ctxt.handleWeirdStringValue(handledType(), value, msg);
+            }
+        }
         return _format.createParser(ctxt).parseDateTime(value);
     }
 

@@ -7,7 +7,9 @@ Major version: 3 (for earlier, see VERSION-2.x)
 
 3.3.0 (not yet released)
 
-No changes since 3.2
+#191: `DateTimeDeserializer` accepts malformed zone id suffix (trailing text
+  after `]`, or missing `]`)
+ (fixed by @arfa-21)
 
 3.2.4 (not yet released)
 
