@@ -90,6 +90,7 @@ public class DateTimeDeserializer
                 ctxt.reportInputMismatch(getValueType(ctxt), "Unknown DateTimeZone id '%s'", tzId);
                 tz = null; // never gets here
             }
+            final String fullValue = value;
             value = value.substring(0, ix);
 
             // 12-Jul-2015, tatu: Initially planned to support "timestamp[zone-id]"
@@ -103,10 +104,17 @@ public class DateTimeDeserializer
             }
             */
 
-            DateTime result = _format.createParser(ctxt)
-                    .withZone(tz)
-                    .parseDateTime(value)
-                    ;
+            DateTime result;
+            try {
+                result = _format.createParser(ctxt)
+                        .withZone(tz)
+                        .parseDateTime(value)
+                        ;
+            } catch (IllegalArgumentException e) {
+                // 07-Oct-2026: [datatype-joda#191] do not let raw Joda exception escape
+                return (ReadableInstant) ctxt.handleWeirdStringValue(handledType(), fullValue,
+                        "Invalid date/time before DateTimeZone id suffix: %s", e.getMessage());
+            }
             // 23-Jul-2017, tatu: As per [datatype-joda#93] only override tz if allowed to
             if (_format.shouldAdjustToContextTimeZone(ctxt)) {
                 result = result.withZone(_format.getTimeZone());

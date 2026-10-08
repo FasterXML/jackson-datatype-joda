@@ -18,6 +18,7 @@ import tools.jackson.databind.ObjectReader;
 import tools.jackson.databind.cfg.DateTimeFeature;
 import tools.jackson.databind.deser.DeserializationProblemHandler;
 import tools.jackson.databind.exc.InvalidFormatException;
+import tools.jackson.databind.exc.MismatchedInputException;
 import tools.jackson.datatype.joda.JodaTestBase;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -196,6 +197,79 @@ public class DateTimeDeserTest extends JodaTestBase
                 "unexpected content after closing ']'");
         _verifyMalformedSuffix("2017-01-01T01:01:01.000Z[UTC",
                 "missing closing ']'");
+    }
+
+    // [datatype-joda#191]: edge cases of suffix detection
+    @Test
+    public void testZoneIdSuffixEdgeCases() throws Exception
+    {
+        final DateTime exp = new DateTime(2017, 1, 1, 1, 1, 1, DateTimeZone.UTC);
+        // surrounding whitespace is trimmed, so still fine
+        assertEquals(exp, READER.readValue(quote("  2017-01-01T01:01:01.000Z[UTC]  ")));
+        // '[' as the very last character
+        _verifyMalformedSuffix("2017-01-01T01:01:01.000Z[", "missing closing ']'");
+        // multiple bracketed sections, last one is not a valid zone id
+        try {
+            READER.readValue(quote("2017-01-01T01:01:01.000Z[UTC][x]"));
+            fail("Should not pass");
+        } catch (MismatchedInputException e) {
+            verifyException(e, "Unknown DateTimeZone id 'x'");
+        }
+    }
+
+    // [datatype-joda#191]: invalid date/time with valid suffix must not leak
+    //   raw IllegalArgumentException
+    @Test
+    public void testInvalidDateTimeBeforeZoneIdSuffix() throws Exception
+    {
+        for (String doc : new String[] {
+                "x[UTC]",
+                "2017-01-01T01:01:01.000Zjunk[UTC]"
+        }) {
+            try {
+                READER.readValue(quote(doc));
+                fail("Should not pass for '"+doc+"'");
+            } catch (InvalidFormatException e) {
+                verifyException(e, "Invalid date/time before DateTimeZone id suffix");
+                assertEquals(doc, e.getValue());
+            }
+        }
+    }
+
+    // [datatype-joda#191]: same handling for all registered target types
+    @Test
+    public void testZoneIdSuffixForReadableTypes() throws Exception
+    {
+        final ObjectMapper mapper = mapperWithModule();
+        final DateTime exp = new DateTime(2017, 1, 1, 1, 1, 1, DateTimeZone.UTC);
+        final String valid = quote("2017-01-01T01:01:01.000Z[UTC]");
+        final String malformed = quote("2017-01-01T01:01:01.000Z[UTC]x");
+
+        assertEquals(exp, mapper.readValue(valid, ReadableInstant.class));
+        assertEquals(exp, mapper.readValue(valid, ReadableDateTime.class));
+        for (Class<?> type : new Class<?>[] { ReadableInstant.class, ReadableDateTime.class }) {
+            try {
+                mapper.readValue(malformed, type);
+                fail("Should not pass for "+type.getName());
+            } catch (InvalidFormatException e) {
+                verifyException(e, "Malformed DateTimeZone id suffix");
+            }
+        }
+    }
+
+    // [datatype-joda#191]: also as a bean property, not just root value
+    @Test
+    public void testMalformedZoneIdSuffixInBean() throws Exception
+    {
+        try {
+            mapperWithModule().readValue(
+                    a2q("{'time':'2017-01-01T01:01:01.000Z[UTC'}"),
+                    ReadableDateTimeWithoutContextTZOverride.class);
+            fail("Should not pass");
+        } catch (InvalidFormatException e) {
+            verifyException(e, "Malformed DateTimeZone id suffix");
+            verifyException(e, "missing closing ']'");
+        }
     }
 
     private void _verifyMalformedSuffix(String doc, String expMsg) throws Exception
