@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.exc.MismatchedInputException;
 import tools.jackson.datatype.joda.JodaTestBase;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -99,6 +100,28 @@ public class LocalDateTimeDeserTest extends JodaTestBase
         assertNull(mapper.readValue(quote(""), LocalDateTime.class));
     }
     
+    // Partial JSON Array must be reported, not quietly read as `null`
+    @Test
+    public void testLocalDateTimeDeserFailsForPartialArray() throws IOException
+    {
+        final ObjectMapper mapper = mapperWithModule();
+
+        // milliseconds are optional, so 6 ints is the shortest accepted form:
+        LocalDateTime date = mapper.readValue("[2001,5,25,10,15,30]", LocalDateTime.class);
+        assertEquals(new LocalDateTime(2001, 5, 25, 10, 15, 30), date);
+
+        for (String doc : new String[] {
+                "[]", "[2001]", "[2001,5]", "[2001,5,25]", "[2001,5,25,10]", "[2001,5,25,10,15]"
+        }) {
+            try {
+                LocalDateTime result = mapper.readValue(doc, LocalDateTime.class);
+                fail("Should not pass for '"+doc+"', got: "+result);
+            } catch (MismatchedInputException e) {
+                verifyException(e, "expected 6 or 7 int values for LocalDateTime");
+            }
+        }
+    }
+
     @Test
     public void testLocalDateTimeDeserWithTypeInfo() throws IOException
     {
