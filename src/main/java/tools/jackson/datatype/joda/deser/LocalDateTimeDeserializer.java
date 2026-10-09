@@ -103,6 +103,10 @@ public class LocalDateTimeDeserializer
             }
             dt = new LocalDateTime(year, month, day, hour, minute, second, millisecond);                 
         } while (false); // bogus loop to allow break from within
+        if (dt == null) { // broke out of the loop above before reading all required ints
+            throw ctxt.wrongTokenException(p, getValueType(ctxt), JsonToken.VALUE_NUMBER_INT,
+                    "expected 6 or 7 int values for LocalDateTime");
+        }
         if (t == JsonToken.END_ARRAY) {
             return dt;
         }
