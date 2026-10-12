@@ -13,6 +13,8 @@ Major version: 3 (for earlier, see VERSION-2.x)
 #192: `LocalTimeDeserializer` ignores configured time zone for timestamps
   (uses JVM default zone instead)
  (fixed by @arfa-21)
+#193: `LocalDateTimeDeserializer` returns `null` for partial array (instead of failing)
+ (fixed by @arfa-21)
 #194: Fix timestamp time zone resolution (explicit zone equal to JVM default;
   `ADJUST_DATES_TO_CONTEXT_TIME_ZONE`)
 
