@@ -12,8 +12,10 @@ import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import tools.jackson.databind.DeserializationFeature;
 import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.cfg.DateTimeFeature;
+import tools.jackson.databind.exc.InvalidFormatException;
 import tools.jackson.databind.exc.MismatchedInputException;
 import tools.jackson.databind.module.SimpleModule;
 import tools.jackson.datatype.joda.JodaTestBase;
@@ -124,6 +126,66 @@ public class LocalDateTimeDeserTest extends JodaTestBase
                 fail("Should not pass for '"+doc+"', got: "+result);
             } catch (MismatchedInputException e) {
                 verifyException(e, "expected 6 or 7 int values for LocalDateTime");
+            }
+        }
+    }
+
+    @Test
+    public void testLocalDateTimeDeserWithPartsAsString() throws IOException
+    {
+        LocalDateTime date = mapperWithModule().readValue(
+                "[\"2001\",\"5\",\"25\",\"10\",\"15\",\"30\",\"7\"]", LocalDateTime.class);
+        assertEquals(new LocalDateTime(2001, 5, 25, 10, 15, 30, 7), date);
+    }
+
+    @Test
+    public void testLocalDateTimeDeserFailsForInvalidArrayElement() throws IOException
+    {
+        final ObjectMapper mapper = mapperWithModule();
+
+        // invalid value for a required field, or for optional milliseconds
+        for (String doc : new String[] {
+                "[2001,\"x\",25,10,15,30]", "[2001,5,25,10,15,30,\"x\"]"
+        }) {
+            try {
+                LocalDateTime result = mapper.readValue(doc, LocalDateTime.class);
+                fail("Should not pass for '"+doc+"', got: "+result);
+            } catch (InvalidFormatException e) {
+                verifyException(e, "not a valid `int` value");
+            }
+        }
+
+        // `null` not accepted (by default) either
+        try {
+            LocalDateTime result = mapper.readValue("[2001,5,null,10,15,30]", LocalDateTime.class);
+            fail("Should not pass, got: "+result);
+        } catch (MismatchedInputException e) {
+            verifyException(e, "Cannot coerce `null`");
+        }
+
+        // nor more than 7 values
+        try {
+            LocalDateTime result = mapper.readValue("[2001,5,25,10,15,30,1,2]", LocalDateTime.class);
+            fail("Should not pass, got: "+result);
+        } catch (MismatchedInputException e) {
+            verifyException(e, "after LocalDateTime ints");
+        }
+    }
+
+    @Test
+    public void testLocalDateTimeDeserFloatsWithoutFloatAsInt() throws IOException
+    {
+        final ObjectMapper mapper = mapperWithModuleBuilder()
+                .disable(DeserializationFeature.ACCEPT_FLOAT_AS_INT)
+                .build();
+        for (String doc : new String[] {
+                "[2001.5,5,25,10,15,30]", "[2001,5,25,10,15,30,999.9]"
+        }) {
+            try {
+                LocalDateTime result = mapper.readValue(doc, LocalDateTime.class);
+                fail("Should not pass for '"+doc+"', got: "+result);
+            } catch (InvalidFormatException e) {
+                verifyException(e, "Cannot coerce Floating-point value");
             }
         }
     }

@@ -6,6 +6,9 @@ import org.joda.time.DateTimeZone;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.JsonParser;
+import tools.jackson.core.JsonToken;
 import tools.jackson.databind.*;
 import tools.jackson.datatype.joda.cfg.JacksonJodaDateFormat;
 
@@ -79,6 +82,27 @@ public abstract class JodaDateDeserializerBase<T>
         }
         // No adjustment allowed: timestamp is resolved as-is (UTC)
         return DateTimeZone.UTC;
+    }
+
+    /**
+     * Helper method for reading the next required int element of a JSON Array
+     * value: reports premature end of the Array using given message, and
+     * otherwise handles the element (including coercion of Strings, floating-point
+     * numbers and {@code null}s) using standard {@code int} handling.
+     */
+    protected int _nextArrayInt(JsonParser p, DeserializationContext ctxt,
+            String endOfArrayMsg)
+        throws JacksonException
+    {
+        int value = p.nextIntValue(-1); // fast speculative case
+        if (value == -1) { // either -1, or not an integral number; slow path
+            if (p.currentToken() == JsonToken.END_ARRAY) {
+                throw ctxt.wrongTokenException(p, getValueType(ctxt), JsonToken.VALUE_NUMBER_INT,
+                        endOfArrayMsg);
+            }
+            value = _parseIntPrimitive(p, ctxt);
+        }
+        return value;
     }
 
     /**

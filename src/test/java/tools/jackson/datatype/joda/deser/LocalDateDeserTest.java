@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.cfg.DateTimeFeature;
+import tools.jackson.databind.exc.MismatchedInputException;
 import tools.jackson.datatype.joda.JodaTestBase;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -114,6 +115,20 @@ public class LocalDateDeserTest extends JodaTestBase
         assertEquals(2001, date.getYear());
         assertEquals(5, date.getMonthOfYear());
         assertEquals(25, date.getDayOfMonth());
+    }
+
+    @Test
+    public void testLocalDateDeserFailsForPartialArray() throws IOException
+    {
+        ObjectMapper mapper = mapperWithModule();
+        for (String doc : new String[] { "[]", "[2001]", "[2001,5]" }) {
+            try {
+                LocalDate result = mapper.readValue(doc, LocalDate.class);
+                fail("Should not pass for '"+doc+"', got: "+result);
+            } catch (MismatchedInputException e) {
+                verifyException(e, "expected 3 int values for LocalDate");
+            }
+        }
     }
 
     @Test
