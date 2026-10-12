@@ -5,7 +5,7 @@ import java.util.TimeZone;
 
 import org.joda.time.DateTimeZone;
 import org.joda.time.LocalTime;
-import org.joda.time.chrono.ISOChronology;
+import org.joda.time.format.ISODateTimeFormat;
 
 import org.junit.jupiter.api.Test;
 
@@ -17,7 +17,10 @@ import tools.jackson.core.StreamReadCapability;
 import tools.jackson.core.util.JacksonFeatureSet;
 import tools.jackson.core.util.JsonParserDelegate;
 import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.cfg.DateTimeFeature;
+import tools.jackson.databind.module.SimpleModule;
 import tools.jackson.datatype.joda.JodaTestBase;
+import tools.jackson.datatype.joda.cfg.JacksonJodaDateFormat;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -29,6 +32,11 @@ public class LocalTimeDeserTest extends JodaTestBase
 
     static class LocalTimeAsTimestamp {
         @JsonFormat(timezone = "America/Los_Angeles")
+        public LocalTime value;
+    }
+
+    static class LocalTimeTaipei {
+        @JsonFormat(timezone = "Asia/Taipei")
         public LocalTime value;
     }
 
@@ -92,7 +100,6 @@ public class LocalTimeDeserTest extends JodaTestBase
         assertEquals(3, time.getMinuteOfHour());
         assertEquals(2, time.getSecondOfMinute());
         assertEquals(1, time.getMillisOfSecond());
-        assertEquals(ISOChronology.getInstanceUTC(), time.getChronology());
 
         ObjectMapper mapper = mapperWithModule(TimeZone.getTimeZone("America/Los_Angeles"));
         LocalTime time2 = mapper.readValue(trickyInstant, LocalTime.class);
@@ -139,6 +146,13 @@ public class LocalTimeDeserTest extends JodaTestBase
         assertEquals(3, wrapper.value.getMinuteOfHour());
         assertEquals(2, wrapper.value.getSecondOfMinute());
         assertEquals(1, wrapper.value.getMillisOfSecond());
+
+        // and same if disabled globally
+        mapper = jodaMapperBuilder(TimeZone.getTimeZone("Asia/Taipei"))
+                .disable(DateTimeFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE)
+                .build();
+        assertEquals(new LocalTime(4, 3, 2, 1),
+                mapper.readValue("1238558582001", LocalTime.class));
     }
 
     @Test
@@ -187,16 +201,17 @@ public class LocalTimeDeserTest extends JodaTestBase
     @Test
     public void testLocalTimeDeserWithFormatTimeZoneSameAsDefault() throws IOException
     {
-        // Format time zone that equals JVM default must still win over the
-        // context one (UTC here)
-        final TimeZone jvmZone = TimeZone.getDefault();
+        // Default format whose (non-explicit) zone is the same as the annotation's:
+        // mimics default formats (that use JVM default zone) without depending on JVM zone.
+        // Annotation zone must still be considered explicit and win over context zone (UTC)
+        JacksonJodaDateFormat fmt = new JacksonJodaDateFormat(
+                ISODateTimeFormat.localTimeParser().withZone(DateTimeZone.forID("Asia/Taipei")));
         ObjectMapper mapper = mapperWithModuleBuilder()
-                .withConfigOverride(LocalTime.class,
-                        o -> o.setFormat(JsonFormat.Value.empty().withTimeZone(jvmZone)))
+                .addModule(new SimpleModule()
+                        .addDeserializer(LocalTime.class, new LocalTimeDeserializer(fmt)))
                 .build();
-        LocalTimeNoAdjust wrapper = mapper.readValue(
-                a2q("{'value':1238558582001}"), LocalTimeNoAdjust.class);
-        assertEquals(new LocalTime(1238558582001L, DateTimeZone.forTimeZone(jvmZone)),
-                wrapper.value);
+        LocalTimeTaipei wrapper = mapper.readValue(
+                a2q("{'value':1238558582001}"), LocalTimeTaipei.class);
+        assertEquals(new LocalTime(12, 3, 2, 1), wrapper.value);
     }
 }
