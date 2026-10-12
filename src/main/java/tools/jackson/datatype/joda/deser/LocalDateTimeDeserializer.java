@@ -1,6 +1,5 @@
 package tools.jackson.datatype.joda.deser;
 
-import org.joda.time.DateTimeZone;
 import org.joda.time.LocalDateTime;
 
 import tools.jackson.core.*;
@@ -114,8 +113,6 @@ public class LocalDateTimeDeserializer
     }
 
     protected LocalDateTime _fromTimestamp(DeserializationContext ctxt, long ts) {
-        DateTimeZone tz = _format.isTimezoneExplicit() ? _format.getTimeZone()
-                : DateTimeZone.forTimeZone(ctxt.getTimeZone());
-        return new LocalDateTime(ts, tz);
+        return new LocalDateTime(ts, _timestampZone(ctxt));
     }
 }

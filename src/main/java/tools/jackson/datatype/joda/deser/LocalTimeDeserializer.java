@@ -34,7 +34,7 @@ public class LocalTimeDeserializer
     {
         switch (p.currentTokenId()) {
         case JsonTokenId.ID_NUMBER_INT:
-            return new LocalTime(p.getLongValue());            
+            return _fromTimestamp(ctxt, p.getLongValue());
         case JsonTokenId.ID_STRING:
             return _fromString(p, ctxt, p.getString());
         case JsonTokenId.ID_START_OBJECT:
@@ -68,7 +68,7 @@ public class LocalTimeDeserializer
         //     some textual formats
         if (ctxt.isEnabled(StreamReadCapability.UNTYPED_SCALARS)
                 && _isValidTimestampString(value)) {
-            return new LocalTime(NumberInput.parseLong(value));
+            return _fromTimestamp(ctxt, NumberInput.parseLong(value));
         }
         return _format.createParser(ctxt).parseLocalTime(value);
     }
@@ -93,5 +93,9 @@ public class LocalTimeDeserializer
             throw ctxt.wrongTokenException(p, getValueType(ctxt), JsonToken.END_ARRAY, "after LocalTime ints");
         }
         return new LocalTime(hour, minute, second, millis);
+    }
+
+    protected LocalTime _fromTimestamp(DeserializationContext ctxt, long ts) {
+        return new LocalTime(ts, _timestampZone(ctxt));
     }
 }
