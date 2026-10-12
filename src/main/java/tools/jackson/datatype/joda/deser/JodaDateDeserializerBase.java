@@ -124,7 +124,7 @@ public abstract class JodaDateDeserializerBase<T>
                     ? "`null`" : "empty String (\"\")";
             return ctxt.handleNullForPrimitives(handledType(), p, this,
 "Cannot coerce %s to `int` for element #%d of %s Array value (disable `DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES` to allow)",
-                    inputDesc, p.streamReadContext().getCurrentIndex(),
+                    inputDesc, p.streamReadContext().getCurrentIndex() + 1,
                     ClassUtil.nameOf(handledType()));
         }
         return defaultValue;

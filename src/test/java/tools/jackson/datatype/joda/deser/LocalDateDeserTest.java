@@ -146,7 +146,7 @@ public class LocalDateDeserTest extends JodaTestBase
             LocalDate result = mapper.readValue("[2001,null,30]", LocalDate.class);
             fail("Should not pass, got: "+result);
         } catch (MismatchedInputException e) {
-            verifyException(e, "Cannot coerce `null` to `int` for element #1 of `org.joda.time.LocalDate` Array value");
+            verifyException(e, "Cannot coerce `null` to `int` for element #2 of `org.joda.time.LocalDate` Array value");
         }
     }
 

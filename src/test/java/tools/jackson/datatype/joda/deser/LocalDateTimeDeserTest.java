@@ -160,13 +160,13 @@ public class LocalDateTimeDeserTest extends JodaTestBase
             LocalDateTime result = mapper.readValue("[2001,5,null,10,15,30]", LocalDateTime.class);
             fail("Should not pass, got: "+result);
         } catch (MismatchedInputException e) {
-            verifyException(e, "Cannot coerce `null` to `int` for element #2 of `org.joda.time.LocalDateTime` Array value");
+            verifyException(e, "Cannot coerce `null` to `int` for element #3 of `org.joda.time.LocalDateTime` Array value");
         }
         try {
             LocalDateTime result = mapper.readValue("[2001,\"\",25,10,15,30]", LocalDateTime.class);
             fail("Should not pass, got: "+result);
         } catch (MismatchedInputException e) {
-            verifyException(e, "Cannot coerce empty String (\"\") to `int` for element #1 of `org.joda.time.LocalDateTime` Array value");
+            verifyException(e, "Cannot coerce empty String (\"\") to `int` for element #2 of `org.joda.time.LocalDateTime` Array value");
         }
 
         // nor out-of-range values
