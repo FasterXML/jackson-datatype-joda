@@ -122,6 +122,12 @@ public class LocalTimeDeserTest extends JodaTestBase
         } catch (MismatchedInputException e) {
             verifyException(e, "after LocalTime ints");
         }
+        try {
+            LocalTime result = MAPPER.readValue("[24,59,1]", LocalTime.class);
+            fail("Should not pass, got: "+result);
+        } catch (InvalidFormatException e) {
+            verifyException(e, "Value 24 for hourOfDay must be in the range [0,23]");
+        }
     }
 
     @Test

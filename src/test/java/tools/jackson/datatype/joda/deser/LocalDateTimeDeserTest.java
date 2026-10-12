@@ -155,12 +155,27 @@ public class LocalDateTimeDeserTest extends JodaTestBase
             }
         }
 
-        // `null` not accepted (by default) either
+        // `null` (or empty String) not accepted (by default) either
         try {
             LocalDateTime result = mapper.readValue("[2001,5,null,10,15,30]", LocalDateTime.class);
             fail("Should not pass, got: "+result);
         } catch (MismatchedInputException e) {
-            verifyException(e, "Cannot coerce `null`");
+            verifyException(e, "Cannot coerce `null` to `int` for element #2 of `org.joda.time.LocalDateTime` Array value");
+        }
+        try {
+            LocalDateTime result = mapper.readValue("[2001,\"\",25,10,15,30]", LocalDateTime.class);
+            fail("Should not pass, got: "+result);
+        } catch (MismatchedInputException e) {
+            verifyException(e, "Cannot coerce empty String (\"\") to `int` for element #1 of `org.joda.time.LocalDateTime` Array value");
+        }
+
+        // nor out-of-range values
+        try {
+            LocalDateTime result = mapper.readValue("[2001,13,25,10,15,30]", LocalDateTime.class);
+            fail("Should not pass, got: "+result);
+        } catch (InvalidFormatException e) {
+            verifyException(e, "Value 13 for monthOfYear must be in the range [1,12]");
+            assertEquals(13, e.getValue());
         }
 
         // nor more than 7 values

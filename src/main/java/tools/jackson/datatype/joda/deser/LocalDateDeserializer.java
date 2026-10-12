@@ -1,5 +1,6 @@
 package tools.jackson.datatype.joda.deser;
 
+import org.joda.time.IllegalFieldValueException;
 import org.joda.time.LocalDate;
 
 import tools.jackson.core.JacksonException;
@@ -84,7 +85,11 @@ public class LocalDateDeserializer
         if (p.nextToken() != JsonToken.END_ARRAY) {
             throw ctxt.wrongTokenException(p, getValueType(ctxt), JsonToken.END_ARRAY, "after LocalDate ints");
         }
-        return new LocalDate(year, month, day);
+        try {
+            return new LocalDate(year, month, day);
+        } catch (IllegalFieldValueException e) {
+            throw _invalidArrayValue(ctxt, e);
+        }
     }
 
     protected LocalDate _fromTimestamp(DeserializationContext ctxt, long ts) {

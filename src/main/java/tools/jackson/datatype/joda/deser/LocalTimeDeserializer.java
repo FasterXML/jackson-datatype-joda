@@ -1,5 +1,6 @@
 package tools.jackson.datatype.joda.deser;
 
+import org.joda.time.IllegalFieldValueException;
 import org.joda.time.LocalTime;
 
 import tools.jackson.core.JacksonException;
@@ -91,7 +92,11 @@ public class LocalTimeDeserializer
                         "after LocalTime ints");
             }
         }
-        return new LocalTime(hour, minute, second, millis);
+        try {
+            return new LocalTime(hour, minute, second, millis);
+        } catch (IllegalFieldValueException e) {
+            throw _invalidArrayValue(ctxt, e);
+        }
     }
 
     protected LocalTime _fromTimestamp(DeserializationContext ctxt, long ts) {
