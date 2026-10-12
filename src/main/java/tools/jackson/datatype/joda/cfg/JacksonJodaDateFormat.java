@@ -172,7 +172,10 @@ public class JacksonJodaDateFormat extends JacksonJodaFormatBase
     }
 
     public JacksonJodaDateFormat withTimeZone(TimeZone tz) {
-        if ((tz == null) || (_jdkTimezone != null && _jdkTimezone.equals(tz))) {
+        // Must not short-circuit on non-explicit default zone, even if it is the same
+        // (otherwise annotation-specified zone that equals JVM default is not "explicit")
+        if ((tz == null)
+                || (_explicitTimezone && _jdkTimezone != null && _jdkTimezone.equals(tz))) {
             return this;
         }
         return new JacksonJodaDateFormat(this, tz);

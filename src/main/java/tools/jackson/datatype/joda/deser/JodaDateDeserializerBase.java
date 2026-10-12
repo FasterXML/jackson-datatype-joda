@@ -1,5 +1,9 @@
 package tools.jackson.datatype.joda.deser;
 
+import java.util.TimeZone;
+
+import org.joda.time.DateTimeZone;
+
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 import tools.jackson.databind.*;
@@ -13,6 +17,12 @@ public abstract class JodaDateDeserializerBase<T>
     extends JodaDeserializerBase<T>
 {
     protected final JacksonJodaDateFormat _format;
+
+    /**
+     * Cached conversion of the last seen context {@link TimeZone} into
+     * {@link DateTimeZone}, to avoid re-resolving it for every value.
+     */
+    private transient volatile ContextZone _contextZone;
 
     protected JodaDateDeserializerBase(Class<?> type, JacksonJodaDateFormat format)
     {
@@ -54,4 +64,35 @@ public abstract class JodaDateDeserializerBase<T>
         }
         return this;
     }
+
+    /**
+     * Helper method for resolving the time zone to use for converting a
+     * timestamp: explicit format time zone if one is specified; context
+     * time zone if adjustment to it is enabled; UTC otherwise.
+     */
+    protected DateTimeZone _timestampZone(DeserializationContext ctxt) {
+        if (_format.isTimezoneExplicit()) {
+            return _format.getTimeZone();
+        }
+        if (_format.shouldAdjustToContextTimeZone(ctxt)) {
+            return _contextTimeZone(ctxt);
+        }
+        // No adjustment allowed: timestamp is resolved as-is (UTC)
+        return DateTimeZone.UTC;
+    }
+
+    /**
+     * Helper method for accessing the context time zone as {@link DateTimeZone}.
+     */
+    protected DateTimeZone _contextTimeZone(DeserializationContext ctxt) {
+        final TimeZone jdkZone = ctxt.getTimeZone();
+        ContextZone cached = _contextZone;
+        if (cached == null || cached.jdkZone() != jdkZone) {
+            cached = new ContextZone(jdkZone, DateTimeZone.forTimeZone(jdkZone));
+            _contextZone = cached;
+        }
+        return cached.jodaZone();
+    }
+
+    private record ContextZone(TimeZone jdkZone, DateTimeZone jodaZone) { }
 }

@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.cfg.DateTimeFeature;
 import tools.jackson.datatype.joda.JodaTestBase;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -113,5 +114,20 @@ public class LocalDateDeserTest extends JodaTestBase
         assertEquals(2001, date.getYear());
         assertEquals(5, date.getMonthOfYear());
         assertEquals(25, date.getDayOfMonth());
+    }
+
+    @Test
+    public void testLocalDateDeserFromTimestampWithoutAdjust() throws IOException
+    {
+        final TimeZone la = TimeZone.getTimeZone("America/Los_Angeles");
+        // with adjustment (default), context zone is used
+        assertEquals(new LocalDate(2009, 3, 31),
+                mapperWithModule(la).readValue("1238558582001", LocalDate.class));
+        // without, timestamp resolved as UTC
+        ObjectMapper mapper = jodaMapperBuilder(la)
+                .disable(DateTimeFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE)
+                .build();
+        assertEquals(new LocalDate(2009, 4, 1),
+                mapper.readValue("1238558582001", LocalDate.class));
     }
 }
