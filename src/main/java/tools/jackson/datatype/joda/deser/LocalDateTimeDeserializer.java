@@ -1,5 +1,6 @@
 package tools.jackson.datatype.joda.deser;
 
+import org.joda.time.IllegalFieldValueException;
 import org.joda.time.LocalDateTime;
 
 import tools.jackson.core.*;
@@ -72,40 +73,28 @@ public class LocalDateTimeDeserializer
     protected LocalDateTime _fromArray(final JsonParser p, final DeserializationContext ctxt)
         throws JacksonException
     {
-        // [yyyy,mm,dd,hh,MM,ss,ms]
-        JsonToken t = p.nextToken();
-        LocalDateTime dt = null;
-        do {
-            if (!t.isNumeric()) { break; }
-            int year = p.getIntValue();
-            t = p.nextToken(); // VALUE_NUMBER_INT
-            if (!t.isNumeric()) { break; }
-            int month = p.getIntValue();
-            t = p.nextToken(); // VALUE_NUMBER_INT
-            if (!t.isNumeric()) { break; }
-            int day = p.getIntValue();
-            t = p.nextToken(); // VALUE_NUMBER_INT
-            if (!t.isNumeric()) { break; }
-            int hour = p.getIntValue();
-            t = p.nextToken(); // VALUE_NUMBER_INT
-            if (!t.isNumeric()) { break; }
-            int minute = p.getIntValue();
-            t = p.nextToken(); // VALUE_NUMBER_INT
-            if (!t.isNumeric()) { break; }
-            int second = p.getIntValue();
-            t = p.nextToken(); // VALUE_NUMBER_INT | END_ARRAY
-            // let's leave milliseconds optional?
-            int millisecond = 0;
-            if (t.isNumeric()) { // VALUE_NUMBER_INT           
-                millisecond = p.getIntValue();
-                t = p.nextToken(); // END_ARRAY?
+        // [yyyy,mm,dd,hh,MM,ss,ms?] (or Strings)
+        final String msg = "expected 6 or 7 int values for LocalDateTime";
+        int year = _nextArrayInt(p, ctxt, msg);
+        int month = _nextArrayInt(p, ctxt, msg);
+        int day = _nextArrayInt(p, ctxt, msg);
+        int hour = _nextArrayInt(p, ctxt, msg);
+        int minute = _nextArrayInt(p, ctxt, msg);
+        int second = _nextArrayInt(p, ctxt, msg);
+        // milliseconds are optional
+        int millisecond = 0;
+        if (p.nextToken() != JsonToken.END_ARRAY) {
+            millisecond = _parseIntPrimitive(p, ctxt);
+            if (p.nextToken() != JsonToken.END_ARRAY) {
+                throw ctxt.wrongTokenException(p, getValueType(ctxt), JsonToken.END_ARRAY,
+                        "after LocalDateTime ints");
             }
-            dt = new LocalDateTime(year, month, day, hour, minute, second, millisecond);                 
-        } while (false); // bogus loop to allow break from within
-        if (t == JsonToken.END_ARRAY) {
-            return dt;
         }
-        throw ctxt.wrongTokenException(p, getValueType(ctxt), JsonToken.END_ARRAY, "after LocalDateTime ints");
+        try {
+            return new LocalDateTime(year, month, day, hour, minute, second, millisecond);
+        } catch (IllegalFieldValueException e) {
+            throw _invalidArrayValue(ctxt, e);
+        }
     }
 
     protected LocalDateTime _fromTimestamp(DeserializationContext ctxt, long ts) {

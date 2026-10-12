@@ -17,6 +17,8 @@ import tools.jackson.core.StreamReadCapability;
 import tools.jackson.core.util.JacksonFeatureSet;
 import tools.jackson.core.util.JsonParserDelegate;
 import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.exc.InvalidFormatException;
+import tools.jackson.databind.exc.MismatchedInputException;
 import tools.jackson.databind.cfg.DateTimeFeature;
 import tools.jackson.databind.module.SimpleModule;
 import tools.jackson.datatype.joda.JodaTestBase;
@@ -87,6 +89,45 @@ public class LocalTimeDeserTest extends JodaTestBase
 
         // since 1.6.1, for [JACKSON-360]
         assertNull(MAPPER.readValue(quote(""), LocalTime.class));
+    }
+
+    @Test
+    public void testLocalTimeDeserWithPartsAsString() throws IOException
+    {
+        LocalTime time = MAPPER.readValue("[\"23\",\"59\",\"1\",\"222\"]", LocalTime.class);
+        assertEquals(new LocalTime(23, 59, 1, 222), time);
+    }
+
+    // Partial or malformed JSON Array must be reported with a clear message
+    @Test
+    public void testLocalTimeDeserFailsForPartialArray() throws IOException
+    {
+        for (String doc : new String[] { "[]", "[23]", "[23,59]" }) {
+            try {
+                LocalTime result = MAPPER.readValue(doc, LocalTime.class);
+                fail("Should not pass for '"+doc+"', got: "+result);
+            } catch (MismatchedInputException e) {
+                verifyException(e, "expected 3 or 4 int values for LocalTime");
+            }
+        }
+        try {
+            LocalTime result = MAPPER.readValue("[23,59,1,\"x\"]", LocalTime.class);
+            fail("Should not pass, got: "+result);
+        } catch (InvalidFormatException e) {
+            verifyException(e, "not a valid `int` value");
+        }
+        try {
+            LocalTime result = MAPPER.readValue("[23,59,1,222,1]", LocalTime.class);
+            fail("Should not pass, got: "+result);
+        } catch (MismatchedInputException e) {
+            verifyException(e, "after LocalTime ints");
+        }
+        try {
+            LocalTime result = MAPPER.readValue("[24,59,1]", LocalTime.class);
+            fail("Should not pass, got: "+result);
+        } catch (InvalidFormatException e) {
+            verifyException(e, "Value 24 for hourOfDay must be in the range [0,23]");
+        }
     }
 
     @Test

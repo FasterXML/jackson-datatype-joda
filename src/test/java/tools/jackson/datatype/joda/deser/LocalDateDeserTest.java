@@ -11,6 +11,8 @@ import org.junit.jupiter.api.Test;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.cfg.DateTimeFeature;
+import tools.jackson.databind.exc.InvalidFormatException;
+import tools.jackson.databind.exc.MismatchedInputException;
 import tools.jackson.datatype.joda.JodaTestBase;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -114,6 +116,38 @@ public class LocalDateDeserTest extends JodaTestBase
         assertEquals(2001, date.getYear());
         assertEquals(5, date.getMonthOfYear());
         assertEquals(25, date.getDayOfMonth());
+    }
+
+    @Test
+    public void testLocalDateDeserFailsForPartialArray() throws IOException
+    {
+        ObjectMapper mapper = mapperWithModule();
+        for (String doc : new String[] { "[]", "[2001]", "[2001,5]" }) {
+            try {
+                LocalDate result = mapper.readValue(doc, LocalDate.class);
+                fail("Should not pass for '"+doc+"', got: "+result);
+            } catch (MismatchedInputException e) {
+                verifyException(e, "expected 3 int values for LocalDate");
+            }
+        }
+    }
+
+    @Test
+    public void testLocalDateDeserFailsForInvalidArrayValues() throws IOException
+    {
+        ObjectMapper mapper = mapperWithModule();
+        try {
+            LocalDate result = mapper.readValue("[2001,2,30]", LocalDate.class);
+            fail("Should not pass, got: "+result);
+        } catch (InvalidFormatException e) {
+            verifyException(e, "Value 30 for dayOfMonth must be in the range [1,28]");
+        }
+        try {
+            LocalDate result = mapper.readValue("[2001,null,30]", LocalDate.class);
+            fail("Should not pass, got: "+result);
+        } catch (MismatchedInputException e) {
+            verifyException(e, "Cannot coerce `null` to `int` for element #2 of `org.joda.time.LocalDate` Array value");
+        }
     }
 
     @Test
