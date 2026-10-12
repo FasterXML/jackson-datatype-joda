@@ -10,8 +10,8 @@ Major version: 3 (for earlier, see VERSION-2.x)
 #191: `DateTimeDeserializer` accepts malformed zone id suffix (trailing text
   after `]`, or missing `]`)
  (fixed by @arfa-21)
-- `@JsonFormat(timezone)` ignored if same as JVM default time zone
-- Disabling `ADJUST_DATES_TO_CONTEXT_TIME_ZONE` now makes numeric timestamps
+#194: `@JsonFormat(timezone)` ignored if same as JVM default time zone;
+  disabling `ADJUST_DATES_TO_CONTEXT_TIME_ZONE` now makes numeric timestamps
   resolve as UTC (instead of context time zone) for `DateTime`, `LocalDate`
   and `LocalDateTime`
 
