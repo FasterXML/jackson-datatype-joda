@@ -1,6 +1,5 @@
 package tools.jackson.datatype.joda.deser;
 
-import org.joda.time.DateTimeZone;
 import org.joda.time.LocalTime;
 
 import tools.jackson.core.JacksonException;
@@ -97,8 +96,6 @@ public class LocalTimeDeserializer
     }
 
     protected LocalTime _fromTimestamp(DeserializationContext ctxt, long ts) {
-        DateTimeZone tz = _format.isTimezoneExplicit() ? _format.getTimeZone()
-                : DateTimeZone.forTimeZone(ctxt.getTimeZone());
-        return new LocalTime(ts, tz);
+        return new LocalTime(ts, _timestampZone(ctxt));
     }
 }

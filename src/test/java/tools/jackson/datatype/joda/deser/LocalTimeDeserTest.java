@@ -3,6 +3,7 @@ package tools.jackson.datatype.joda.deser;
 import java.io.IOException;
 import java.util.TimeZone;
 
+import org.joda.time.DateTimeZone;
 import org.joda.time.LocalTime;
 import org.joda.time.chrono.ISOChronology;
 
@@ -10,6 +11,11 @@ import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+
+import tools.jackson.core.JsonParser;
+import tools.jackson.core.StreamReadCapability;
+import tools.jackson.core.util.JacksonFeatureSet;
+import tools.jackson.core.util.JsonParserDelegate;
 import tools.jackson.databind.ObjectMapper;
 import tools.jackson.datatype.joda.JodaTestBase;
 
@@ -24,6 +30,21 @@ public class LocalTimeDeserTest extends JodaTestBase
     static class LocalTimeAsTimestamp {
         @JsonFormat(timezone = "America/Los_Angeles")
         public LocalTime value;
+    }
+
+    static class LocalTimeNoAdjust {
+        @JsonFormat(without = JsonFormat.Feature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE)
+        public LocalTime value;
+    }
+
+    // Simulates a textual format (like XML, CSV) where scalars are untyped
+    static class UntypedScalarsParser extends JsonParserDelegate {
+        public UntypedScalarsParser(JsonParser p) { super(p); }
+
+        @Override
+        public JacksonFeatureSet<StreamReadCapability> streamReadCapabilities() {
+            return super.streamReadCapabilities().with(StreamReadCapability.UNTYPED_SCALARS);
+        }
     }
 
     /*
@@ -98,6 +119,48 @@ public class LocalTimeDeserTest extends JodaTestBase
         assertEquals(3, wrapper.value.getMinuteOfHour());
         assertEquals(2, wrapper.value.getSecondOfMinute());
         assertEquals(1, wrapper.value.getMillisOfSecond());
+
+        // also with a non-UTC context time zone, to verify precedence
+        ObjectMapper mapper = mapperWithModule(TimeZone.getTimeZone("Asia/Taipei"));
+        wrapper = mapper.readValue(
+                a2q("{'value':1238558582001}"), LocalTimeAsTimestamp.class);
+        assertEquals(21, wrapper.value.getHourOfDay());
+        assertEquals(3, wrapper.value.getMinuteOfHour());
+    }
+
+    @Test
+    public void testLocalTimeDeserWithoutAdjustToContextTimeZone() throws IOException
+    {
+        // Context zone must not be applied if adjustment is disabled: resolved as UTC
+        ObjectMapper mapper = mapperWithModule(TimeZone.getTimeZone("Asia/Taipei"));
+        LocalTimeNoAdjust wrapper = mapper.readValue(
+                a2q("{'value':1238558582001}"), LocalTimeNoAdjust.class);
+        assertEquals(4, wrapper.value.getHourOfDay());
+        assertEquals(3, wrapper.value.getMinuteOfHour());
+        assertEquals(2, wrapper.value.getSecondOfMinute());
+        assertEquals(1, wrapper.value.getMillisOfSecond());
+    }
+
+    @Test
+    public void testLocalTimeDeserFromTimestampString() throws IOException
+    {
+        final String trickyInstant = quote("1238558582001");
+
+        LocalTime time;
+        try (JsonParser p = new UntypedScalarsParser(MAPPER.createParser(trickyInstant))) {
+            time = MAPPER.readValue(p, LocalTime.class);
+        }
+        assertEquals(4, time.getHourOfDay());
+        assertEquals(3, time.getMinuteOfHour());
+        assertEquals(2, time.getSecondOfMinute());
+        assertEquals(1, time.getMillisOfSecond());
+
+        ObjectMapper mapper = mapperWithModule(TimeZone.getTimeZone("Asia/Taipei"));
+        try (JsonParser p = new UntypedScalarsParser(mapper.createParser(trickyInstant))) {
+            time = mapper.readValue(p, LocalTime.class);
+        }
+        assertEquals(12, time.getHourOfDay());
+        assertEquals(3, time.getMinuteOfHour());
     }
 
     @Test
@@ -119,5 +182,21 @@ public class LocalTimeDeserTest extends JodaTestBase
         assertEquals(45, time2.getMinuteOfHour());
         assertEquals(22, time2.getSecondOfMinute());
         assertEquals(0, time2.getMillisOfSecond());
+    }
+
+    @Test
+    public void testLocalTimeDeserWithFormatTimeZoneSameAsDefault() throws IOException
+    {
+        // Format time zone that equals JVM default must still win over the
+        // context one (UTC here)
+        final TimeZone jvmZone = TimeZone.getDefault();
+        ObjectMapper mapper = mapperWithModuleBuilder()
+                .withConfigOverride(LocalTime.class,
+                        o -> o.setFormat(JsonFormat.Value.empty().withTimeZone(jvmZone)))
+                .build();
+        LocalTimeNoAdjust wrapper = mapper.readValue(
+                a2q("{'value':1238558582001}"), LocalTimeNoAdjust.class);
+        assertEquals(new LocalTime(1238558582001L, DateTimeZone.forTimeZone(jvmZone)),
+                wrapper.value);
     }
 }
