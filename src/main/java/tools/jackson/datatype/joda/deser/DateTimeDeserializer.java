@@ -147,8 +147,6 @@ public class DateTimeDeserializer
     }
 
     protected DateTime _fromTimestamp(DeserializationContext ctxt, long ts) {
-        DateTimeZone tz = _format.isTimezoneExplicit() ? _format.getTimeZone()
-                : DateTimeZone.forTimeZone(ctxt.getTimeZone());
-        return new DateTime(ts, tz);
+        return new DateTime(ts, _timestampZone(ctxt));
     }
 }
