@@ -53,7 +53,15 @@ public class DateTimeZoneDeserializer extends JodaDeserializerBase<DateTimeZone>
         //     some textual formats
         if (ctxt.isEnabled(StreamReadCapability.UNTYPED_SCALARS)
                 && _isValidTimestampString(value)) {
-            return _fromOffset(ctxt, NumberInput.parseInt(value));
+            // 13-Oct-2026: [datatype-joda#197] value only validated for `long` range,
+            //   but an offset is `int`; out-of-range must be reported, not escape as a
+            //   raw `NumberFormatException` from `parseInt`
+            long offset = NumberInput.parseLong(value);
+            if (offset < Integer.MIN_VALUE || offset > Integer.MAX_VALUE) {
+                return (DateTimeZone) ctxt.handleWeirdStringValue(handledType(), value,
+                        "Timestamp value out of range of `int`");
+            }
+            return _fromOffset(ctxt, (int) offset);
         }
         // [datatype-joda#195]: do not let raw Joda exception escape
         try {

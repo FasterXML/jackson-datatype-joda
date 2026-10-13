@@ -26,3 +26,6 @@ Jooyoung Pyoung (@anthologia)
   [3.3.0]
  * Fixed #193: `LocalDateTimeDeserializer` returns `null` for partial array
   [3.3.0]
+ * Fixed #197: `DateTimeZoneDeserializer` leaks raw `NumberFormatException` for
+   out-of-`int`-range timestamp String
+  [3.3.0]
