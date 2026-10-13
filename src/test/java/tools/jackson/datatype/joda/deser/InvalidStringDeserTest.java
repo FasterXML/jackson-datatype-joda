@@ -66,6 +66,45 @@ public class InvalidStringDeserTest extends JodaTestBase
     }
 
     @Test
+    public void testIntervalDurationTimeZone() throws Exception
+    {
+        _verifyInvalid(Interval.class, "2001-13-01T00:00:00Z/2002-01-01T00:00:00Z",
+                "Value 13 for monthOfYear must be in the range [1,12]");
+        // end before start
+        _verifyInvalid(Interval.class, "200-100",
+                "The end instant must be greater than the start instant");
+        _verifyInvalid(Duration.class, "garbage", "Invalid format");
+        // years/months cannot be converted to Duration
+        _verifyInvalid(Duration.class, "P1Y", "Invalid Duration value");
+        _verifyInvalid(DateTimeZone.class, "Not/AZone", "not recognised");
+        try {
+            Object result = MAPPER.readValue("99", DateTimeZone.class);
+            fail("Should not pass, got: "+result);
+        } catch (InvalidFormatException e) {
+            verifyException(e, "Cannot deserialize value of type `org.joda.time.DateTimeZone` from number 99");
+            assertEquals(99, e.getValue());
+        }
+    }
+
+    @Test
+    public void testMapKeys() throws Exception
+    {
+        _verifyInvalidKey(new TypeReference<Map<LocalDate, Integer>>() { },
+                LocalDate.class, "2001-13-01",
+                "Value 13 for monthOfYear must be in the range [1,12]");
+        _verifyInvalidKey(new TypeReference<Map<LocalDateTime, Integer>>() { },
+                LocalDateTime.class, "2001-05-25T25:00:00",
+                "Value 25 for hourOfDay must be in the range [0,23]");
+        _verifyInvalidKey(new TypeReference<Map<LocalTime, Integer>>() { },
+                LocalTime.class, "25:00",
+                "Value 25 for hourOfDay must be in the range [0,23]");
+        _verifyInvalidKey(new TypeReference<Map<DateTime, Integer>>() { },
+                DateTime.class, "garbage", "Invalid format");
+        _verifyInvalidKey(new TypeReference<Map<Duration, Integer>>() { },
+                Duration.class, "P1Y", "Invalid Duration value");
+    }
+
+    @Test
     public void testAsProperty() throws Exception
     {
         try {
@@ -103,6 +142,21 @@ public class InvalidStringDeserTest extends JodaTestBase
             fail("Should not pass, got: "+result);
         } catch (InvalidFormatException e) {
             verifyException(e, "Value 25 for hourOfDay must be in the range [0,23]");
+        }
+    }
+
+    private void _verifyInvalidKey(TypeReference<?> mapType, Class<?> keyType,
+            String key, String expMsg)
+        throws Exception
+    {
+        try {
+            Object result = MAPPER.readValue(a2q("{'"+key+"':1}"), mapType);
+            fail("Should not pass, got: "+result);
+        } catch (InvalidFormatException e) {
+            verifyException(e, "Cannot deserialize Map key of type `"+keyType.getName()+"`");
+            verifyException(e, expMsg);
+            assertEquals(key, e.getValue());
+            assertEquals(keyType, e.getTargetType());
         }
     }
 

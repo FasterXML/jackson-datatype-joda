@@ -16,12 +16,18 @@ public class DateTimeKeyDeserializer extends JodaKeyDeserializer
     protected DateTime deserialize(String key, DeserializationContext ctxt)
             throws JacksonException
     {
+        DateTimeZone dtz = null;
         if (ctxt.isEnabled(DateTimeFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE)) {
             TimeZone tz = ctxt.getTimeZone();
-            DateTimeZone dtz = (tz == null) ? DateTimeZone.UTC : DateTimeZone.forTimeZone(tz);
-            return new DateTime(key, dtz);
+            dtz = (tz == null) ? DateTimeZone.UTC : DateTimeZone.forTimeZone(tz);
         }
-        return DateTime.parse(key);
+        // [datatype-joda#195]: do not let raw Joda exception escape
+        try {
+            return (dtz == null) ? DateTime.parse(key) : new DateTime(key, dtz);
+        } catch (IllegalArgumentException e) {
+            return (DateTime) ctxt.handleWeirdKey(DateTime.class, key,
+                    "%s", e.getMessage());
+        }
     }
 
 }

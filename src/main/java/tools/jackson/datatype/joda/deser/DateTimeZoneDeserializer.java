@@ -55,11 +55,23 @@ public class DateTimeZoneDeserializer extends JodaDeserializerBase<DateTimeZone>
                 && _isValidTimestampString(value)) {
             return _fromOffset(ctxt, NumberInput.parseInt(value));
         }
-        return DateTimeZone.forID(value);
+        // [datatype-joda#195]: do not let raw Joda exception escape
+        try {
+            return DateTimeZone.forID(value);
+        } catch (IllegalArgumentException e) {
+            return (DateTimeZone) ctxt.handleWeirdStringValue(handledType(), value,
+                    "%s", e.getMessage());
+        }
     }
 
     // @since 2.12
     protected DateTimeZone _fromOffset(DeserializationContext ctxt, int offset) {
-        return DateTimeZone.forOffsetHours(offset);
+        // [datatype-joda#195]: do not let raw Joda exception escape
+        try {
+            return DateTimeZone.forOffsetHours(offset);
+        } catch (IllegalArgumentException e) {
+            return (DateTimeZone) ctxt.handleWeirdNumberValue(handledType(), offset,
+                    "%s", e.getMessage());
+        }
     }
 }
