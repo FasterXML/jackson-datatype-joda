@@ -146,22 +146,6 @@ public abstract class JodaDateDeserializerBase<T>
     }
 
     /**
-     * Helper method for reporting a String value Joda could not parse
-     * (invalid format, or out-of-range field like month 13)
-     * as {@link DatabindException}.
-     *
-     * @since 3.3
-     */
-    protected DatabindException _invalidStringValue(DeserializationContext ctxt,
-            String value, IllegalArgumentException e)
-    {
-        DatabindException dbe = ctxt.weirdStringException(value,
-                handledType(), e.getMessage());
-        dbe.initCause(e);
-        return dbe;
-    }
-
-    /**
      * Helper method for accessing the context time zone as {@link DateTimeZone}.
      */
     protected DateTimeZone _contextTimeZone(DeserializationContext ctxt) {

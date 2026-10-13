@@ -8,7 +8,9 @@ import org.junit.jupiter.api.Test;
 
 import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.DatabindException;
+import tools.jackson.databind.DeserializationContext;
 import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.deser.DeserializationProblemHandler;
 import tools.jackson.databind.exc.InvalidFormatException;
 import tools.jackson.datatype.joda.JodaTestBase;
 
@@ -77,6 +79,33 @@ public class InvalidStringDeserTest extends JodaTestBase
         }
     }
 
+    // Should allow `DeserializationProblemHandler` to provide replacement value
+    @Test
+    public void testWithProblemHandler() throws Exception
+    {
+        final LocalDate fallback = new LocalDate(1970, 1, 1);
+        ObjectMapper mapper = mapperWithModuleBuilder()
+                .addHandler(new DeserializationProblemHandler() {
+                    @Override
+                    public Object handleWeirdStringValue(DeserializationContext ctxt,
+                            Class<?> targetType, String valueToConvert, String failureMsg) {
+                        if (targetType == LocalDate.class) {
+                            return fallback;
+                        }
+                        return NOT_HANDLED;
+                    }
+                })
+                .build();
+        assertEquals(fallback, mapper.readValue(q("2001-13-01"), LocalDate.class));
+        // but other types not handled
+        try {
+            Object result = mapper.readValue(q("25:00"), LocalTime.class);
+            fail("Should not pass, got: "+result);
+        } catch (InvalidFormatException e) {
+            verifyException(e, "Value 25 for hourOfDay must be in the range [0,23]");
+        }
+    }
+
     private void _verifyInvalid(Class<?> type, String value, String expMsg)
         throws Exception
     {
@@ -88,7 +117,6 @@ public class InvalidStringDeserTest extends JodaTestBase
             verifyException(e, expMsg);
             assertEquals(value, e.getValue());
             assertEquals(type, e.getTargetType());
-            assertInstanceOf(IllegalArgumentException.class, e.getCause());
         } catch (DatabindException e) {
             fail("Expected InvalidFormatException, got: "+e);
         }

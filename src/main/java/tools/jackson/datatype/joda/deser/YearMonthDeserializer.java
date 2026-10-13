@@ -1,6 +1,7 @@
 package tools.jackson.datatype.joda.deser;
 
 import org.joda.time.YearMonth;
+import org.joda.time.format.DateTimeFormatter;
 
 import tools.jackson.core.JacksonException;
 import tools.jackson.core.JsonParser;
@@ -58,11 +59,13 @@ public class YearMonthDeserializer extends JodaDateDeserializerBase<YearMonth>
         if (value.isEmpty()) {
             return _fromEmptyString(p, ctxt, value);
         }
+        final DateTimeFormatter parser = _format.createParser(ctxt);
         // [datatype-joda#195]: do not let raw Joda exception escape
         try {
-            return YearMonth.parse(value, _format.createParser(ctxt));
+            return YearMonth.parse(value, parser);
         } catch (IllegalArgumentException e) {
-            throw _invalidStringValue(ctxt, value, e);
+            return (YearMonth) ctxt.handleWeirdStringValue(handledType(), value,
+                    "%s", e.getMessage());
         }
     }
 }
