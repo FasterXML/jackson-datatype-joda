@@ -71,7 +71,12 @@ public class LocalTimeDeserializer
                 && _isValidTimestampString(value)) {
             return _fromTimestamp(ctxt, NumberInput.parseLong(value));
         }
-        return _format.createParser(ctxt).parseLocalTime(value);
+        // [datatype-joda#195]: do not let raw Joda exception escape
+        try {
+            return _format.createParser(ctxt).parseLocalTime(value);
+        } catch (IllegalArgumentException e) {
+            throw _invalidStringValue(ctxt, value, e);
+        }
     }
 
     // @since 2.12

@@ -68,7 +68,12 @@ public class InstantDeserializer
         }
         // 11-Sep-2018, tatu: `DateTimeDeserializer` allows timezone inclusion in brackets;
         //    should that be checked here too?
-        return Instant.parse(value, _format.createParser(ctxt));
+        // [datatype-joda#195]: do not let raw Joda exception escape
+        try {
+            return Instant.parse(value, _format.createParser(ctxt));
+        } catch (IllegalArgumentException e) {
+            throw _invalidStringValue(ctxt, value, e);
+        }
     }
 
     // @since 2.12

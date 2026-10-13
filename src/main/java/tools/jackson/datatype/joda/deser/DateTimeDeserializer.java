@@ -143,7 +143,12 @@ public class DateTimeDeserializer
                 return (ReadableInstant) ctxt.handleWeirdStringValue(handledType(), value, msg);
             }
         }
-        return _format.createParser(ctxt).parseDateTime(value);
+        // [datatype-joda#195]: do not let raw Joda exception escape
+        try {
+            return _format.createParser(ctxt).parseDateTime(value);
+        } catch (IllegalArgumentException e) {
+            throw _invalidStringValue(ctxt, value, e);
+        }
     }
 
     protected DateTime _fromTimestamp(DeserializationContext ctxt, long ts) {

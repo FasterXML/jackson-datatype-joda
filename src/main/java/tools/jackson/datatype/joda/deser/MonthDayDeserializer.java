@@ -59,6 +59,11 @@ public class MonthDayDeserializer extends JodaDateDeserializerBase<MonthDay>
         if (value.isEmpty()) {
             return _fromEmptyString(p, ctxt, value);
         }
-        return MonthDay.parse(value, _format.createParser(ctxt));
+        // [datatype-joda#195]: do not let raw Joda exception escape
+        try {
+            return MonthDay.parse(value, _format.createParser(ctxt));
+        } catch (IllegalArgumentException e) {
+            throw _invalidStringValue(ctxt, value, e);
+        }
     }
 }

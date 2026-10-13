@@ -17,6 +17,8 @@ Major version: 3 (for earlier, see VERSION-2.x)
  (fixed by @arfa-21)
 #194: Fix timestamp time zone resolution (explicit zone equal to JVM default;
   `ADJUST_DATES_TO_CONTEXT_TIME_ZONE`)
+#195: Invalid String values for `LocalDate`/`LocalDateTime`/`LocalTime`/`DateTime`
+  fail with raw Joda `IllegalArgumentException`
 
 3.2.4 (not yet released)
 
