@@ -16,6 +16,12 @@ public class LocalDateKeyDeserializer extends JodaKeyDeserializer
     protected LocalDate deserialize(String key, DeserializationContext ctxt)
         throws JacksonException
     {
-        return parser.parseLocalDate(key);
+        // [datatype-joda#195]: do not let raw Joda exception escape
+        try {
+            return parser.parseLocalDate(key);
+        } catch (IllegalArgumentException e) {
+            return (LocalDate) ctxt.handleWeirdKey(LocalDate.class, key,
+                    "%s", e.getMessage());
+        }
     }
 }

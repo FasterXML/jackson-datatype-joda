@@ -2,6 +2,7 @@ package tools.jackson.datatype.joda.deser;
 
 import org.joda.time.IllegalFieldValueException;
 import org.joda.time.LocalDateTime;
+import org.joda.time.format.DateTimeFormatter;
 
 import tools.jackson.core.*;
 import tools.jackson.core.io.NumberInput;
@@ -67,7 +68,14 @@ public class LocalDateTimeDeserializer
                 && _isValidTimestampString(value)) {
             return _fromTimestamp(ctxt, NumberInput.parseLong(value));
         }
-        return _format.createParser(ctxt).parseLocalDateTime(value);
+        final DateTimeFormatter parser = _format.createParser(ctxt);
+        // [datatype-joda#195]: do not let raw Joda exception escape
+        try {
+            return parser.parseLocalDateTime(value);
+        } catch (IllegalArgumentException e) {
+            return (LocalDateTime) ctxt.handleWeirdStringValue(handledType(), value,
+                    "%s", e.getMessage());
+        }
     }
 
     protected LocalDateTime _fromArray(final JsonParser p, final DeserializationContext ctxt)
