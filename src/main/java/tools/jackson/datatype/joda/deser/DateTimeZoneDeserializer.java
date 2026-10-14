@@ -15,6 +15,10 @@ import tools.jackson.databind.DeserializationContext;
  */
 public class DateTimeZoneDeserializer extends JodaDeserializerBase<DateTimeZone>
 {
+    // [datatype-joda#197]: same message for all invalid offsets, whether
+    //   out of `int` range or not
+    private final static String INVALID_OFFSET_MSG = "Offset hours must be in range [-23, 23]";
+
     public DateTimeZoneDeserializer() { super(DateTimeZone.class); }
 
     @Override
@@ -24,6 +28,11 @@ public class DateTimeZoneDeserializer extends JodaDeserializerBase<DateTimeZone>
         switch (p.currentTokenId()) {
         case JsonTokenId.ID_NUMBER_INT:
             // for fun let's allow use of offsets...
+            // [datatype-joda#197]: `long`/`BigInteger` must not fail on `getIntValue()`
+            if (p.getNumberType() != JsonParser.NumberType.INT) {
+                return (DateTimeZone) ctxt.handleWeirdNumberValue(handledType(),
+                        p.getNumberValue(), INVALID_OFFSET_MSG);
+            }
             return _fromOffset(ctxt, p.getIntValue());
         case JsonTokenId.ID_STRING:
             return _fromString(p, ctxt, p.getString());
@@ -52,16 +61,16 @@ public class DateTimeZoneDeserializer extends JodaDeserializerBase<DateTimeZone>
         // 30-Sep-2020: [datatype-joda#117] Should allow use of "Timestamp as String" for
         //     some textual formats
         if (ctxt.isEnabled(StreamReadCapability.UNTYPED_SCALARS)
-                && _isValidTimestampString(value)) {
-            // 13-Oct-2026: [datatype-joda#197] value only validated for `long` range,
-            //   but an offset is `int`; out-of-range must be reported, not escape as a
-            //   raw `NumberFormatException` from `parseInt`
-            long offset = NumberInput.parseLong(value);
-            if (offset < Integer.MIN_VALUE || offset > Integer.MAX_VALUE) {
+                && _isIntNumber(value)) {
+            // [datatype-joda#197]: any invalid offset (out of `int` range or not)
+            //   must be reported, not escape as a raw `NumberFormatException`
+            //   or Joda `IllegalArgumentException`
+            try {
+                return DateTimeZone.forOffsetHours(NumberInput.parseInt(value));
+            } catch (IllegalArgumentException e) { // includes NumberFormatException
                 return (DateTimeZone) ctxt.handleWeirdStringValue(handledType(), value,
-                        "Timestamp value out of range of `int`");
+                        INVALID_OFFSET_MSG);
             }
-            return _fromOffset(ctxt, (int) offset);
         }
         // [datatype-joda#195]: do not let raw Joda exception escape
         try {
@@ -79,7 +88,7 @@ public class DateTimeZoneDeserializer extends JodaDeserializerBase<DateTimeZone>
             return DateTimeZone.forOffsetHours(offset);
         } catch (IllegalArgumentException e) {
             return (DateTimeZone) ctxt.handleWeirdNumberValue(handledType(), offset,
-                    "%s", e.getMessage());
+                    INVALID_OFFSET_MSG);
         }
     }
 }

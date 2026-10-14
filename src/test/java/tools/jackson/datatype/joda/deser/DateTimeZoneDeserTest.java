@@ -14,7 +14,6 @@ import tools.jackson.core.util.JsonParserDelegate;
 import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.ObjectReader;
 import tools.jackson.databind.exc.InvalidFormatException;
-import tools.jackson.databind.exc.MismatchedInputException;
 import tools.jackson.datatype.joda.JodaTestBase;
 import tools.jackson.datatype.joda.deser.DateTimeDeserTest.DateTimeZoneWrapper;
 
@@ -94,18 +93,56 @@ public class DateTimeZoneDeserTest extends JodaTestBase
         }
     }
 
-    // [datatype-joda#197]: out-of-`int`-range timestamp String must be reported,
-    //   not escape as a raw `NumberFormatException` from `parseInt`
+    // [datatype-joda#197]: valid offset as timestamp String still works
     @Test
-    public void testDeserFailsForOutOfRangeTimestampString() throws Exception
+    public void testDeserFromOffsetTimestampString() throws Exception
     {
-        for (String value : new String[] { "2147483648", "9999999999", "-2147483649" }) {
-            try (JsonParser p = new UntypedScalarsParser(MAPPER.createParser(quote(value)))) {
-                DateTimeZone result = MAPPER.readValue(p, DateTimeZone.class);
+        assertEquals(DateTimeZone.forOffsetHours(5), _readUntyped("5"));
+        assertEquals(DateTimeZone.forOffsetHours(-3), _readUntyped("-3"));
+        assertEquals(DateTimeZone.forOffsetHours(23), _readUntyped("23"));
+        assertEquals(DateTimeZone.forOffsetHours(-23), _readUntyped("-23"));
+    }
+
+    // [datatype-joda#197]: invalid offset as timestamp String, whether out of
+    //   `int` range or not, must be reported via the same handler
+    @Test
+    public void testDeserFailsForInvalidOffsetTimestampString() throws Exception
+    {
+        for (String value : new String[] { "24", "-24", "2147483647",
+                "2147483648", "-2147483649", "9999999999", "99999999999999999999" }) {
+            try {
+                DateTimeZone result = _readUntyped(value);
                 fail("Should not pass for '"+value+"', got: "+result);
-            } catch (MismatchedInputException e) {
-                verifyException(e, "out of range");
+            } catch (InvalidFormatException e) {
+                verifyException(e, "from String \""+value+"\"");
+                verifyException(e, "Offset hours must be in range [-23, 23]");
+                assertEquals(value, e.getValue());
             }
+        }
+    }
+
+    // [datatype-joda#197]: invalid offset as JSON number, whether out of
+    //   `int` range or not, must be reported via the same handler
+    @Test
+    public void testDeserFailsForInvalidOffsetNumber() throws Exception
+    {
+        for (String value : new String[] { "24", "-24", "2147483647",
+                "2147483648", "-2147483649", "99999999999999999999" }) {
+            try {
+                DateTimeZone result = READER.readValue(value);
+                fail("Should not pass for "+value+", got: "+result);
+            } catch (InvalidFormatException e) {
+                verifyException(e, "from number "+value);
+                verifyException(e, "Offset hours must be in range [-23, 23]");
+                assertEquals(value, String.valueOf(e.getValue()));
+            }
+        }
+    }
+
+    private DateTimeZone _readUntyped(String value) throws Exception
+    {
+        try (JsonParser p = new UntypedScalarsParser(MAPPER.createParser(quote(value)))) {
+            return MAPPER.readValue(p, DateTimeZone.class);
         }
     }
 }
