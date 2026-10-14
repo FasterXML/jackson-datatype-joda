@@ -107,7 +107,31 @@ public class LocalDateTimeDeserTest extends JodaTestBase
         // since 1.6.1, for [JACKSON-360]
         assertNull(mapper.readValue(quote(""), LocalDateTime.class));
     }
-    
+
+    // Edge-of-long timestamp with non-UTC time zone makes Joda's zone offset
+    // addition overflow: must be reported, not escape as raw `ArithmeticException`
+    @Test
+    public void testLocalDateTimeDeserFailsForOverflowingTimestamp() throws IOException
+    {
+        ObjectMapper mapper = mapperWithModule(TimeZone.getTimeZone("Asia/Taipei"));
+        try {
+            LocalDateTime result = mapper.readValue(String.valueOf(Long.MAX_VALUE), LocalDateTime.class);
+            fail("Should not pass, got: "+result);
+        } catch (InvalidFormatException e) {
+            verifyException(e, "Adding time zone offset caused overflow");
+            assertEquals(Long.valueOf(Long.MAX_VALUE), e.getValue());
+        }
+        // and from the other end, with a negative-offset zone
+        mapper = mapperWithModule(TimeZone.getTimeZone("America/Los_Angeles"));
+        try {
+            LocalDateTime result = mapper.readValue(String.valueOf(Long.MIN_VALUE), LocalDateTime.class);
+            fail("Should not pass, got: "+result);
+        } catch (InvalidFormatException e) {
+            verifyException(e, "Adding time zone offset caused overflow");
+            assertEquals(Long.valueOf(Long.MIN_VALUE), e.getValue());
+        }
+    }
+
     // Partial JSON Array must be reported, not quietly read as `null`
     @Test
     public void testLocalDateTimeDeserFailsForPartialArray() throws IOException

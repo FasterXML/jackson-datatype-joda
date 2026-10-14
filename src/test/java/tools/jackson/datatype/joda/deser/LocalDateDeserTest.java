@@ -89,6 +89,30 @@ public class LocalDateDeserTest extends JodaTestBase
         assertEquals(ISOChronology.getInstanceUTC(), date4.getChronology());
     }
 
+    // Edge-of-long timestamp with non-UTC time zone makes Joda's zone offset
+    // addition overflow: must be reported, not escape as raw `ArithmeticException`
+    @Test
+    public void testLocalDateDeserFailsForOverflowingTimestamp() throws IOException
+    {
+        ObjectMapper mapper = mapperWithModule(TimeZone.getTimeZone("Asia/Taipei"));
+        try {
+            LocalDate result = mapper.readValue(String.valueOf(Long.MAX_VALUE), LocalDate.class);
+            fail("Should not pass, got: "+result);
+        } catch (InvalidFormatException e) {
+            verifyException(e, "Adding time zone offset caused overflow");
+            assertEquals(Long.valueOf(Long.MAX_VALUE), e.getValue());
+        }
+        // and from the other end, with a negative-offset zone
+        mapper = mapperWithModule(TimeZone.getTimeZone("America/Los_Angeles"));
+        try {
+            LocalDate result = mapper.readValue(String.valueOf(Long.MIN_VALUE), LocalDate.class);
+            fail("Should not pass, got: "+result);
+        } catch (InvalidFormatException e) {
+            verifyException(e, "Adding time zone offset caused overflow");
+            assertEquals(Long.valueOf(Long.MIN_VALUE), e.getValue());
+        }
+    }
+
     @Test
     public void testLocalDateDeserWithTypeInfo() throws IOException
     {

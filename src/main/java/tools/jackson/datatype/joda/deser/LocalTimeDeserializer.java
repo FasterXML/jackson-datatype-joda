@@ -108,6 +108,13 @@ public class LocalTimeDeserializer
     }
 
     protected LocalTime _fromTimestamp(DeserializationContext ctxt, long ts) {
-        return new LocalTime(ts, _timestampZone(ctxt));
+        // 14-Oct-2026: zone offset addition for edge-of-long timestamp can
+        //   overflow; do not let raw Joda exception escape
+        try {
+            return new LocalTime(ts, _timestampZone(ctxt));
+        } catch (ArithmeticException e) {
+            return (LocalTime) ctxt.handleWeirdNumberValue(handledType(), ts,
+                    "%s", e.getMessage());
+        }
     }
 }
