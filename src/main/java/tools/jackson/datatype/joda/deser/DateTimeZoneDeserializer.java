@@ -6,6 +6,7 @@ import tools.jackson.core.JacksonException;
 import tools.jackson.core.JsonParser;
 import tools.jackson.core.JsonTokenId;
 import tools.jackson.core.StreamReadCapability;
+import tools.jackson.core.exc.InputCoercionException;
 import tools.jackson.core.io.NumberInput;
 
 import tools.jackson.databind.DeserializationContext;
@@ -28,12 +29,16 @@ public class DateTimeZoneDeserializer extends JodaDeserializerBase<DateTimeZone>
         switch (p.currentTokenId()) {
         case JsonTokenId.ID_NUMBER_INT:
             // for fun let's allow use of offsets...
-            // [datatype-joda#197]: `long`/`BigInteger` must not fail on `getIntValue()`
-            if (p.getNumberType() != JsonParser.NumberType.INT) {
+            // [datatype-joda#197]: out-of-`int`-range value must be reported, not
+            //   escape as `InputCoercionException` (but in-range `long` is fine)
+            final int offset;
+            try {
+                offset = p.getIntValue();
+            } catch (InputCoercionException e) {
                 return (DateTimeZone) ctxt.handleWeirdNumberValue(handledType(),
                         p.getNumberValue(), INVALID_OFFSET_MSG);
             }
-            return _fromOffset(ctxt, p.getIntValue());
+            return _fromOffset(ctxt, offset);
         case JsonTokenId.ID_STRING:
             return _fromString(p, ctxt, p.getString());
         case JsonTokenId.ID_START_OBJECT:

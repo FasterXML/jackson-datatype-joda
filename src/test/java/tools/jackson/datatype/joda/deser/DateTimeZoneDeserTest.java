@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import tools.jackson.core.JsonParser;
+import tools.jackson.core.util.JsonParserDelegate;
 import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.ObjectReader;
 import tools.jackson.databind.exc.InvalidFormatException;
@@ -123,6 +124,20 @@ public class DateTimeZoneDeserTest extends JodaTestBase
                 verifyException(e, "Offset hours must be in range [-23, 23]");
                 assertEquals(value, String.valueOf(e.getValue()));
             }
+        }
+    }
+
+    // [datatype-joda#197]: in-range offset reported as `long` (as with typed
+    //   binary formats like Avro) must still be accepted
+    @Test
+    public void testDeserFromOffsetAsLong() throws Exception
+    {
+        try (JsonParser p = new JsonParserDelegate(MAPPER.createParser("5")) {
+            @Override
+            public NumberType getNumberType() { return NumberType.LONG; }
+        }) {
+            assertEquals(DateTimeZone.forOffsetHours(5),
+                    MAPPER.readValue(p, DateTimeZone.class));
         }
     }
 
