@@ -13,9 +13,6 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 import tools.jackson.core.JsonParser;
-import tools.jackson.core.StreamReadCapability;
-import tools.jackson.core.util.JacksonFeatureSet;
-import tools.jackson.core.util.JsonParserDelegate;
 import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.exc.InvalidFormatException;
 import tools.jackson.databind.exc.MismatchedInputException;
@@ -45,16 +42,6 @@ public class LocalTimeDeserTest extends JodaTestBase
     static class LocalTimeNoAdjust {
         @JsonFormat(without = JsonFormat.Feature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE)
         public LocalTime value;
-    }
-
-    // Simulates a textual format (like XML, CSV) where scalars are untyped
-    static class UntypedScalarsParser extends JsonParserDelegate {
-        public UntypedScalarsParser(JsonParser p) { super(p); }
-
-        @Override
-        public JacksonFeatureSet<StreamReadCapability> streamReadCapabilities() {
-            return super.streamReadCapabilities().with(StreamReadCapability.UNTYPED_SCALARS);
-        }
     }
 
     /*

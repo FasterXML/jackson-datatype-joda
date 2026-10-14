@@ -11,6 +11,10 @@ import org.joda.time.MonthDay;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
+import tools.jackson.core.JsonParser;
+import tools.jackson.core.StreamReadCapability;
+import tools.jackson.core.util.JacksonFeatureSet;
+import tools.jackson.core.util.JsonParserDelegate;
 import tools.jackson.databind.cfg.CoercionAction;
 import tools.jackson.databind.cfg.CoercionInputShape;
 import tools.jackson.databind.json.JsonMapper;
@@ -46,6 +50,16 @@ public abstract class JodaTestBase
     // Mix-in class for forcing polymorphic handling
     @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.WRAPPER_ARRAY)
     protected static interface MixinForPolymorphism {
+    }
+
+    // Simulates a textual format (like XML, CSV) where scalars are untyped
+    protected static class UntypedScalarsParser extends JsonParserDelegate {
+        public UntypedScalarsParser(JsonParser p) { super(p); }
+
+        @Override
+        public JacksonFeatureSet<StreamReadCapability> streamReadCapabilities() {
+            return super.streamReadCapabilities().with(StreamReadCapability.UNTYPED_SCALARS);
+        }
     }
 
     /*

@@ -8,9 +8,6 @@ import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import tools.jackson.core.JsonParser;
-import tools.jackson.core.StreamReadCapability;
-import tools.jackson.core.util.JacksonFeatureSet;
-import tools.jackson.core.util.JsonParserDelegate;
 import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.ObjectReader;
 import tools.jackson.databind.exc.InvalidFormatException;
@@ -23,16 +20,6 @@ public class DateTimeZoneDeserTest extends JodaTestBase
 {
     @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.WRAPPER_ARRAY, property = "@class")
     private static interface ObjectConfiguration {
-    }
-
-    // Simulates a textual format (like XML, CSV) where scalars are untyped
-    static class UntypedScalarsParser extends JsonParserDelegate {
-        public UntypedScalarsParser(JsonParser p) { super(p); }
-
-        @Override
-        public JacksonFeatureSet<StreamReadCapability> streamReadCapabilities() {
-            return super.streamReadCapabilities().with(StreamReadCapability.UNTYPED_SCALARS);
-        }
     }
 
     private final ObjectMapper MAPPER = mapperWithModule();
