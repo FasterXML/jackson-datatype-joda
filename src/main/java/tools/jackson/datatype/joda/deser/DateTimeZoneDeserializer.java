@@ -16,9 +16,8 @@ import tools.jackson.databind.DeserializationContext;
  */
 public class DateTimeZoneDeserializer extends JodaDeserializerBase<DateTimeZone>
 {
-    // [datatype-joda#197]: same message for all invalid offsets, whether
-    //   out of `int` range or not
-    private final static String INVALID_OFFSET_MSG = "Offset hours must be in range [-23, 23]";
+    // [datatype-joda#197]
+    private final static String INT_RANGE_MSG = "Offset value out of range of `int`";
 
     public DateTimeZoneDeserializer() { super(DateTimeZone.class); }
 
@@ -36,7 +35,7 @@ public class DateTimeZoneDeserializer extends JodaDeserializerBase<DateTimeZone>
                 offset = p.getIntValue();
             } catch (InputCoercionException e) {
                 return (DateTimeZone) ctxt.handleWeirdNumberValue(handledType(),
-                        p.getNumberValue(), INVALID_OFFSET_MSG);
+                        p.getNumberValue(), INT_RANGE_MSG);
             }
             return _fromOffset(ctxt, offset);
         case JsonTokenId.ID_STRING:
@@ -67,15 +66,26 @@ public class DateTimeZoneDeserializer extends JodaDeserializerBase<DateTimeZone>
         //     some textual formats
         if (ctxt.isEnabled(StreamReadCapability.UNTYPED_SCALARS)
                 && _isIntNumber(value)) {
-            // [datatype-joda#197]: any invalid offset (out of `int` range or not)
-            //   must be reported, not escape as a raw `NumberFormatException`
-            //   or Joda `IllegalArgumentException`
+            // [datatype-joda#197]: out-of-`int`-range value must be reported, not
+            //   escape as a raw `NumberFormatException`
+            final int offset;
             try {
-                return DateTimeZone.forOffsetHours(NumberInput.parseInt(value));
-            } catch (IllegalArgumentException e) { // includes NumberFormatException
+                offset = NumberInput.parseInt(value);
+            } catch (NumberFormatException e) {
                 return (DateTimeZone) ctxt.handleWeirdStringValue(handledType(), value,
-                        INVALID_OFFSET_MSG);
+                        INT_RANGE_MSG);
             }
+            // [datatype-joda#197]: signed value not valid as hours (like "+0530")
+            //   may still be a compact ISO offset
+            final char c = value.charAt(0);
+            if ((c == '+' || c == '-') && (offset < -23 || offset > 23)) {
+                try {
+                    return DateTimeZone.forID(value);
+                } catch (IllegalArgumentException e) {
+                    ; // not an id either: report as invalid offset below
+                }
+            }
+            return _fromOffset(ctxt, offset);
         }
         // [datatype-joda#195]: do not let raw Joda exception escape
         try {
@@ -93,7 +103,7 @@ public class DateTimeZoneDeserializer extends JodaDeserializerBase<DateTimeZone>
             return DateTimeZone.forOffsetHours(offset);
         } catch (IllegalArgumentException e) {
             return (DateTimeZone) ctxt.handleWeirdNumberValue(handledType(), offset,
-                    INVALID_OFFSET_MSG);
+                    "%s", e.getMessage());
         }
     }
 }
