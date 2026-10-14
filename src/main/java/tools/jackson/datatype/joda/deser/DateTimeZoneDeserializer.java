@@ -75,16 +75,6 @@ public class DateTimeZoneDeserializer extends JodaDeserializerBase<DateTimeZone>
                 return (DateTimeZone) ctxt.handleWeirdStringValue(handledType(), value,
                         INT_RANGE_MSG);
             }
-            // [datatype-joda#197]: signed value not valid as hours (like "+0530")
-            //   may still be a compact ISO offset
-            final char c = value.charAt(0);
-            if ((c == '+' || c == '-') && (offset < -23 || offset > 23)) {
-                try {
-                    return DateTimeZone.forID(value);
-                } catch (IllegalArgumentException e) {
-                    ; // not an id either: report as invalid offset below
-                }
-            }
             return _fromOffset(ctxt, offset);
         }
         // [datatype-joda#195]: do not let raw Joda exception escape

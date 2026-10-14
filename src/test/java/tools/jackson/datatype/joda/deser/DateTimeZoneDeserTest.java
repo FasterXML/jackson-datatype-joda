@@ -93,18 +93,6 @@ public class DateTimeZoneDeserTest extends JodaTestBase
         assertEquals(DateTimeZone.forOffsetHours(-23), _readUntyped("-23"));
     }
 
-    // [datatype-joda#197]: signed value not valid as hours is tried as
-    //   compact ISO offset
-    @Test
-    public void testDeserFromCompactOffsetTimestampString() throws Exception
-    {
-        assertEquals(DateTimeZone.forOffsetHoursMinutes(5, 30), _readUntyped("+0530"));
-        assertEquals(DateTimeZone.forOffsetHours(-5), _readUntyped("-0500"));
-        // but valid hours still read as hours, as before
-        assertEquals(DateTimeZone.forOffsetHours(5), _readUntyped("+05"));
-        assertEquals(DateTimeZone.forOffsetHours(5), _readUntyped("+0005"));
-    }
-
     // [datatype-joda#197]: invalid offset as timestamp String must be reported,
     //   not escape as raw exception
     @Test
