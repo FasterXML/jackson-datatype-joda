@@ -198,8 +198,8 @@ public class DateTimeZoneDeserTest extends JodaTestBase
         try (TokenBuffer buf = TokenBuffer.forGeneration()) {
             buf.writeNumber(value);
             try (JsonParser p = buf.asParser()) {
-                assertEquals(JsonParser.NumberType.LONG, p.nextToken() == null
-                        ? null : p.getNumberType());
+                assertNotNull(p.nextToken());
+                assertEquals(JsonParser.NumberType.LONG, p.getNumberType());
                 return MAPPER.readValue(p, DateTimeZone.class);
             }
         }
