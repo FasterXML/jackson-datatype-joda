@@ -13,6 +13,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.cfg.DateTimeFeature;
+import tools.jackson.databind.exc.InvalidFormatException;
 import tools.jackson.datatype.joda.JodaTestBase;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -112,5 +113,26 @@ public class IntervalDeserTest extends JodaTestBase
                 mapper.readValue(quote("1970-01-01T06:00:01.000+06:00/1970-01-01T06:00:02.000+06:00"), Interval.class);
 
         assertEquals(expectedInterval, actualInterval);
+    }
+
+    @Test
+    public void testIntervalDeserFailsForOverflowingPeriod() throws IOException
+    {
+        final ObjectMapper mapper = mapperWithModule();
+        for (String value : new String[] {
+                "2020-01-01T00:00:00Z/P2147483647Y",
+                "-292275054-01-01T00:00:00Z/P-2147483647Y",
+                "292278993-12-31T23:59:59.999Z/PT2147483647H",
+                "P-2147483647Y/2020-01-01T00:00:00Z",
+                "PT2147483647H/-292275054-01-01T00:00:00Z",
+        }) {
+            try {
+                Interval result = mapper.readValue(quote(value), Interval.class);
+                fail("Should not pass, got: "+result);
+            } catch (InvalidFormatException e) {
+                verifyException(e, "Cannot deserialize value of type `org.joda.time.Interval` from String");
+                assertEquals(value, e.getValue());
+            }
+        }
     }
 }
