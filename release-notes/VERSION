@@ -26,6 +26,9 @@ Major version: 3 (for earlier, see VERSION-2.x)
 #199: `LocalDate`/`LocalDateTime`/`LocalTime` deserializers leak raw Joda
   exception for edge-of-`long` timestamps (zone offset overflow, out-of-range year)
  (fixed by @arfa-21)
+#200: `IntervalDeserializer` leaks raw `ArithmeticException` for overflowing
+  period (instead of failing with `InvalidFormatException`)
+ (fixed by @arfa-21)
 
 3.2.4 (not yet released)
 

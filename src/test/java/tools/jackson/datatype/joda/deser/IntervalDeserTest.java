@@ -131,7 +131,28 @@ public class IntervalDeserTest extends JodaTestBase
                 fail("Should not pass, got: "+result);
             } catch (InvalidFormatException e) {
                 verifyException(e, "Cannot deserialize value of type `org.joda.time.Interval` from String");
+                verifyException(e, "period or duration out of range");
                 assertEquals(value, e.getValue());
+            }
+        }
+    }
+
+    @Test
+    public void testIntervalDeserFailsForOutOfRangeEpochMillis() throws IOException
+    {
+        final ObjectMapper mapper = mapperWithModule();
+        // start, end outside of `long` range for "start-end" (epoch millis) notation
+        for (String[] input : new String[][] {
+                { "9223372036854775808-9223372036854775809", "9223372036854775808" },
+                { "0-9223372036854775808", "9223372036854775808" },
+        }) {
+            final String value = input[0];
+            try {
+                Interval result = mapper.readValue(quote(value), Interval.class);
+                fail("Should not pass, got: "+result);
+            } catch (InvalidFormatException e) {
+                verifyException(e, "Failed to parse number from '"+input[1]+"'");
+                assertEquals(input[1], e.getValue());
             }
         }
     }

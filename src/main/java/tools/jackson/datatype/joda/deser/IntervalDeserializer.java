@@ -86,11 +86,16 @@ public class IntervalDeserializer extends JodaDateDeserializerBase<Interval>
             return (Interval) ctxt.handleWeirdStringValue(handledType(), str,
 "Failed to parse number from '%s' (full source String '%s')",
                     str, value);
-        } catch (IllegalArgumentException | ArithmeticException e) {
+        } catch (IllegalArgumentException e) {
             // [datatype-joda#195]: do not let raw Joda exception escape
-            // (invalid start/end, end before start, or period overflow)
+            // (invalid start/end, or end before start)
             return (Interval) ctxt.handleWeirdStringValue(handledType(), value,
                     "%s", e.getMessage());
+        } catch (ArithmeticException e) {
+            // [datatype-joda#200]: applying period/duration to start/end overflows
+            return (Interval) ctxt.handleWeirdStringValue(handledType(), value,
+                    "period or duration out of range (overflow computing start/end): %s",
+                    e.getMessage());
         }
 
         final DateTimeZone contextTimezone =
