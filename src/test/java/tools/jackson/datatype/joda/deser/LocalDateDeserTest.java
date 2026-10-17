@@ -139,10 +139,6 @@ public class LocalDateDeserTest extends JodaTestBase
         }
         // and same for "timestamp as String" from textual formats (like XML, CSV):
         // reported with original String value
-        // (NOTE: only positive; 19-digit negative ones not recognized as timestamps)
-        if (ts < 0L) {
-            return;
-        }
         final String text = String.valueOf(ts);
         try (JsonParser p = new UntypedScalarsParser(mapper.createParser(quote(text)))) {
             LocalDate result = mapper.readValue(p, LocalDate.class);
