@@ -2,8 +2,12 @@ package tools.jackson.datatype.joda.deser;
 
 import java.util.TimeZone;
 
+import org.joda.time.DateTimeField;
+import org.joda.time.DateTimeFieldType;
 import org.joda.time.DateTimeZone;
 import org.joda.time.IllegalFieldValueException;
+import org.joda.time.chrono.ISOChronology;
+import org.joda.time.field.FieldUtils;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
@@ -21,6 +25,13 @@ import tools.jackson.datatype.joda.cfg.JacksonJodaDateFormat;
 public abstract class JodaDateDeserializerBase<T>
     extends JodaDeserializerBase<T>
 {
+    /**
+     * Timestamps strictly within {@code (-2^62, 2^62)} (about +/- 146 million
+     * years) are always within supported year range and cannot overflow
+     * when time zone offset is added; ones outside need to be verified.
+     */
+    private final static long SAFE_TIMESTAMP_RANGE = 1L << 62;
+
     protected final JacksonJodaDateFormat _format;
 
     /**
@@ -84,6 +95,45 @@ public abstract class JodaDateDeserializerBase<T>
         }
         // No adjustment allowed: timestamp is resolved as-is (UTC)
         return DateTimeZone.UTC;
+    }
+
+    /**
+     * Helper method for converting a timestamp into a value using time zone
+     * from {@link #_timestampZone}: reports values Joda cannot convert
+     * (like edge-of-{@code long} timestamps for which zone offset addition
+     * overflows, or that fall outside of supported year range) as
+     * {@link DatabindException}.
+     *
+     * @param text Original textual representation of timestamp, if it was
+     *   read from a String value; {@code null} if read from a number
+     *
+     * @since 3.3
+     */
+    @SuppressWarnings("unchecked")
+    protected T _fromTimestamp(DeserializationContext ctxt, long ts, String text,
+            TimestampConverter<T> converter)
+    {
+        try {
+            final DateTimeZone zone = _timestampZone(ctxt);
+            // Joda does not verify year range of local instant (and may silently
+            // wrap around for edge-of-long values), so need to check explicitly;
+            // but only for edge-of-long values (others are well within range)
+            if (ts <= -SAFE_TIMESTAMP_RANGE || ts >= SAFE_TIMESTAMP_RANGE) {
+                // NOTE: zone offset addition may also overflow (ArithmeticException)
+                final DateTimeField yearField = ISOChronology.getInstanceUTC().year();
+                final int year = yearField.get(zone.convertUTCToLocal(ts));
+                FieldUtils.verifyValueBounds(DateTimeFieldType.year(), year,
+                        yearField.getMinimumValue(), yearField.getMaximumValue());
+            }
+            return converter.convert(ts, zone);
+        } catch (IllegalArgumentException | ArithmeticException e) {
+            if (text != null) {
+                return (T) ctxt.handleWeirdStringValue(handledType(), text,
+                        "%s", e.getMessage());
+            }
+            return (T) ctxt.handleWeirdNumberValue(handledType(), ts,
+                    "%s", e.getMessage());
+        }
     }
 
     /**
@@ -156,6 +206,16 @@ public abstract class JodaDateDeserializerBase<T>
             _contextZone = cached;
         }
         return cached.jodaZone();
+    }
+
+    /**
+     * Function for constructing a value from timestamp and time zone.
+     *
+     * @since 3.3
+     */
+    @FunctionalInterface
+    protected interface TimestampConverter<T> {
+        T convert(long timestamp, DateTimeZone zone);
     }
 
     private record ContextZone(TimeZone jdkZone, DateTimeZone jodaZone) { }

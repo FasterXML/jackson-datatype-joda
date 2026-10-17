@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Test;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import tools.jackson.databind.DeserializationFeature;
+import tools.jackson.core.JsonParser;
 import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.cfg.DateTimeFeature;
 import tools.jackson.databind.exc.InvalidFormatException;
@@ -129,6 +130,45 @@ public class LocalDateTimeDeserTest extends JodaTestBase
         } catch (InvalidFormatException e) {
             verifyException(e, "Adding time zone offset caused overflow");
             assertEquals(Long.valueOf(Long.MIN_VALUE), e.getValue());
+        }
+    }
+
+    // Edge-of-long timestamp for which offset addition does not overflow, but
+    // local instant falls outside of supported year range (Joda would silently
+    // accept, possibly wrapping around): must be reported
+    @Test
+    public void testLocalDateTimeDeserFailsForOutOfRangeTimestamp() throws IOException
+    {
+        _verifyOutOfRangeTimestamp(mapperWithModule(), Long.MAX_VALUE);
+        _verifyOutOfRangeTimestamp(mapperWithModule(), Long.MIN_VALUE);
+        _verifyOutOfRangeTimestamp(mapperWithModule(TimeZone.getTimeZone("Asia/Taipei")),
+                Long.MIN_VALUE);
+        _verifyOutOfRangeTimestamp(mapperWithModule(TimeZone.getTimeZone("America/Los_Angeles")),
+                Long.MAX_VALUE);
+    }
+
+    private void _verifyOutOfRangeTimestamp(ObjectMapper mapper, long ts) throws IOException
+    {
+        try {
+            LocalDateTime result = mapper.readValue(String.valueOf(ts), LocalDateTime.class);
+            fail("Should not pass, got: "+result.getClass().getName());
+        } catch (InvalidFormatException e) {
+            verifyException(e, "for year must be in the range");
+            assertEquals(Long.valueOf(ts), e.getValue());
+        }
+        // and same for "timestamp as String" from textual formats (like XML, CSV):
+        // reported with original String value
+        // (NOTE: only positive; 19-digit negative ones not recognized as timestamps)
+        if (ts < 0L) {
+            return;
+        }
+        final String text = String.valueOf(ts);
+        try (JsonParser p = new UntypedScalarsParser(mapper.createParser(quote(text)))) {
+            LocalDateTime result = mapper.readValue(p, LocalDateTime.class);
+            fail("Should not pass, got: "+result.getClass().getName());
+        } catch (InvalidFormatException e) {
+            verifyException(e, "for year must be in the range");
+            assertEquals(text, e.getValue());
         }
     }
 
