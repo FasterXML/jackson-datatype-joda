@@ -23,6 +23,9 @@ Major version: 3 (for earlier, see VERSION-2.x)
   out-of-`int`-range timestamp String (and `InputCoercionException` for
   out-of-`int`-range number)
  (fixed by @arfa-21)
+#199: `LocalDate`/`LocalDateTime`/`LocalTime` deserializers leak raw Joda
+  exception for edge-of-`long` timestamps (zone offset overflow, out-of-range year)
+ (fixed by @arfa-21)
 
 3.2.4 (not yet released)
 

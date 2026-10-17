@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Test;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import tools.jackson.databind.DeserializationFeature;
+import tools.jackson.core.JsonParser;
 import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.cfg.DateTimeFeature;
 import tools.jackson.databind.exc.InvalidFormatException;
@@ -107,7 +108,66 @@ public class LocalDateTimeDeserTest extends JodaTestBase
         // since 1.6.1, for [JACKSON-360]
         assertNull(mapper.readValue(quote(""), LocalDateTime.class));
     }
-    
+
+    // Edge-of-long timestamp with non-UTC time zone makes Joda's zone offset
+    // addition overflow: must be reported, not escape as raw `ArithmeticException`
+    @Test
+    public void testLocalDateTimeDeserFailsForOverflowingTimestamp() throws IOException
+    {
+        ObjectMapper mapper = mapperWithModule(TimeZone.getTimeZone("Asia/Taipei"));
+        try {
+            LocalDateTime result = mapper.readValue(String.valueOf(Long.MAX_VALUE), LocalDateTime.class);
+            fail("Should not pass, got: "+result);
+        } catch (InvalidFormatException e) {
+            verifyException(e, "Adding time zone offset caused overflow");
+            assertEquals(Long.valueOf(Long.MAX_VALUE), e.getValue());
+        }
+        // and from the other end, with a negative-offset zone
+        mapper = mapperWithModule(TimeZone.getTimeZone("America/Los_Angeles"));
+        try {
+            LocalDateTime result = mapper.readValue(String.valueOf(Long.MIN_VALUE), LocalDateTime.class);
+            fail("Should not pass, got: "+result);
+        } catch (InvalidFormatException e) {
+            verifyException(e, "Adding time zone offset caused overflow");
+            assertEquals(Long.valueOf(Long.MIN_VALUE), e.getValue());
+        }
+    }
+
+    // Edge-of-long timestamp for which offset addition does not overflow, but
+    // local instant falls outside of supported year range (Joda would silently
+    // accept, possibly wrapping around): must be reported
+    @Test
+    public void testLocalDateTimeDeserFailsForOutOfRangeTimestamp() throws IOException
+    {
+        _verifyOutOfRangeTimestamp(mapperWithModule(), Long.MAX_VALUE);
+        _verifyOutOfRangeTimestamp(mapperWithModule(), Long.MIN_VALUE);
+        _verifyOutOfRangeTimestamp(mapperWithModule(TimeZone.getTimeZone("Asia/Taipei")),
+                Long.MIN_VALUE);
+        _verifyOutOfRangeTimestamp(mapperWithModule(TimeZone.getTimeZone("America/Los_Angeles")),
+                Long.MAX_VALUE);
+    }
+
+    private void _verifyOutOfRangeTimestamp(ObjectMapper mapper, long ts) throws IOException
+    {
+        try {
+            LocalDateTime result = mapper.readValue(String.valueOf(ts), LocalDateTime.class);
+            fail("Should not pass, got: "+result.getClass().getName());
+        } catch (InvalidFormatException e) {
+            verifyException(e, "for year must be in the range");
+            assertEquals(Long.valueOf(ts), e.getValue());
+        }
+        // and same for "timestamp as String" from textual formats (like XML, CSV):
+        // reported with original String value
+        final String text = String.valueOf(ts);
+        try (JsonParser p = new UntypedScalarsParser(mapper.createParser(quote(text)))) {
+            LocalDateTime result = mapper.readValue(p, LocalDateTime.class);
+            fail("Should not pass, got: "+result.getClass().getName());
+        } catch (InvalidFormatException e) {
+            verifyException(e, "for year must be in the range");
+            assertEquals(text, e.getValue());
+        }
+    }
+
     // Partial JSON Array must be reported, not quietly read as `null`
     @Test
     public void testLocalDateTimeDeserFailsForPartialArray() throws IOException
