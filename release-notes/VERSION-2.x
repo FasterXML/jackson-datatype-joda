@@ -12,6 +12,8 @@ Project: jackson-datatype-joda
 #191: `DateTimeDeserializer` accepts malformed zone id suffix (trailing text
   after `]`, or missing `]`)
  (fixed by @arfa-21)
+#194: Fix timestamp time zone resolution (explicit zone equal to JVM default;
+  `ADJUST_DATES_TO_CONTEXT_TIME_ZONE`)
 
 2.22.3 (21-Sep-2026)
 2.22.2 (16-Aug-2026)

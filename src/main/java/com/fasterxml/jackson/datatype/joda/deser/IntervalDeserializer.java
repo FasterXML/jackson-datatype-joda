@@ -92,7 +92,7 @@ public class IntervalDeserializer extends JodaDateDeserializerBase<Interval>
         }
 
         final DateTimeZone contextTimezone =
-            _format.shouldAdjustToContextTimeZone(ctxt) ? DateTimeZone.forTimeZone(ctxt.getTimeZone()) : null;
+            _format.shouldAdjustToContextTimeZone(ctxt) ? _contextTimeZone(ctxt) : null;
         DateTimeZone tz = _format.isTimezoneExplicit() ? _format.getTimeZone() : contextTimezone;
         if (tz != null) {
             if (!tz.equals(result.getStart().getZone())) {

@@ -356,4 +356,31 @@ public class DateTimeDeserTest extends JodaTestBase
             verifyException(e, DateTime.class.getName());
         }
     }
+
+    @Test
+    public void testDateTimeDeserFromTimestampWithoutAdjust() throws IOException
+    {
+        final TimeZone la = TimeZone.getTimeZone("America/Los_Angeles");
+        // with adjustment (default), context zone is used
+        DateTime dt = mapperWithModule(la).readValue("1238558582001", DateTime.class);
+        assertEquals(1238558582001L, dt.getMillis());
+        assertEquals(DateTimeZone.forID("America/Los_Angeles"), dt.getZone());
+        // without, timestamp resolved as UTC
+        ObjectMapper mapper = jodaMapperBuilder(la)
+                .disable(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE)
+                .build();
+        dt = mapper.readValue("1238558582001", DateTime.class);
+        assertEquals(1238558582001L, dt.getMillis());
+        assertEquals(DateTimeZone.UTC, dt.getZone());
+    }
+
+    @Test
+    public void testDateTimeDeserFromTimestampWithoutAdjustAnnotation() throws IOException
+    {
+        ObjectMapper mapper = mapperWithModule(TimeZone.getTimeZone("America/Los_Angeles"));
+        ReadableDateTimeWithoutContextTZOverride w = mapper.readValue(
+                "{\"time\":1238558582001}", ReadableDateTimeWithoutContextTZOverride.class);
+        assertEquals(1238558582001L, w.time.getMillis());
+        assertEquals(DateTimeZone.UTC, w.time.getZone());
+    }
 }

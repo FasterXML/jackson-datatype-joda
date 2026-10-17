@@ -2,7 +2,6 @@ package com.fasterxml.jackson.datatype.joda.deser;
 
 import java.io.IOException;
 
-import org.joda.time.DateTimeZone;
 import org.joda.time.LocalDate;
 
 import com.fasterxml.jackson.core.JsonParser;
@@ -99,8 +98,6 @@ public class LocalDateDeserializer
     }
 
     protected LocalDate _fromTimestamp(DeserializationContext ctxt, long ts) {
-        DateTimeZone tz = _format.isTimezoneExplicit() ? _format.getTimeZone()
-                : DateTimeZone.forTimeZone(ctxt.getTimeZone());
-        return new LocalDate(ts, tz);
+        return new LocalDate(ts, _timestampZone(ctxt));
     }
 }

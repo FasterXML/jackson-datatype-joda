@@ -1,6 +1,8 @@
 package com.fasterxml.jackson.datatype.joda;
 
+import java.text.DateFormat;
 import java.util.Arrays;
+import java.util.TimeZone;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
@@ -60,6 +62,28 @@ public abstract class JodaTestBase
     protected static MapperBuilder<?,?> mapperWithModuleBuilder() {
         return JsonMapper.builder()
                 .addModule(new JodaModule());
+    }
+
+    protected static MapperBuilder<?,?> jodaMapperBuilder(DateFormat df) {
+        return mapperWithModuleBuilder()
+                .defaultDateFormat(df);
+    }
+
+    protected static MapperBuilder<?,?> jodaMapperBuilder(TimeZone tz) {
+        return mapperWithModuleBuilder()
+                .defaultTimeZone(tz);
+    }
+
+    protected static ObjectMapper mapperWithModule() {
+        return mapperWithModuleBuilder().build();
+    }
+
+    protected static ObjectMapper mapperWithModule(DateFormat df) {
+        return jodaMapperBuilder(df).build();
+    }
+
+    protected static ObjectMapper mapperWithModule(TimeZone tz) {
+        return jodaMapperBuilder(tz).build();
     }
 
     // @since 2.12

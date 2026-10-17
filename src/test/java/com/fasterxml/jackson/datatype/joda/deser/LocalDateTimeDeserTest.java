@@ -3,13 +3,16 @@ package com.fasterxml.jackson.datatype.joda.deser;
 import java.io.IOException;
 import java.util.TimeZone;
 
+import org.joda.time.DateTimeZone;
 import org.joda.time.LocalDateTime;
 import org.joda.time.chrono.ISOChronology;
 
 import org.junit.jupiter.api.Test;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.datatype.joda.JodaTestBase;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -128,5 +131,34 @@ public class LocalDateTimeDeserTest extends JodaTestBase
         assertEquals(34, date2.getMinuteOfHour());
         assertEquals(9, date2.getSecondOfMinute());
         assertEquals(1, date2.getMillisOfSecond());
+    }
+
+    @Test
+    public void testLocalDateTimeDeserFromTimestampWithoutAdjust() throws IOException
+    {
+        final TimeZone la = TimeZone.getTimeZone("America/Los_Angeles");
+        // with adjustment (default), context zone is used
+        assertEquals(new LocalDateTime(2009, 3, 31, 21, 3, 2, 1),
+                mapperWithModule(la).readValue("1238558582001", LocalDateTime.class));
+        // without, timestamp resolved as UTC
+        ObjectMapper mapper = jodaMapperBuilder(la)
+                .disable(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE)
+                .build();
+        assertEquals(new LocalDateTime(2009, 4, 1, 4, 3, 2, 1),
+                mapper.readValue("1238558582001", LocalDateTime.class));
+    }
+
+    @Test
+    public void testLocalDateTimeDeserWithFormatTimeZoneSameAsDefault() throws IOException
+    {
+        // Format time zone that equals JVM default must still win over the
+        // context one (UTC here)
+        final TimeZone jvmZone = TimeZone.getDefault();
+        ObjectMapper mapper = mapperWithModuleBuilder()
+                .withConfigOverride(LocalDateTime.class,
+                        o -> o.setFormat(JsonFormat.Value.empty().withTimeZone(jvmZone)))
+                .build();
+        assertEquals(new LocalDateTime(1238558582001L, DateTimeZone.forTimeZone(jvmZone)),
+                mapper.readValue("1238558582001", LocalDateTime.class));
     }
 }
