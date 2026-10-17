@@ -15,6 +15,6 @@ public class LocalTimeKeyDeserializer extends JodaKeyDeserializer
     protected LocalTime deserialize(String key, DeserializationContext ctxt)
         throws JacksonException
     {
-        return (LocalTime) _parseKey(ctxt, LocalTime.class, key, parser::parseLocalTime);
+        return _parseKey(ctxt, LocalTime.class, key, parser::parseLocalTime);
     }
 }

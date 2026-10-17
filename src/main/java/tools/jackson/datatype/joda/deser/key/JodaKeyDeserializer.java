@@ -37,14 +37,15 @@ abstract class JodaKeyDeserializer extends KeyDeserializer
      *
      * @since 3.3
      */
-    protected Object _parseKey(DeserializationContext ctxt, Class<?> keyType, String key,
-            Function<String, ?> parser)
+    @SuppressWarnings("unchecked")
+    protected <K> K _parseKey(DeserializationContext ctxt, Class<K> keyType, String key,
+            Function<String, ? extends K> parser)
         throws JacksonException
     {
         try {
             return parser.apply(key);
         } catch (IllegalArgumentException | ArithmeticException e) {
-            return ctxt.handleWeirdKey(keyType, key, "%s", e.getMessage());
+            return (K) ctxt.handleWeirdKey(keyType, key, "%s", e.getMessage());
         }
     }
 

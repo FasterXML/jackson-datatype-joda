@@ -60,6 +60,6 @@ public class YearMonthDeserializer extends JodaDateDeserializerBase<YearMonth>
             return _fromEmptyString(p, ctxt, value);
         }
         final DateTimeFormatter parser = _format.createParser(ctxt);
-        return _parseString(ctxt, value, v -> YearMonth.parse(v, parser));
+        return _parseWithJoda(ctxt, value, v -> YearMonth.parse(v, parser));
     }
 }

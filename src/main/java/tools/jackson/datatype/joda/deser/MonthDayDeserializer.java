@@ -61,6 +61,6 @@ public class MonthDayDeserializer extends JodaDateDeserializerBase<MonthDay>
             return _fromEmptyString(p, ctxt, value);
         }
         final DateTimeFormatter parser = _format.createParser(ctxt);
-        return _parseString(ctxt, value, v -> MonthDay.parse(v, parser));
+        return _parseWithJoda(ctxt, value, v -> MonthDay.parse(v, parser));
     }
 }

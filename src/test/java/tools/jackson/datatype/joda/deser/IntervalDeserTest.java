@@ -127,13 +127,15 @@ public class IntervalDeserTest extends JodaTestBase
                 "292278993-12-31T23:59:59.999Z/PT2147483647H",
                 "P-2147483647Y/2020-01-01T00:00:00Z",
                 "PT2147483647H/-292275054-01-01T00:00:00Z",
+                // overflow from applying offset, not period
+                "292278994-08-17T07:12:55.807-14:00/PT1S",
         }) {
             try {
                 Interval result = mapper.readValue(quote(value), Interval.class);
                 fail("Should not pass, got: "+result);
             } catch (InvalidFormatException e) {
                 verifyException(e, "Cannot deserialize value of type `org.joda.time.Interval` from String");
-                verifyException(e, "period or duration out of range");
+                verifyException(e, "value out of range (overflow)");
                 assertEquals(value, e.getValue());
             }
         }
@@ -195,7 +197,7 @@ public class IntervalDeserTest extends JodaTestBase
                 fail("Should not pass, got: "+result);
             } catch (InvalidFormatException e) {
                 verifyException(e, "Failed to parse number from '"+input[1]+"'");
-                assertEquals(input[1], e.getValue());
+                assertEquals(value, e.getValue());
             }
         }
     }

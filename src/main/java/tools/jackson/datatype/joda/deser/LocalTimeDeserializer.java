@@ -73,7 +73,7 @@ public class LocalTimeDeserializer
             return _fromTimestamp(ctxt, NumberInput.parseLong(value), value);
         }
         final DateTimeFormatter parser = _format.createParser(ctxt);
-        return _parseString(ctxt, value, parser::parseLocalTime);
+        return _parseWithJoda(ctxt, value, parser::parseLocalTime);
     }
 
     // @since 2.12

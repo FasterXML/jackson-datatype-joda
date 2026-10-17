@@ -83,15 +83,16 @@ public class DateTimeDeserializer
         //   and is the LAST '[...]' (custom patterns may contain literal brackets)
         int ix = value.endsWith("]") ? value.lastIndexOf('[') : -1;
         if (ix > 0) {
+            final String fullValue = value;
             DateTimeZone tz;
             String tzId = value.substring(ix+1, value.length() - 1);
             try {
                 tz = DateTimeZone.forID(tzId);
             } catch (IllegalArgumentException e) {
-                ctxt.reportInputMismatch(getValueType(ctxt), "Unknown DateTimeZone id '%s'", tzId);
-                tz = null; // never gets here
+                // [datatype-joda#200]: report via handler (like other failures)
+                return (ReadableInstant) ctxt.handleWeirdStringValue(handledType(), fullValue,
+                        "Unknown DateTimeZone id '%s'", tzId);
             }
-            final String fullValue = value;
             value = value.substring(0, ix);
 
             // 12-Jul-2015, tatu: Initially planned to support "timestamp[zone-id]"
@@ -141,7 +142,9 @@ public class DateTimeDeserializer
                 final String msg = (value.indexOf(']', openIx) < 0)
                         ? "Malformed DateTimeZone id suffix: missing closing ']'"
                         : "Malformed DateTimeZone id suffix: unexpected content after closing ']'";
-                return (ReadableInstant) ctxt.handleWeirdStringValue(handledType(), value, msg);
+                // [datatype-joda#200]: include Joda's message (may be invalid date/time value)
+                return (ReadableInstant) ctxt.handleWeirdStringValue(handledType(), value,
+                        "%s (%s)", msg, e.getMessage());
             } catch (ArithmeticException e) {
                 // [datatype-joda#200]: overflow, not a malformed suffix
                 return (ReadableInstant) ctxt.handleWeirdStringValue(handledType(), value,
@@ -149,7 +152,7 @@ public class DateTimeDeserializer
             }
         }
         final DateTimeFormatter parser = _format.createParser(ctxt);
-        return _parseString(ctxt, value, parser::parseDateTime);
+        return _parseWithJoda(ctxt, value, parser::parseDateTime);
     }
 
     protected DateTime _fromTimestamp(DeserializationContext ctxt, long ts) {

@@ -111,7 +111,7 @@ abstract class JodaDeserializerBase<T> extends StdScalarDeserializer<T>
      * @since 3.3
      */
     @SuppressWarnings("unchecked")
-    protected T _parseString(DeserializationContext ctxt, String value,
+    protected T _parseWithJoda(DeserializationContext ctxt, String value,
             Function<String, ? extends T> parser)
         throws JacksonException
     {

@@ -77,7 +77,7 @@ public class DateTimeZoneDeserializer extends JodaDeserializerBase<DateTimeZone>
             }
             return _fromOffset(ctxt, offset);
         }
-        return _parseString(ctxt, value, DateTimeZone::forID);
+        return _parseWithJoda(ctxt, value, DateTimeZone::forID);
     }
 
     // @since 2.12

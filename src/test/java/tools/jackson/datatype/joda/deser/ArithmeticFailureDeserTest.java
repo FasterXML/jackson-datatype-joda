@@ -44,7 +44,7 @@ public class ArithmeticFailureDeserTest extends JodaTestBase
     static class OverflowingKeyDeserializer extends LocalDateKeyDeserializer {
         @Override
         protected LocalDate deserialize(String key, DeserializationContext ctxt) {
-            return (LocalDate) _parseKey(ctxt, LocalDate.class, key, k -> {
+            return _parseKey(ctxt, LocalDate.class, key, k -> {
                 throw new ArithmeticException(FAIL_MSG);
             });
         }

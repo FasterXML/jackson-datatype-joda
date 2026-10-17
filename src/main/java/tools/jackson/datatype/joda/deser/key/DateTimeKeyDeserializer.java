@@ -19,9 +19,9 @@ public class DateTimeKeyDeserializer extends JodaKeyDeserializer
         if (ctxt.isEnabled(DateTimeFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE)) {
             TimeZone tz = ctxt.getTimeZone();
             final DateTimeZone dtz = (tz == null) ? DateTimeZone.UTC : DateTimeZone.forTimeZone(tz);
-            return (DateTime) _parseKey(ctxt, DateTime.class, key, k -> new DateTime(k, dtz));
+            return _parseKey(ctxt, DateTime.class, key, k -> new DateTime(k, dtz));
         }
-        return (DateTime) _parseKey(ctxt, DateTime.class, key, DateTime::parse);
+        return _parseKey(ctxt, DateTime.class, key, DateTime::parse);
     }
 
 }
