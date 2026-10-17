@@ -3,14 +3,25 @@ package com.fasterxml.jackson.datatype.joda.deser;
 import java.io.IOException;
 import java.util.TimeZone;
 
+import org.joda.time.DateTimeZone;
 import org.joda.time.LocalDateTime;
 import org.joda.time.chrono.ISOChronology;
+import org.joda.time.format.ISODateTimeFormat;
 
 import org.junit.jupiter.api.Test;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectReader;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.exc.InvalidFormatException;
+import com.fasterxml.jackson.databind.exc.MismatchedInputException;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.datatype.joda.JodaTestBase;
+import com.fasterxml.jackson.datatype.joda.cfg.JacksonJodaDateFormat;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -99,7 +110,166 @@ public class LocalDateTimeDeserTest extends JodaTestBase
         // since 1.6.1, for [JACKSON-360]
         assertNull(MAPPER.readValue(quote(""), LocalDateTime.class));
     }
-    
+
+    // Edge-of-long timestamp with non-UTC time zone makes Joda's zone offset
+    // addition overflow: must be reported, not escape as raw `ArithmeticException`
+    @Test
+    public void testLocalDateTimeDeserFailsForOverflowingTimestamp() throws IOException
+    {
+        ObjectMapper mapper = mapperWithModule(TimeZone.getTimeZone("Asia/Taipei"));
+        try {
+            LocalDateTime result = mapper.readValue(String.valueOf(Long.MAX_VALUE), LocalDateTime.class);
+            fail("Should not pass, got: "+result);
+        } catch (InvalidFormatException e) {
+            verifyException(e, "Adding time zone offset caused overflow");
+            assertEquals(Long.valueOf(Long.MAX_VALUE), e.getValue());
+        }
+        // and from the other end, with a negative-offset zone
+        mapper = mapperWithModule(TimeZone.getTimeZone("America/Los_Angeles"));
+        try {
+            LocalDateTime result = mapper.readValue(String.valueOf(Long.MIN_VALUE), LocalDateTime.class);
+            fail("Should not pass, got: "+result);
+        } catch (InvalidFormatException e) {
+            verifyException(e, "Adding time zone offset caused overflow");
+            assertEquals(Long.valueOf(Long.MIN_VALUE), e.getValue());
+        }
+    }
+
+    // Edge-of-long timestamp for which offset addition does not overflow, but
+    // local instant falls outside of supported year range (Joda would silently
+    // accept, possibly wrapping around): must be reported
+    @Test
+    public void testLocalDateTimeDeserFailsForOutOfRangeTimestamp() throws IOException
+    {
+        _verifyOutOfRangeTimestamp(mapperWithModule(), Long.MAX_VALUE);
+        _verifyOutOfRangeTimestamp(mapperWithModule(), Long.MIN_VALUE);
+        _verifyOutOfRangeTimestamp(mapperWithModule(TimeZone.getTimeZone("Asia/Taipei")),
+                Long.MIN_VALUE);
+        _verifyOutOfRangeTimestamp(mapperWithModule(TimeZone.getTimeZone("America/Los_Angeles")),
+                Long.MAX_VALUE);
+    }
+
+    private void _verifyOutOfRangeTimestamp(ObjectMapper mapper, long ts) throws IOException
+    {
+        try {
+            LocalDateTime result = mapper.readValue(String.valueOf(ts), LocalDateTime.class);
+            fail("Should not pass, got: "+result.getClass().getName());
+        } catch (InvalidFormatException e) {
+            verifyException(e, "for year must be in the range");
+            assertEquals(Long.valueOf(ts), e.getValue());
+        }
+        // and same for "timestamp as String" from textual formats (like XML, CSV):
+        // reported with original String value
+        final String text = String.valueOf(ts);
+        try (JsonParser p = new UntypedScalarsParser(mapper.createParser(quote(text)))) {
+            LocalDateTime result = mapper.readValue(p, LocalDateTime.class);
+            fail("Should not pass, got: "+result.getClass().getName());
+        } catch (InvalidFormatException e) {
+            verifyException(e, "for year must be in the range");
+            assertEquals(text, e.getValue());
+        }
+    }
+
+    // Partial JSON Array must be reported, not quietly read as `null`
+    @Test
+    public void testLocalDateTimeDeserFailsForPartialArray() throws IOException
+    {
+        final ObjectMapper mapper = mapperWithModule();
+
+        // milliseconds are optional, so 6 ints is the shortest accepted form:
+        LocalDateTime date = mapper.readValue("[2001,5,25,10,15,30]", LocalDateTime.class);
+        assertEquals(new LocalDateTime(2001, 5, 25, 10, 15, 30), date);
+
+        for (String doc : new String[] {
+                "[]", "[2001]", "[2001,5]", "[2001,5,25]", "[2001,5,25,10]", "[2001,5,25,10,15]"
+        }) {
+            try {
+                LocalDateTime result = mapper.readValue(doc, LocalDateTime.class);
+                fail("Should not pass for '"+doc+"', got: "+result);
+            } catch (MismatchedInputException e) {
+                verifyException(e, "expected 6 or 7 int values for LocalDateTime");
+            }
+        }
+    }
+
+    @Test
+    public void testLocalDateTimeDeserWithPartsAsString() throws IOException
+    {
+        LocalDateTime date = mapperWithModule().readValue(
+                "[\"2001\",\"5\",\"25\",\"10\",\"15\",\"30\",\"7\"]", LocalDateTime.class);
+        assertEquals(new LocalDateTime(2001, 5, 25, 10, 15, 30, 7), date);
+    }
+
+    @Test
+    public void testLocalDateTimeDeserFailsForInvalidArrayElement() throws IOException
+    {
+        final ObjectMapper mapper = mapperWithModule();
+
+        // invalid value for a required field, or for optional milliseconds
+        for (String doc : new String[] {
+                "[2001,\"x\",25,10,15,30]", "[2001,5,25,10,15,30,\"x\"]"
+        }) {
+            try {
+                LocalDateTime result = mapper.readValue(doc, LocalDateTime.class);
+                fail("Should not pass for '"+doc+"', got: "+result);
+            } catch (InvalidFormatException e) {
+                verifyException(e, "not a valid `int` value");
+            }
+        }
+
+        // `null` (or empty String) not accepted if `null`s are not allowed for
+        // primitives (in 2.x, by default coerced to 0)
+        final ObjectReader noNulls = mapper.readerFor(LocalDateTime.class)
+                .with(DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES);
+        try {
+            LocalDateTime result = noNulls.readValue("[2001,5,null,10,15,30]");
+            fail("Should not pass, got: "+result);
+        } catch (MismatchedInputException e) {
+            verifyException(e, "Cannot coerce `null` to `int` for element #3 of `org.joda.time.LocalDateTime` Array value");
+        }
+        try {
+            LocalDateTime result = noNulls.readValue("[2001,\"\",25,10,15,30]");
+            fail("Should not pass, got: "+result);
+        } catch (MismatchedInputException e) {
+            verifyException(e, "Cannot coerce empty String (\"\") to `int` for element #2 of `org.joda.time.LocalDateTime` Array value");
+        }
+
+        // nor out-of-range values
+        try {
+            LocalDateTime result = mapper.readValue("[2001,13,25,10,15,30]", LocalDateTime.class);
+            fail("Should not pass, got: "+result);
+        } catch (InvalidFormatException e) {
+            verifyException(e, "Value 13 for monthOfYear must be in the range [1,12]");
+            assertEquals(13, e.getValue());
+        }
+
+        // nor more than 7 values
+        try {
+            LocalDateTime result = mapper.readValue("[2001,5,25,10,15,30,1,2]", LocalDateTime.class);
+            fail("Should not pass, got: "+result);
+        } catch (MismatchedInputException e) {
+            verifyException(e, "after LocalDateTime ints");
+        }
+    }
+
+    @Test
+    public void testLocalDateTimeDeserFloatsWithoutFloatAsInt() throws IOException
+    {
+        final ObjectMapper mapper = mapperWithModuleBuilder()
+                .disable(DeserializationFeature.ACCEPT_FLOAT_AS_INT)
+                .build();
+        for (String doc : new String[] {
+                "[2001.5,5,25,10,15,30]", "[2001,5,25,10,15,30,999.9]"
+        }) {
+            try {
+                LocalDateTime result = mapper.readValue(doc, LocalDateTime.class);
+                fail("Should not pass for '"+doc+"', got: "+result);
+            } catch (InvalidFormatException e) {
+                verifyException(e, "Cannot coerce Floating-point value");
+            }
+        }
+    }
+
     @Test
     public void testLocalDateTimeDeserWithTypeInfo() throws IOException
     {
@@ -128,5 +298,39 @@ public class LocalDateTimeDeserTest extends JodaTestBase
         assertEquals(34, date2.getMinuteOfHour());
         assertEquals(9, date2.getSecondOfMinute());
         assertEquals(1, date2.getMillisOfSecond());
+    }
+
+    @Test
+    public void testLocalDateTimeDeserFromTimestampWithoutAdjust() throws IOException
+    {
+        final TimeZone la = TimeZone.getTimeZone("America/Los_Angeles");
+        // with adjustment (default), context zone is used
+        assertEquals(new LocalDateTime(2009, 3, 31, 21, 3, 2, 1),
+                mapperWithModule(la).readValue("1238558582001", LocalDateTime.class));
+        // without, timestamp resolved as UTC
+        ObjectMapper mapper = jodaMapperBuilder(la)
+                .disable(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE)
+                .build();
+        assertEquals(new LocalDateTime(2009, 4, 1, 4, 3, 2, 1),
+                mapper.readValue("1238558582001", LocalDateTime.class));
+    }
+
+    @Test
+    public void testLocalDateTimeDeserWithFormatTimeZoneSameAsDefault() throws IOException
+    {
+        // Default format whose (non-explicit) zone is the same as the configured one:
+        // mimics default formats (that use JVM default zone) without depending on JVM zone.
+        // Configured zone must still be considered explicit and win over context zone (UTC)
+        final DateTimeZone taipei = DateTimeZone.forID("Asia/Taipei");
+        JacksonJodaDateFormat fmt = new JacksonJodaDateFormat(
+                ISODateTimeFormat.localDateOptionalTimeParser().withZone(taipei));
+        ObjectMapper mapper = mapperWithModuleBuilder()
+                .addModule(new SimpleModule()
+                        .addDeserializer(LocalDateTime.class, new LocalDateTimeDeserializer(fmt)))
+                .withConfigOverride(LocalDateTime.class,
+                        o -> o.setFormat(JsonFormat.Value.empty().withTimeZone(taipei.toTimeZone())))
+                .build();
+        assertEquals(new LocalDateTime(2009, 4, 1, 12, 3, 2, 1),
+                mapper.readValue("1238558582001", LocalDateTime.class));
     }
 }

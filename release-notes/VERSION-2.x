@@ -9,6 +9,31 @@ Project: jackson-datatype-joda
 #190: `PeriodDeserializer` silently truncates out-of-range and invalid values
   (instead of failing)
  (fixed by @arfa-21)
+#191: `DateTimeDeserializer` accepts malformed zone id suffix (trailing text
+  after `]`, or missing `]`)
+ (fixed by @arfa-21)
+#192: `LocalTimeDeserializer` ignores configured time zone for timestamps
+  (uses JVM default zone instead)
+ (fixed by @arfa-21)
+#193: `LocalDateTimeDeserializer` returns `null` for partial array (instead of failing)
+ (fixed by @arfa-21)
+#194: Fix timestamp time zone resolution (explicit zone equal to JVM default;
+  `ADJUST_DATES_TO_CONTEXT_TIME_ZONE`)
+#195: Invalid String values for `LocalDate`/`LocalDateTime`/`LocalTime`/`DateTime`
+  fail with raw Joda `IllegalArgumentException`
+#197: `DateTimeZoneDeserializer` leaks raw `NumberFormatException` for
+  out-of-`int`-range timestamp String (and `InputCoercionException` for
+  out-of-`int`-range number)
+ (fixed by @arfa-21)
+#199: `LocalDate`/`LocalDateTime`/`LocalTime` deserializers leak raw Joda
+  exception for edge-of-`long` timestamps (zone offset overflow, out-of-range year)
+ (fixed by @arfa-21)
+#200: `IntervalDeserializer` leaks raw `ArithmeticException` for overflowing
+  period (instead of failing with `InvalidFormatException`); also report
+  `ArithmeticException` as `InvalidFormatException` for all date/time String
+  value and Map key deserializers, and report `Interval` String value without
+  separator via `DeserializationProblemHandler`
+ (fixed by @arfa-21)
 
 2.22.3 (21-Sep-2026)
 2.22.2 (16-Aug-2026)

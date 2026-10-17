@@ -3,10 +3,14 @@ package com.fasterxml.jackson.datatype.joda;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
+import java.util.TimeZone;
+
 import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.*;
+import com.fasterxml.jackson.datatype.joda.cfg.FormatConfig;
+import com.fasterxml.jackson.datatype.joda.cfg.JacksonJodaDateFormat;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -165,5 +169,25 @@ public class TimeZoneTest extends JodaTestBase
         m.addMixIn(DateTime.class, TypeInfoMixIn.class);
         assertEquals("[\"org.joda.time.DateTime\",\"1970-01-01T00:00:00.000Z[UTC]\"]",
                 m.writeValueAsString(DATE_JAN_1_1970_UTC));
+    }
+
+    // Time zone specified (by annotation, f.ex) must be considered explicit even
+    // if it is the same as the (JVM) default zone of the default format
+    @Test
+    public void testExplicitTimeZoneSameAsDefault() throws Exception
+    {
+        JacksonJodaDateFormat def = FormatConfig.DEFAULT_LOCAL_TIMEONLY_PARSER;
+        assertFalse(def.isTimezoneExplicit());
+
+        JacksonJodaDateFormat f = def.withTimeZone(TimeZone.getDefault());
+        assertTrue(f.isTimezoneExplicit());
+        assertEquals(DateTimeZone.forTimeZone(TimeZone.getDefault()), f.getTimeZone());
+
+        // but no change if same explicit zone
+        assertSame(f, f.withTimeZone(TimeZone.getDefault()));
+
+        f = def.withTimeZone(TimeZone.getTimeZone("UTC"));
+        assertTrue(f.isTimezoneExplicit());
+        assertEquals(DateTimeZone.UTC, f.getTimeZone());
     }
 }

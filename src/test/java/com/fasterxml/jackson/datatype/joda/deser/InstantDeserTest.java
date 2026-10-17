@@ -11,6 +11,7 @@ import org.joda.time.ReadableInstant;
 
 import org.junit.jupiter.api.Test;
 
+import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.joda.JodaTestBase;
 
@@ -77,5 +78,25 @@ public class InstantDeserTest extends JodaTestBase
         DateTime date = input.value.toDateTime();
         assertEquals(1972, date.getYear());
         assertEquals(789, date.getMillisOfSecond());
+    }
+
+    // "Timestamp as String" with leading sign must be accepted for all values
+    // within 64-bit range, including 19-digit ones
+    @Test
+    public void testDeserInstantFromSignedTimestampString() throws IOException
+    {
+        for (long ts : new long[] { Long.MIN_VALUE, -1000000000000000000L,
+                1000000000000000000L, Long.MAX_VALUE }) {
+            _verifyTimestampString(String.valueOf(ts), ts);
+        }
+        _verifyTimestampString("+1000000000000000000", 1000000000000000000L);
+        _verifyTimestampString("+"+Long.MAX_VALUE, Long.MAX_VALUE);
+    }
+
+    private void _verifyTimestampString(String text, long expected) throws IOException
+    {
+        try (JsonParser p = new UntypedScalarsParser(MAPPER.createParser(quote(text)))) {
+            assertEquals(expected, MAPPER.readValue(p, Instant.class).getMillis());
+        }
     }
 }

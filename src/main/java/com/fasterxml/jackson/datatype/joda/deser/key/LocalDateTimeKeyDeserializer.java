@@ -13,6 +13,6 @@ public class LocalDateTimeKeyDeserializer extends JodaKeyDeserializer {
 
     @Override
     protected LocalDateTime deserialize(String key, DeserializationContext ctxt) throws IOException {
-        return parser.parseLocalDateTime(key);
+        return _parseKey(ctxt, LocalDateTime.class, key, parser::parseLocalDateTime);
     }
 }

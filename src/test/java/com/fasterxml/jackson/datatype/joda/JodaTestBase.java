@@ -1,9 +1,15 @@
 package com.fasterxml.jackson.datatype.joda;
 
+import java.text.DateFormat;
 import java.util.Arrays;
+import java.util.TimeZone;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.StreamReadCapability;
+import com.fasterxml.jackson.core.util.JacksonFeatureSet;
+import com.fasterxml.jackson.core.util.JsonParserDelegate;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.cfg.CoercionAction;
 import com.fasterxml.jackson.databind.cfg.CoercionInputShape;
@@ -47,6 +53,16 @@ public abstract class JodaTestBase
     protected static interface MixinForPolymorphism {
     }
 
+    // Simulates a textual format (like XML, CSV) where scalars are untyped
+    protected static class UntypedScalarsParser extends JsonParserDelegate {
+        public UntypedScalarsParser(JsonParser p) { super(p); }
+
+        @Override
+        public JacksonFeatureSet<StreamReadCapability> getReadCapabilities() {
+            return super.getReadCapabilities().with(StreamReadCapability.UNTYPED_SCALARS);
+        }
+    }
+
     /*
     /**********************************************************
     /* Factory methods
@@ -60,6 +76,28 @@ public abstract class JodaTestBase
     protected static MapperBuilder<?,?> mapperWithModuleBuilder() {
         return JsonMapper.builder()
                 .addModule(new JodaModule());
+    }
+
+    protected static MapperBuilder<?,?> jodaMapperBuilder(DateFormat df) {
+        return mapperWithModuleBuilder()
+                .defaultDateFormat(df);
+    }
+
+    protected static MapperBuilder<?,?> jodaMapperBuilder(TimeZone tz) {
+        return mapperWithModuleBuilder()
+                .defaultTimeZone(tz);
+    }
+
+    protected static ObjectMapper mapperWithModule() {
+        return mapperWithModuleBuilder().build();
+    }
+
+    protected static ObjectMapper mapperWithModule(DateFormat df) {
+        return jodaMapperBuilder(df).build();
+    }
+
+    protected static ObjectMapper mapperWithModule(TimeZone tz) {
+        return jodaMapperBuilder(tz).build();
     }
 
     // @since 2.12

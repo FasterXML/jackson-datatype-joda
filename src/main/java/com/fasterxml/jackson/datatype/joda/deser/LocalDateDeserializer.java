@@ -2,8 +2,9 @@ package com.fasterxml.jackson.datatype.joda.deser;
 
 import java.io.IOException;
 
-import org.joda.time.DateTimeZone;
+import org.joda.time.IllegalFieldValueException;
 import org.joda.time.LocalDate;
+import org.joda.time.format.DateTimeFormatter;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
@@ -70,9 +71,10 @@ public class LocalDateDeserializer
         //     some textual formats
         if (ctxt.isEnabled(StreamReadCapability.UNTYPED_SCALARS)
                 && _isValidTimestampString(value)) {
-            return _fromTimestamp(ctxt, NumberInput.parseLong(value));
+            return _fromTimestamp(ctxt, NumberInput.parseLong(value), value);
         }
-        return _format.createParser(ctxt).parseLocalDate(value);
+        final DateTimeFormatter parser = _format.createParser(ctxt);
+        return _parseWithJoda(ctxt, value, parser::parseLocalDate);
     }
 
     // @since 2.12
@@ -80,27 +82,32 @@ public class LocalDateDeserializer
         throws IOException
     {
         // [yyyy,mm,dd] or ["yyyy","mm","dd"]
-        int year = p.nextIntValue(-1); // fast speculative case
-        if (year == -1) { // either -1, or not an integral number; slow path
-            year = _parseIntPrimitive(p, ctxt);
-        }
-        int month = p.nextIntValue(-1);
-        if (month == -1) {
-            month = _parseIntPrimitive(p, ctxt);
-        }
-        int day = p.nextIntValue(-1);
-        if (day == -1) {
-            day = _parseIntPrimitive(p, ctxt);
-        }
+        final String msg = "expected 3 int values for LocalDate";
+        int year = _nextArrayInt(p, ctxt, msg);
+        int month = _nextArrayInt(p, ctxt, msg);
+        int day = _nextArrayInt(p, ctxt, msg);
         if (p.nextToken() != JsonToken.END_ARRAY) {
-            throw ctxt.wrongTokenException(p, handledType(), JsonToken.END_ARRAY, "after LocalDate ints");
+            throw ctxt.wrongTokenException(p, getValueType(ctxt), JsonToken.END_ARRAY, "after LocalDate ints");
         }
-        return new LocalDate(year, month, day);
+        try {
+            return new LocalDate(year, month, day);
+        } catch (IllegalFieldValueException e) {
+            throw _invalidArrayValue(ctxt, e);
+        }
     }
 
-    protected LocalDate _fromTimestamp(DeserializationContext ctxt, long ts) {
-        DateTimeZone tz = _format.isTimezoneExplicit() ? _format.getTimeZone()
-                : DateTimeZone.forTimeZone(ctxt.getTimeZone());
-        return new LocalDate(ts, tz);
+    protected LocalDate _fromTimestamp(DeserializationContext ctxt, long ts)
+        throws IOException
+    {
+        return _fromTimestamp(ctxt, ts, null);
+    }
+
+    // @since 2.23
+    protected LocalDate _fromTimestamp(DeserializationContext ctxt, long ts, String text)
+        throws IOException
+    {
+        // [datatype-joda#199]: zone offset addition for edge-of-long timestamp can
+        //   overflow (or result fall outside year range); do not let raw Joda exception escape
+        return _fromTimestamp(ctxt, ts, text, LocalDate::new);
     }
 }

@@ -6,6 +6,7 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.ReadableDateTime;
 import org.joda.time.ReadableInstant;
+import org.joda.time.format.DateTimeFormatter;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonTokenId;
@@ -81,18 +82,19 @@ public class DateTimeDeserializer
         }
         // 08-Jul-2015, tatu: as per [datatype-joda#44], optional TimeZone inclusion
         // NOTE: on/off feature only for serialization; on deser should accept both
-        int ix = value.indexOf('[');
+        // 07-Oct-2026: [datatype-joda#191] zone id suffix has to close the value;
+        //   and is the LAST '[...]' (custom patterns may contain literal brackets)
+        int ix = value.endsWith("]") ? value.lastIndexOf('[') : -1;
         if (ix > 0) {
+            final String fullValue = value;
             DateTimeZone tz;
-            int ix2 = value.lastIndexOf(']');
-            String tzId = (ix2 < ix)
-                    ? value.substring(ix+1)
-                    : value.substring(ix+1, ix2);
+            String tzId = value.substring(ix+1, value.length() - 1);
             try {
                 tz = DateTimeZone.forID(tzId);
             } catch (IllegalArgumentException e) {
-                ctxt.reportInputMismatch(handledType(), "Unknown DateTimeZone id '%s'", tzId);
-                tz = null; // never gets here
+                // [datatype-joda#200]: report via handler (like other failures)
+                return (ReadableInstant) ctxt.handleWeirdStringValue(handledType(), fullValue,
+                        "Unknown DateTimeZone id '%s'", tzId);
             }
             value = value.substring(0, ix);
 
@@ -107,10 +109,17 @@ public class DateTimeDeserializer
             }
             */
 
-            DateTime result = _format.createParser(ctxt)
-                    .withZone(tz)
-                    .parseDateTime(value)
-                    ;
+            DateTime result;
+            try {
+                result = _format.createParser(ctxt)
+                        .withZone(tz)
+                        .parseDateTime(value)
+                        ;
+            } catch (IllegalArgumentException | ArithmeticException e) {
+                // 07-Oct-2026: [datatype-joda#191] do not let raw Joda exception escape
+                return (ReadableInstant) ctxt.handleWeirdStringValue(handledType(), fullValue,
+                        "Invalid date/time before DateTimeZone id suffix: %s", e.getMessage());
+            }
             // 23-Jul-2017, tatu: As per [datatype-joda#93] only override tz if allowed to
             if (_format.shouldAdjustToContextTimeZone(ctxt)) {
                 result = result.withZone(_format.getTimeZone());
@@ -126,12 +135,30 @@ public class DateTimeDeserializer
 
         // Not sure if it should use timezone or not...
         // 15-Sep-2015, tatu: impl of 'createParser()' SHOULD handle all timezone/locale setup
-        return _format.createParser(ctxt).parseDateTime(value);
+        final int openIx = value.indexOf('[');
+        if (openIx > 0) {
+            // 07-Oct-2026: [datatype-joda#191] Not a valid zone id suffix, but may still
+            //   be valid for a custom pattern with literal '['
+            try {
+                return _format.createParser(ctxt).parseDateTime(value);
+            } catch (IllegalArgumentException e) {
+                final String msg = (value.indexOf(']', openIx) < 0)
+                        ? "Malformed DateTimeZone id suffix: missing closing ']'"
+                        : "Malformed DateTimeZone id suffix: unexpected content after closing ']'";
+                // [datatype-joda#200]: include Joda's message (may be invalid date/time value)
+                return (ReadableInstant) ctxt.handleWeirdStringValue(handledType(), value,
+                        "%s (%s)", msg, e.getMessage());
+            } catch (ArithmeticException e) {
+                // [datatype-joda#200]: overflow, not a malformed suffix
+                return (ReadableInstant) ctxt.handleWeirdStringValue(handledType(), value,
+                        "%s", e.getMessage());
+            }
+        }
+        final DateTimeFormatter parser = _format.createParser(ctxt);
+        return _parseWithJoda(ctxt, value, parser::parseDateTime);
     }
 
     protected DateTime _fromTimestamp(DeserializationContext ctxt, long ts) {
-        DateTimeZone tz = _format.isTimezoneExplicit() ? _format.getTimeZone()
-                : DateTimeZone.forTimeZone(ctxt.getTimeZone());
-        return new DateTime(ts, tz);
+        return new DateTime(ts, _timestampZone(ctxt));
     }
 }

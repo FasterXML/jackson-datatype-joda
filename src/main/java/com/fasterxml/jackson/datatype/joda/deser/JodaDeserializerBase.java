@@ -1,6 +1,7 @@
 package com.fasterxml.jackson.datatype.joda.deser;
 
 import java.io.IOException;
+import java.util.function.Function;
 
 import com.fasterxml.jackson.core.*;
 import com.fasterxml.jackson.core.io.NumberInput;
@@ -38,7 +39,16 @@ abstract class JodaDeserializerBase<T> extends StdScalarDeserializer<T>
         // 14-Jul-2020, tatu: Need to support "numbers as Strings" for data formats
         //    that only have String values for scalars (CSV, Properties, XML)
         // NOTE: we do allow negative values, but has to fit in 64-bits:
-        return _isIntNumber(str) && NumberInput.inLongRange(str, (str.charAt(0) == '-'));
+        if (!_isIntNumber(str)) {
+            return false;
+        }
+        // 16-Oct-2026: `inLongRange()` expects digits only, so must skip
+        //   leading sign (if any) for 19-digit values to be accepted
+        final char c = str.charAt(0);
+        if (c == '-' || c == '+') {
+            return NumberInput.inLongRange(str.substring(1), c == '-');
+        }
+        return NumberInput.inLongRange(str, false);
     }
 
     /**
@@ -87,5 +97,28 @@ abstract class JodaDeserializerBase<T> extends StdScalarDeserializer<T>
                         ClassUtil.getTypeDescription(type),
                         JsonToken.valueDescFor(t),
                         p.currentToken()));
+    }
+
+    /**
+     * Helper method for parsing given String value using Joda functionality,
+     * so that Joda failures -- {@link IllegalArgumentException} (including
+     * {@link org.joda.time.IllegalFieldValueException}) and {@link ArithmeticException}
+     * (for overflows) -- are reported via
+     * {@link DeserializationContext#handleWeirdStringValue} instead of escaping
+     * as raw Joda exceptions (see [datatype-joda#195], [datatype-joda#200]).
+     *
+     * @since 2.23
+     */
+    @SuppressWarnings("unchecked")
+    protected T _parseWithJoda(DeserializationContext ctxt, String value,
+            Function<String, ? extends T> parser)
+        throws IOException
+    {
+        try {
+            return parser.apply(value);
+        } catch (IllegalArgumentException | ArithmeticException e) {
+            return (T) ctxt.handleWeirdStringValue(handledType(), value,
+                    "%s", e.getMessage());
+        }
     }
 }
