@@ -6,6 +6,7 @@ import java.util.TimeZone;
 import org.joda.time.DateTimeZone;
 import org.joda.time.LocalDateTime;
 import org.joda.time.chrono.ISOChronology;
+import org.joda.time.format.ISODateTimeFormat;
 
 import org.junit.jupiter.api.Test;
 
@@ -13,7 +14,9 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.datatype.joda.JodaTestBase;
+import com.fasterxml.jackson.datatype.joda.cfg.JacksonJodaDateFormat;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -151,14 +154,19 @@ public class LocalDateTimeDeserTest extends JodaTestBase
     @Test
     public void testLocalDateTimeDeserWithFormatTimeZoneSameAsDefault() throws IOException
     {
-        // Format time zone that equals JVM default must still win over the
-        // context one (UTC here)
-        final TimeZone jvmZone = TimeZone.getDefault();
+        // Default format whose (non-explicit) zone is the same as the configured one:
+        // mimics default formats (that use JVM default zone) without depending on JVM zone.
+        // Configured zone must still be considered explicit and win over context zone (UTC)
+        final DateTimeZone taipei = DateTimeZone.forID("Asia/Taipei");
+        JacksonJodaDateFormat fmt = new JacksonJodaDateFormat(
+                ISODateTimeFormat.localDateOptionalTimeParser().withZone(taipei));
         ObjectMapper mapper = mapperWithModuleBuilder()
+                .addModule(new SimpleModule()
+                        .addDeserializer(LocalDateTime.class, new LocalDateTimeDeserializer(fmt)))
                 .withConfigOverride(LocalDateTime.class,
-                        o -> o.setFormat(JsonFormat.Value.empty().withTimeZone(jvmZone)))
+                        o -> o.setFormat(JsonFormat.Value.empty().withTimeZone(taipei.toTimeZone())))
                 .build();
-        assertEquals(new LocalDateTime(1238558582001L, DateTimeZone.forTimeZone(jvmZone)),
+        assertEquals(new LocalDateTime(2009, 4, 1, 12, 3, 2, 1),
                 mapper.readValue("1238558582001", LocalDateTime.class));
     }
 }

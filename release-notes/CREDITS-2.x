@@ -133,3 +133,5 @@ Joo Hyuk Kim (@JooHyukKim)
    (2.23.0)
   * Fixed #191: `DateTimeDeserializer` accepts malformed zone id suffix
    (2.23.0)
+  * Fixed #192: `LocalTimeDeserializer` ignores configured time zone for timestamps
+   (2.23.0)

@@ -14,6 +14,9 @@ Project: jackson-datatype-joda
  (fixed by @arfa-21)
 #194: Fix timestamp time zone resolution (explicit zone equal to JVM default;
   `ADJUST_DATES_TO_CONTEXT_TIME_ZONE`)
+#192: `LocalTimeDeserializer` ignores configured time zone for timestamps
+  (uses JVM default zone instead)
+ (fixed by @arfa-21)
 
 2.22.3 (21-Sep-2026)
 2.22.2 (16-Aug-2026)
