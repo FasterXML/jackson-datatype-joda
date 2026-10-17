@@ -77,13 +77,7 @@ public class DateTimeZoneDeserializer extends JodaDeserializerBase<DateTimeZone>
             }
             return _fromOffset(ctxt, offset);
         }
-        // [datatype-joda#195]: do not let raw Joda exception escape
-        try {
-            return DateTimeZone.forID(value);
-        } catch (IllegalArgumentException e) {
-            return (DateTimeZone) ctxt.handleWeirdStringValue(handledType(), value,
-                    "%s", e.getMessage());
-        }
+        return _parseWithJoda(ctxt, value, DateTimeZone::forID);
     }
 
     // @since 2.12

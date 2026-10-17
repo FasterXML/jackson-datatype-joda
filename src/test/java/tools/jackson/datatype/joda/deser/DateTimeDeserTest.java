@@ -212,8 +212,9 @@ public class DateTimeDeserTest extends JodaTestBase
         try {
             READER.readValue(quote("2017-01-01T01:01:01.000Z[UTC][x]"));
             fail("Should not pass");
-        } catch (MismatchedInputException e) {
+        } catch (InvalidFormatException e) {
             verifyException(e, "Unknown DateTimeZone id 'x'");
+            assertEquals("2017-01-01T01:01:01.000Z[UTC][x]", e.getValue());
         }
     }
 
@@ -269,6 +270,8 @@ public class DateTimeDeserTest extends JodaTestBase
         } catch (InvalidFormatException e) {
             verifyException(e, "Malformed DateTimeZone id suffix");
             verifyException(e, "missing closing ']'");
+            // [datatype-joda#200]: Joda's own message included as well
+            verifyException(e, "is malformed at");
         }
     }
 
@@ -299,6 +302,9 @@ public class DateTimeDeserTest extends JodaTestBase
                 })
                 .build();
         assertEquals(fallback, mapper.readValue(quote("2017-01-01T01:01:01.000Z[UTC"),
+                DateTime.class));
+        // [datatype-joda#200]: as well as unknown zone id
+        assertEquals(fallback, mapper.readValue(quote("2017-01-01T01:01:01.000Z[Foo/Bar]"),
                 DateTime.class));
     }
 

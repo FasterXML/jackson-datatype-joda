@@ -1,6 +1,7 @@
 package tools.jackson.datatype.joda.deser;
 
 import java.io.IOException;
+import java.util.function.Function;
 
 import tools.jackson.core.*;
 import tools.jackson.core.io.NumberInput;
@@ -97,6 +98,29 @@ abstract class JodaDeserializerBase<T> extends StdScalarDeserializer<T>
                         ClassUtil.getTypeDescription(type),
                         JsonToken.valueDescFor(t),
                         p.currentToken()));
+    }
+
+    /**
+     * Helper method for parsing given String value using Joda functionality,
+     * so that Joda failures -- {@link IllegalArgumentException} (including
+     * {@link org.joda.time.IllegalFieldValueException}) and {@link ArithmeticException}
+     * (for overflows) -- are reported via
+     * {@link DeserializationContext#handleWeirdStringValue} instead of escaping
+     * as raw Joda exceptions (see [datatype-joda#195], [datatype-joda#200]).
+     *
+     * @since 3.3
+     */
+    @SuppressWarnings("unchecked")
+    protected T _parseWithJoda(DeserializationContext ctxt, String value,
+            Function<String, ? extends T> parser)
+        throws JacksonException
+    {
+        try {
+            return parser.apply(value);
+        } catch (IllegalArgumentException | ArithmeticException e) {
+            return (T) ctxt.handleWeirdStringValue(handledType(), value,
+                    "%s", e.getMessage());
+        }
     }
 
     /**
