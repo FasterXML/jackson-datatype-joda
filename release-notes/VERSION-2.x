@@ -17,6 +17,8 @@ Project: jackson-datatype-joda
 #192: `LocalTimeDeserializer` ignores configured time zone for timestamps
   (uses JVM default zone instead)
  (fixed by @arfa-21)
+#193: `LocalDateTimeDeserializer` returns `null` for partial array (instead of failing)
+ (fixed by @arfa-21)
 
 2.22.3 (21-Sep-2026)
 2.22.2 (16-Aug-2026)

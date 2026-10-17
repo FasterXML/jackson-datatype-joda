@@ -135,3 +135,5 @@ Joo Hyuk Kim (@JooHyukKim)
    (2.23.0)
   * Fixed #192: `LocalTimeDeserializer` ignores configured time zone for timestamps
    (2.23.0)
+  * Fixed #193: `LocalDateTimeDeserializer` returns `null` for partial array
+   (2.23.0)

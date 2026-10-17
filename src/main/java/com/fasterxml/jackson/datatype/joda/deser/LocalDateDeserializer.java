@@ -2,6 +2,7 @@ package com.fasterxml.jackson.datatype.joda.deser;
 
 import java.io.IOException;
 
+import org.joda.time.IllegalFieldValueException;
 import org.joda.time.LocalDate;
 
 import com.fasterxml.jackson.core.JsonParser;
@@ -79,22 +80,18 @@ public class LocalDateDeserializer
         throws IOException
     {
         // [yyyy,mm,dd] or ["yyyy","mm","dd"]
-        int year = p.nextIntValue(-1); // fast speculative case
-        if (year == -1) { // either -1, or not an integral number; slow path
-            year = _parseIntPrimitive(p, ctxt);
-        }
-        int month = p.nextIntValue(-1);
-        if (month == -1) {
-            month = _parseIntPrimitive(p, ctxt);
-        }
-        int day = p.nextIntValue(-1);
-        if (day == -1) {
-            day = _parseIntPrimitive(p, ctxt);
-        }
+        final String msg = "expected 3 int values for LocalDate";
+        int year = _nextArrayInt(p, ctxt, msg);
+        int month = _nextArrayInt(p, ctxt, msg);
+        int day = _nextArrayInt(p, ctxt, msg);
         if (p.nextToken() != JsonToken.END_ARRAY) {
-            throw ctxt.wrongTokenException(p, handledType(), JsonToken.END_ARRAY, "after LocalDate ints");
+            throw ctxt.wrongTokenException(p, getValueType(ctxt), JsonToken.END_ARRAY, "after LocalDate ints");
         }
-        return new LocalDate(year, month, day);
+        try {
+            return new LocalDate(year, month, day);
+        } catch (IllegalFieldValueException e) {
+            throw _invalidArrayValue(ctxt, e);
+        }
     }
 
     protected LocalDate _fromTimestamp(DeserializationContext ctxt, long ts) {

@@ -2,6 +2,7 @@ package com.fasterxml.jackson.datatype.joda.deser;
 
 import java.io.IOException;
 
+import org.joda.time.IllegalFieldValueException;
 import org.joda.time.LocalTime;
 
 import com.fasterxml.jackson.core.JsonParser;
@@ -80,22 +81,25 @@ public class LocalTimeDeserializer
     protected LocalTime _fromArray(final JsonParser p, final DeserializationContext ctxt)
         throws IOException
     {
-        p.nextToken(); // VALUE_NUMBER_INT 
-        int hour = p.getIntValue(); 
-        p.nextToken(); // VALUE_NUMBER_INT
-        int minute = p.getIntValue();
-        p.nextToken(); // VALUE_NUMBER_INT
-        int second = p.getIntValue();
-        p.nextToken(); // VALUE_NUMBER_INT | END_ARRAY
+        // [HH,MM,ss,ms?] (or Strings)
+        final String msg = "expected 3 or 4 int values for LocalTime";
+        int hour = _nextArrayInt(p, ctxt, msg);
+        int minute = _nextArrayInt(p, ctxt, msg);
+        int second = _nextArrayInt(p, ctxt, msg);
+        // milliseconds are optional
         int millis = 0;
-        if (p.currentToken() != JsonToken.END_ARRAY) {
-            millis = p.getIntValue();
-            p.nextToken(); // END_ARRAY?
+        if (p.nextToken() != JsonToken.END_ARRAY) {
+            millis = _parseIntPrimitive(p, ctxt);
+            if (p.nextToken() != JsonToken.END_ARRAY) {
+                throw ctxt.wrongTokenException(p, getValueType(ctxt), JsonToken.END_ARRAY,
+                        "after LocalTime ints");
+            }
         }
-        if (p.currentToken() != JsonToken.END_ARRAY) {
-            throw ctxt.wrongTokenException(p, handledType(), JsonToken.END_ARRAY, "after LocalTime ints");
+        try {
+            return new LocalTime(hour, minute, second, millis);
+        } catch (IllegalFieldValueException e) {
+            throw _invalidArrayValue(ctxt, e);
         }
-        return new LocalTime(hour, minute, second, millis);
     }
 
     protected LocalTime _fromTimestamp(DeserializationContext ctxt, long ts) {

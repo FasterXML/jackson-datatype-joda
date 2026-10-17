@@ -11,6 +11,9 @@ import org.junit.jupiter.api.Test;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.exc.InvalidFormatException;
+import com.fasterxml.jackson.databind.exc.MismatchedInputException;
 import com.fasterxml.jackson.datatype.joda.JodaTestBase;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -118,6 +121,48 @@ public class LocalDateDeserTest extends JodaTestBase
         assertEquals(2001, date.getYear());
         assertEquals(5, date.getMonthOfYear());
         assertEquals(25, date.getDayOfMonth());
+    }
+
+    @Test
+    public void testLocalDateDeserFailsForPartialArray() throws IOException
+    {
+        ObjectMapper mapper = mapperWithModule();
+        for (String doc : new String[] { "[]", "[2001]", "[2001,5]" }) {
+            try {
+                LocalDate result = mapper.readValue(doc, LocalDate.class);
+                fail("Should not pass for '"+doc+"', got: "+result);
+            } catch (MismatchedInputException e) {
+                verifyException(e, "expected 3 int values for LocalDate");
+            }
+        }
+    }
+
+    @Test
+    public void testLocalDateDeserFailsForInvalidArrayValues() throws IOException
+    {
+        ObjectMapper mapper = mapperWithModule();
+        try {
+            LocalDate result = mapper.readValue("[2001,2,30]", LocalDate.class);
+            fail("Should not pass, got: "+result);
+        } catch (InvalidFormatException e) {
+            verifyException(e, "Value 30 for dayOfMonth must be in the range [1,28]");
+        }
+        // in 2.x `null` is coerced to 0 by default (so fails as out-of-range value)
+        try {
+            LocalDate result = mapper.readValue("[2001,null,30]", LocalDate.class);
+            fail("Should not pass, got: "+result);
+        } catch (InvalidFormatException e) {
+            verifyException(e, "Value 0 for monthOfYear must be in the range [1,12]");
+        }
+        // ... unless `null`s are not allowed for primitives
+        try {
+            LocalDate result = mapper.readerFor(LocalDate.class)
+                    .with(DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES)
+                    .readValue("[2001,null,30]");
+            fail("Should not pass, got: "+result);
+        } catch (MismatchedInputException e) {
+            verifyException(e, "Cannot coerce `null` to `int` for element #2 of `org.joda.time.LocalDate` Array value");
+        }
     }
 
     @Test
