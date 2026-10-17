@@ -11,6 +11,7 @@ import com.fasterxml.jackson.datatype.joda.cfg.FormatConfig;
 import com.fasterxml.jackson.datatype.joda.cfg.JacksonJodaDateFormat;
 
 import org.joda.time.MonthDay;
+import org.joda.time.format.DateTimeFormatter;
 
 /**
  * A Jackson deserializer for Joda MonthDay objects.
@@ -62,6 +63,13 @@ public class MonthDayDeserializer extends JodaDateDeserializerBase<MonthDay>
         if (value.isEmpty()) {
             return _fromEmptyString(p, ctxt, value);
         }
-        return MonthDay.parse(value, _format.createParser(ctxt));
+        final DateTimeFormatter parser = _format.createParser(ctxt);
+        // [datatype-joda#195]: do not let raw Joda exception escape
+        try {
+            return MonthDay.parse(value, parser);
+        } catch (IllegalArgumentException e) {
+            return (MonthDay) ctxt.handleWeirdStringValue(handledType(), value,
+                    "%s", e.getMessage());
+        }
     }
 }

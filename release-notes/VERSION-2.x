@@ -19,6 +19,8 @@ Project: jackson-datatype-joda
  (fixed by @arfa-21)
 #193: `LocalDateTimeDeserializer` returns `null` for partial array (instead of failing)
  (fixed by @arfa-21)
+#195: Invalid String values for `LocalDate`/`LocalDateTime`/`LocalTime`/`DateTime`
+  fail with raw Joda `IllegalArgumentException`
 
 2.22.3 (21-Sep-2026)
 2.22.2 (16-Aug-2026)

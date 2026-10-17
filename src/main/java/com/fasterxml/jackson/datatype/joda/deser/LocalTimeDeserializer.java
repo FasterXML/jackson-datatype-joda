@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import org.joda.time.IllegalFieldValueException;
 import org.joda.time.LocalTime;
+import org.joda.time.format.DateTimeFormatter;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
@@ -74,7 +75,14 @@ public class LocalTimeDeserializer
                 && _isValidTimestampString(value)) {
             return _fromTimestamp(ctxt, NumberInput.parseLong(value));
         }
-        return _format.createParser(ctxt).parseLocalTime(value);
+        final DateTimeFormatter parser = _format.createParser(ctxt);
+        // [datatype-joda#195]: do not let raw Joda exception escape
+        try {
+            return parser.parseLocalTime(value);
+        } catch (IllegalArgumentException e) {
+            return (LocalTime) ctxt.handleWeirdStringValue(handledType(), value,
+                    "%s", e.getMessage());
+        }
     }
 
     // @since 2.12

@@ -6,6 +6,7 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.ReadableDateTime;
 import org.joda.time.ReadableInstant;
+import org.joda.time.format.DateTimeFormatter;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonTokenId;
@@ -146,7 +147,14 @@ public class DateTimeDeserializer
                 return (ReadableInstant) ctxt.handleWeirdStringValue(handledType(), value, msg);
             }
         }
-        return _format.createParser(ctxt).parseDateTime(value);
+        final DateTimeFormatter parser = _format.createParser(ctxt);
+        // [datatype-joda#195]: do not let raw Joda exception escape
+        try {
+            return parser.parseDateTime(value);
+        } catch (IllegalArgumentException e) {
+            return (ReadableInstant) ctxt.handleWeirdStringValue(handledType(), value,
+                    "%s", e.getMessage());
+        }
     }
 
     protected DateTime _fromTimestamp(DeserializationContext ctxt, long ts) {

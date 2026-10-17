@@ -89,6 +89,11 @@ public class IntervalDeserializer extends JodaDateDeserializerBase<Interval>
             return (Interval) ctxt.handleWeirdStringValue(handledType(), str,
 "Failed to parse number from '%s' (full source String '%s')",
                     str, value);
+        } catch (IllegalArgumentException e) {
+            // [datatype-joda#195]: do not let raw Joda exception escape
+            // (invalid start/end, or end before start)
+            return (Interval) ctxt.handleWeirdStringValue(handledType(), value,
+                    "%s", e.getMessage());
         }
 
         final DateTimeZone contextTimezone =
