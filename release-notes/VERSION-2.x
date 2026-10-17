@@ -12,13 +12,13 @@ Project: jackson-datatype-joda
 #191: `DateTimeDeserializer` accepts malformed zone id suffix (trailing text
   after `]`, or missing `]`)
  (fixed by @arfa-21)
-#194: Fix timestamp time zone resolution (explicit zone equal to JVM default;
-  `ADJUST_DATES_TO_CONTEXT_TIME_ZONE`)
 #192: `LocalTimeDeserializer` ignores configured time zone for timestamps
   (uses JVM default zone instead)
  (fixed by @arfa-21)
 #193: `LocalDateTimeDeserializer` returns `null` for partial array (instead of failing)
  (fixed by @arfa-21)
+#194: Fix timestamp time zone resolution (explicit zone equal to JVM default;
+  `ADJUST_DATES_TO_CONTEXT_TIME_ZONE`)
 #195: Invalid String values for `LocalDate`/`LocalDateTime`/`LocalTime`/`DateTime`
   fail with raw Joda `IllegalArgumentException`
 #197: `DateTimeZoneDeserializer` leaks raw `NumberFormatException` for
