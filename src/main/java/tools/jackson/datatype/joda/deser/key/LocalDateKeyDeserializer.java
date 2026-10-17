@@ -19,7 +19,7 @@ public class LocalDateKeyDeserializer extends JodaKeyDeserializer
         // [datatype-joda#195]: do not let raw Joda exception escape
         try {
             return parser.parseLocalDate(key);
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException | ArithmeticException e) {
             return (LocalDate) ctxt.handleWeirdKey(LocalDate.class, key,
                     "%s", e.getMessage());
         }

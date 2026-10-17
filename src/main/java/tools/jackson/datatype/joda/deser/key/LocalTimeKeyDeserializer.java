@@ -18,7 +18,7 @@ public class LocalTimeKeyDeserializer extends JodaKeyDeserializer
         // [datatype-joda#195]: do not let raw Joda exception escape
         try {
             return parser.parseLocalTime(key);
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException | ArithmeticException e) {
             return (LocalTime) ctxt.handleWeirdKey(LocalTime.class, key,
                     "%s", e.getMessage());
         }

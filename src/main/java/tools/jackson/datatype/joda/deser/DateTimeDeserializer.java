@@ -111,7 +111,7 @@ public class DateTimeDeserializer
                         .withZone(tz)
                         .parseDateTime(value)
                         ;
-            } catch (IllegalArgumentException e) {
+            } catch (IllegalArgumentException | ArithmeticException e) {
                 // 07-Oct-2026: [datatype-joda#191] do not let raw Joda exception escape
                 return (ReadableInstant) ctxt.handleWeirdStringValue(handledType(), fullValue,
                         "Invalid date/time before DateTimeZone id suffix: %s", e.getMessage());
@@ -148,7 +148,7 @@ public class DateTimeDeserializer
         // [datatype-joda#195]: do not let raw Joda exception escape
         try {
             return parser.parseDateTime(value);
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException | ArithmeticException e) {
             return (ReadableInstant) ctxt.handleWeirdStringValue(handledType(), value,
                     "%s", e.getMessage());
         }

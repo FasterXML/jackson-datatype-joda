@@ -73,7 +73,7 @@ public class InstantDeserializer
         // [datatype-joda#195]: do not let raw Joda exception escape
         try {
             return Instant.parse(value, parser);
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException | ArithmeticException e) {
             return (Instant) ctxt.handleWeirdStringValue(handledType(), value,
                     "%s", e.getMessage());
         }

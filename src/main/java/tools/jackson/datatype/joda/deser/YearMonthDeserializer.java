@@ -63,7 +63,7 @@ public class YearMonthDeserializer extends JodaDateDeserializerBase<YearMonth>
         // [datatype-joda#195]: do not let raw Joda exception escape
         try {
             return YearMonth.parse(value, parser);
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException | ArithmeticException e) {
             return (YearMonth) ctxt.handleWeirdStringValue(handledType(), value,
                     "%s", e.getMessage());
         }

@@ -64,7 +64,7 @@ public class MonthDayDeserializer extends JodaDateDeserializerBase<MonthDay>
         // [datatype-joda#195]: do not let raw Joda exception escape
         try {
             return MonthDay.parse(value, parser);
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException | ArithmeticException e) {
             return (MonthDay) ctxt.handleWeirdStringValue(handledType(), value,
                     "%s", e.getMessage());
         }

@@ -24,7 +24,7 @@ public class DateTimeKeyDeserializer extends JodaKeyDeserializer
         // [datatype-joda#195]: do not let raw Joda exception escape
         try {
             return (dtz == null) ? DateTime.parse(key) : new DateTime(key, dtz);
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException | ArithmeticException e) {
             return (DateTime) ctxt.handleWeirdKey(DateTime.class, key,
                     "%s", e.getMessage());
         }

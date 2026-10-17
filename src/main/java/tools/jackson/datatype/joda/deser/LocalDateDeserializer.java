@@ -75,7 +75,7 @@ public class LocalDateDeserializer
         // [datatype-joda#195]: do not let raw Joda exception escape
         try {
             return parser.parseLocalDate(value);
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException | ArithmeticException e) {
             return (LocalDate) ctxt.handleWeirdStringValue(handledType(), value,
                     "%s", e.getMessage());
         }
