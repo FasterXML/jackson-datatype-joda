@@ -137,3 +137,7 @@ Joo Hyuk Kim (@JooHyukKim)
    (2.23.0)
   * Fixed #193: `LocalDateTimeDeserializer` returns `null` for partial array
    (2.23.0)
+  * Fixed #197: `DateTimeZoneDeserializer` leaks raw `NumberFormatException` for
+    out-of-`int`-range timestamp String (and `InputCoercionException` for
+    out-of-`int`-range number)
+   (2.23.0)
