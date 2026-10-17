@@ -28,6 +28,12 @@ Project: jackson-datatype-joda
 #199: `LocalDate`/`LocalDateTime`/`LocalTime` deserializers leak raw Joda
   exception for edge-of-`long` timestamps (zone offset overflow, out-of-range year)
  (fixed by @arfa-21)
+#200: `IntervalDeserializer` leaks raw `ArithmeticException` for overflowing
+  period (instead of failing with `InvalidFormatException`); also report
+  `ArithmeticException` as `InvalidFormatException` for all date/time String
+  value and Map key deserializers, and report `Interval` String value without
+  separator via `DeserializationProblemHandler`
+ (fixed by @arfa-21)
 
 2.22.3 (21-Sep-2026)
 2.22.2 (16-Aug-2026)
