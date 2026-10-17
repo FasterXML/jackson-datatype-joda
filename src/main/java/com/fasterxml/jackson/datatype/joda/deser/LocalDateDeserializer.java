@@ -71,7 +71,7 @@ public class LocalDateDeserializer
         //     some textual formats
         if (ctxt.isEnabled(StreamReadCapability.UNTYPED_SCALARS)
                 && _isValidTimestampString(value)) {
-            return _fromTimestamp(ctxt, NumberInput.parseLong(value));
+            return _fromTimestamp(ctxt, NumberInput.parseLong(value), value);
         }
         final DateTimeFormatter parser = _format.createParser(ctxt);
         // [datatype-joda#195]: do not let raw Joda exception escape
@@ -102,7 +102,18 @@ public class LocalDateDeserializer
         }
     }
 
-    protected LocalDate _fromTimestamp(DeserializationContext ctxt, long ts) {
-        return new LocalDate(ts, _timestampZone(ctxt));
+    protected LocalDate _fromTimestamp(DeserializationContext ctxt, long ts)
+        throws IOException
+    {
+        return _fromTimestamp(ctxt, ts, null);
+    }
+
+    // @since 2.23
+    protected LocalDate _fromTimestamp(DeserializationContext ctxt, long ts, String text)
+        throws IOException
+    {
+        // [datatype-joda#199]: zone offset addition for edge-of-long timestamp can
+        //   overflow (or result fall outside year range); do not let raw Joda exception escape
+        return _fromTimestamp(ctxt, ts, text, LocalDate::new);
     }
 }

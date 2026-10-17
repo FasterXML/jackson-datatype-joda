@@ -38,7 +38,16 @@ abstract class JodaDeserializerBase<T> extends StdScalarDeserializer<T>
         // 14-Jul-2020, tatu: Need to support "numbers as Strings" for data formats
         //    that only have String values for scalars (CSV, Properties, XML)
         // NOTE: we do allow negative values, but has to fit in 64-bits:
-        return _isIntNumber(str) && NumberInput.inLongRange(str, (str.charAt(0) == '-'));
+        if (!_isIntNumber(str)) {
+            return false;
+        }
+        // 16-Oct-2026: `inLongRange()` expects digits only, so must skip
+        //   leading sign (if any) for 19-digit values to be accepted
+        final char c = str.charAt(0);
+        if (c == '-' || c == '+') {
+            return NumberInput.inLongRange(str.substring(1), c == '-');
+        }
+        return NumberInput.inLongRange(str, false);
     }
 
     /**

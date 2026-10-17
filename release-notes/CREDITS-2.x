@@ -141,3 +141,6 @@ Joo Hyuk Kim (@JooHyukKim)
     out-of-`int`-range timestamp String (and `InputCoercionException` for
     out-of-`int`-range number)
    (2.23.0)
+  * Fixed #199: `LocalDate`/`LocalDateTime`/`LocalTime` deserializers leak raw Joda
+    exception for edge-of-`long` timestamps (zone offset overflow, out-of-range year)
+   (2.23.0)

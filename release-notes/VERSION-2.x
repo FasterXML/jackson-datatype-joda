@@ -25,6 +25,9 @@ Project: jackson-datatype-joda
   out-of-`int`-range timestamp String (and `InputCoercionException` for
   out-of-`int`-range number)
  (fixed by @arfa-21)
+#199: `LocalDate`/`LocalDateTime`/`LocalTime` deserializers leak raw Joda
+  exception for edge-of-`long` timestamps (zone offset overflow, out-of-range year)
+ (fixed by @arfa-21)
 
 2.22.3 (21-Sep-2026)
 2.22.2 (16-Aug-2026)
