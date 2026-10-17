@@ -66,7 +66,9 @@ public class IntervalDeserializer extends JodaDateDeserializerBase<Interval>
             index = value.indexOf('-', 1);
         }
         if (index < 0) {
-            throw ctxt.weirdStringException(value, handledType(), "no slash or hyphen found to separate start, end");
+            // [datatype-joda#200]: report via handler (like other failures), not throw directly
+            return (Interval) ctxt.handleWeirdStringValue(handledType(), value,
+                    "no slash or hyphen found to separate start, end");
         }
         long start, end;
         String str = value.substring(0, index);

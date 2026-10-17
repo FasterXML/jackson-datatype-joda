@@ -142,16 +142,14 @@ public class DateTimeDeserializer
                         ? "Malformed DateTimeZone id suffix: missing closing ']'"
                         : "Malformed DateTimeZone id suffix: unexpected content after closing ']'";
                 return (ReadableInstant) ctxt.handleWeirdStringValue(handledType(), value, msg);
+            } catch (ArithmeticException e) {
+                // [datatype-joda#200]: overflow, not a malformed suffix
+                return (ReadableInstant) ctxt.handleWeirdStringValue(handledType(), value,
+                        "%s", e.getMessage());
             }
         }
         final DateTimeFormatter parser = _format.createParser(ctxt);
-        // [datatype-joda#195]: do not let raw Joda exception escape
-        try {
-            return parser.parseDateTime(value);
-        } catch (IllegalArgumentException | ArithmeticException e) {
-            return (ReadableInstant) ctxt.handleWeirdStringValue(handledType(), value,
-                    "%s", e.getMessage());
-        }
+        return _parseString(ctxt, value, parser::parseDateTime);
     }
 
     protected DateTime _fromTimestamp(DeserializationContext ctxt, long ts) {

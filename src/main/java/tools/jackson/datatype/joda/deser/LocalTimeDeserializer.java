@@ -73,13 +73,7 @@ public class LocalTimeDeserializer
             return _fromTimestamp(ctxt, NumberInput.parseLong(value), value);
         }
         final DateTimeFormatter parser = _format.createParser(ctxt);
-        // [datatype-joda#195]: do not let raw Joda exception escape
-        try {
-            return parser.parseLocalTime(value);
-        } catch (IllegalArgumentException | ArithmeticException e) {
-            return (LocalTime) ctxt.handleWeirdStringValue(handledType(), value,
-                    "%s", e.getMessage());
-        }
+        return _parseString(ctxt, value, parser::parseLocalTime);
     }
 
     // @since 2.12

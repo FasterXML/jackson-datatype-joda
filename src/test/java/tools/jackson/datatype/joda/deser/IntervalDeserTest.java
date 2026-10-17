@@ -11,8 +11,10 @@ import org.joda.time.chrono.ISOChronology;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
+import tools.jackson.databind.DeserializationContext;
 import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.cfg.DateTimeFeature;
+import tools.jackson.databind.deser.DeserializationProblemHandler;
 import tools.jackson.databind.exc.InvalidFormatException;
 import tools.jackson.datatype.joda.JodaTestBase;
 
@@ -134,6 +136,47 @@ public class IntervalDeserTest extends JodaTestBase
                 verifyException(e, "period or duration out of range");
                 assertEquals(value, e.getValue());
             }
+        }
+    }
+
+    // Smaller overflows are reported by Joda as out-of-range field values
+    // (and not as `ArithmeticException`), but must fail the same way
+    @Test
+    public void testIntervalDeserFailsForOutOfRangeYear() throws IOException
+    {
+        final ObjectMapper mapper = mapperWithModule();
+        final String value = "2020-01-01T00:00:00Z/P300000000Y";
+        try {
+            Interval result = mapper.readValue(quote(value), Interval.class);
+            fail("Should not pass, got: "+result);
+        } catch (InvalidFormatException e) {
+            verifyException(e, "Cannot deserialize value of type `org.joda.time.Interval` from String");
+            verifyException(e, "for year must be in the range");
+            assertEquals(value, e.getValue());
+        }
+    }
+
+    // Problem handler gets to deal with all String value failures
+    @Test
+    public void testIntervalDeserFailuresWithProblemHandler() throws IOException
+    {
+        final Interval fallback = new Interval(0L, 1L, DateTimeZone.UTC);
+        final ObjectMapper mapper = mapperWithModuleBuilder()
+                .addHandler(new DeserializationProblemHandler() {
+                    @Override
+                    public Object handleWeirdStringValue(DeserializationContext ctxt,
+                            Class<?> targetType, String valueToConvert, String failureMsg) {
+                        return fallback;
+                    }
+                })
+                .build();
+        for (String value : new String[] {
+                "20200101", // no separator
+                "2020-01-01T00:00:00Z/P2147483647Y", // overflow
+                "200-100", // end before start
+                "0-9223372036854775808", // out of `long` range
+        }) {
+            assertEquals(fallback, mapper.readValue(quote(value), Interval.class), value);
         }
     }
 
