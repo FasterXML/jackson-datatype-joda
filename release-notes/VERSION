@@ -33,7 +33,7 @@ Major version: 3 (for earlier, see VERSION-2.x)
   separator via `DeserializationProblemHandler`
  (fixed by @arfa-21)
 
-3.2.4 (not yet released)
+3.2.4 (18-Oct-2026)
 
 #190: `PeriodDeserializer` silently truncates out-of-range and invalid values
   (instead of failing)
