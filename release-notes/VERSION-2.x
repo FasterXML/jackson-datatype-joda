@@ -10,6 +10,7 @@ Project: jackson-datatype-joda
   (instead of failing)
  (fixed by @arfa-21)
 
+2.22.4 (17-Oct-2026)
 2.22.3 (21-Sep-2026)
 2.22.2 (16-Aug-2026)
 2.22.1 (07-Jul-2026)
@@ -17,6 +18,7 @@ Project: jackson-datatype-joda
 
 No changes since 2.21
 
+2.21.8 (17-Oct-2026)
 2.21.7 (21-Sep-2026)
 2.21.6 (14-Aug-2026)
 2.21.5 (06-Jul-2026)
@@ -62,6 +64,7 @@ No changes since 2.19.1
 #152: Unify testing structure/tools [JSTEP-10]
  (contributed by Joo-Hyuk K)
 
+2.18.12 (17-Oct-2026)
 2.18.11 (20-Sep-2026)
 2.18.10 (15-Aug-2026)
 2.18.9 (07-Jul-2026)
