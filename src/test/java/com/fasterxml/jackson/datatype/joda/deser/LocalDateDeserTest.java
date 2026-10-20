@@ -3,6 +3,7 @@ package com.fasterxml.jackson.datatype.joda.deser;
 import java.io.IOException;
 import java.util.TimeZone;
 
+import org.joda.time.IllegalFieldValueException;
 import org.joda.time.LocalDate;
 import org.joda.time.chrono.ISOChronology;
 
@@ -208,6 +209,7 @@ public class LocalDateDeserTest extends JodaTestBase
             fail("Should not pass, got: "+result);
         } catch (InvalidFormatException e) {
             verifyException(e, "Value 30 for dayOfMonth must be in the range [1,28]");
+            assertInstanceOf(IllegalFieldValueException.class, e.getCause());
         }
         // in 2.x `null` is coerced to 0 by default (so fails as out-of-range value)
         try {

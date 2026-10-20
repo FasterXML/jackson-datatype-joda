@@ -50,12 +50,10 @@ public class DateMidnightDeserializer
     {
         // We'll accept either long (timestamp) or array:
         if (p.isExpectedStartArrayToken()) {
-            p.nextToken(); // VALUE_NUMBER_INT
-            int year = p.getIntValue();
-            p.nextToken(); // VALUE_NUMBER_INT
-            int month = p.getIntValue();
-            p.nextToken(); // VALUE_NUMBER_INT
-            int day = p.getIntValue();
+            final String msg = "expected 3 int values for DateMidnight";
+            int year = _nextArrayInt(p, ctxt, msg);
+            int month = _nextArrayInt(p, ctxt, msg);
+            int day = _nextArrayInt(p, ctxt, msg);
             if (p.nextToken() != JsonToken.END_ARRAY) {
                 throw ctxt.wrongTokenException(p, handledType(), JsonToken.END_ARRAY,
                         "after DateMidnight ints");
@@ -113,8 +111,14 @@ public class DateMidnightDeserializer
             String text)
         throws IOException
     {
-        // [datatype-joda#192], [datatype-joda#199]: use configured time zone (not JVM
-        //   default), and do not let raw Joda exception escape
+        // [datatype-joda#199]: do not let raw Joda exception escape
         return _fromTimestamp(ctxt, ts, text, org.joda.time.DateMidnight::new);
+    }
+
+    // Timestamps (like Strings) resolved using JVM default time zone, for
+    // backwards compatibility (and to round-trip serialized values)
+    @Override
+    protected DateTimeZone _timestampZone(DeserializationContext ctxt) {
+        return DateTimeZone.getDefault();
     }
 }

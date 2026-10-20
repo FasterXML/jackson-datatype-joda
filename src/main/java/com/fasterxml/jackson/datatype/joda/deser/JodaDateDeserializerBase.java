@@ -218,8 +218,18 @@ public abstract class JodaDateDeserializerBase<T>
             IllegalFieldValueException e)
         throws IOException
     {
-        return (T) ctxt.handleWeirdNumberValue(handledType(), e.getIllegalNumberValue(),
-                "%s", e.getMessage());
+        try {
+            return (T) ctxt.handleWeirdNumberValue(handledType(), e.getIllegalNumberValue(),
+                    "%s", e.getMessage());
+        } catch (JsonMappingException jme) {
+            // retain Joda exception as cause, if possible (handler may have set its own)
+            if (jme.getCause() == null) {
+                try {
+                    jme.initCause(e);
+                } catch (IllegalStateException ise) { }
+            }
+            throw jme;
+        }
     }
 
     /**

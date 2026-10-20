@@ -14,6 +14,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
+import com.fasterxml.jackson.databind.exc.MismatchedInputException;
 import com.fasterxml.jackson.datatype.joda.JodaTestBase;
 
 @SuppressWarnings("deprecation") // because DateMidnight deprecated by Joda
@@ -227,16 +228,28 @@ public class DateMidnightTest extends JodaTestBase
         }
     }
 
-    // Timestamp must be resolved using configured time zone, not JVM default
+    // Timestamp resolved using JVM default time zone (regardless of context
+    // time zone), so that serialized value round-trips
     @Test
-    public void testDateMidnightDeserFromTimestampWithTimeZone() throws Exception
+    public void testDateMidnightDeserFromTimestampRoundTrip() throws Exception
     {
-        // 2009-04-01T12:00:00Z == 2009-04-02T02:00:00 in Kiritimati (+14:00);
-        // zone chosen so date differs from that of any likely JVM default zone
-        final DateTimeZone tz = DateTimeZone.forID("Pacific/Kiritimati");
-        DateMidnight result = mapperWithModule(tz.toTimeZone())
-                .readValue("1238587200000", DateMidnight.class);
-        assertEquals(new DateMidnight(2009, 4, 2, tz), result);
+        final DateMidnight input = new DateMidnight(2009, 4, 2);
+        for (String tzId : new String[] { "UTC", "Pacific/Kiritimati", "Pacific/Pago_Pago" }) {
+            ObjectMapper mapper = mapperWithModule(TimeZone.getTimeZone(tzId));
+            assertEquals(input, mapper.readValue(String.valueOf(input.getMillis()),
+                    DateMidnight.class));
+        }
+    }
+
+    @Test
+    public void testDateMidnightDeserFailsForPartialArray() throws Exception
+    {
+        try {
+            DateMidnight result = MAPPER.readValue("[2020,1]", DateMidnight.class);
+            fail("Should not pass, got: "+result);
+        } catch (MismatchedInputException e) {
+            verifyException(e, "expected 3 int values for DateMidnight");
+        }
     }
 
 }

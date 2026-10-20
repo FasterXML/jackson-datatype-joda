@@ -368,6 +368,14 @@ public class DateTimeDeserTest extends JodaTestBase
         } catch (InvalidFormatException e) {
             verifyException(e, "Unknown DateTimeZone id 'xx'");
         }
+        // including actual cause, if date/time itself is invalid
+        try {
+            mapperWithModule().readValue(a2q("{'value':'2017-13-01[10]'}"), BracketPatternBean.class);
+            fail("Should not pass");
+        } catch (InvalidFormatException e) {
+            verifyException(e, "Unknown DateTimeZone id '10'");
+            verifyException(e, "Value 13 for monthOfYear must be in the range [1,12]");
+        }
     }
 
     // [datatype-joda#199]: edge-of-long timestamps

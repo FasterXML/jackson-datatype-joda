@@ -84,23 +84,20 @@ public class DateTimeDeserializer
         // NOTE: on/off feature only for serialization; on deser should accept both
         // 07-Oct-2026: [datatype-joda#191] zone id suffix has to close the value;
         //   and is the LAST '[...]' (custom patterns may contain literal brackets)
-        int ix = value.endsWith("]") ? value.lastIndexOf('[') : -1;
+        final int ix = value.endsWith("]") ? value.lastIndexOf('[') : -1;
+        String tzId = null;
+        DateTimeZone tz = null;
         if (ix > 0) {
-            final String fullValue = value;
-            DateTimeZone tz;
-            String tzId = value.substring(ix+1, value.length() - 1);
+            tzId = value.substring(ix+1, value.length() - 1);
             try {
                 tz = DateTimeZone.forID(tzId);
             } catch (IllegalArgumentException e) {
                 // Not a zone id: may be literal brackets at end of custom pattern
-                try {
-                    return _format.createParser(ctxt).parseDateTime(fullValue);
-                } catch (IllegalArgumentException | ArithmeticException e2) {
-                    // [datatype-joda#200]: report via handler (like other failures)
-                    return (ReadableInstant) ctxt.handleWeirdStringValue(handledType(), fullValue,
-                            "Unknown DateTimeZone id '%s'", tzId);
-                }
+                // (handled below, along with other literal brackets)
             }
+        }
+        if (tz != null) {
+            final String fullValue = value;
             value = value.substring(0, ix);
 
             // 12-Jul-2015, tatu: Initially planned to support "timestamp[zone-id]"
@@ -149,9 +146,14 @@ public class DateTimeDeserializer
             try {
                 return _format.createParser(ctxt).parseDateTime(value);
             } catch (IllegalArgumentException e) {
-                final String msg = (value.indexOf(']', openIx) < 0)
-                        ? "Malformed DateTimeZone id suffix: missing closing ']'"
-                        : "Malformed DateTimeZone id suffix: unexpected content after closing ']'";
+                final String msg;
+                if (tzId != null) {
+                    msg = "Unknown DateTimeZone id '"+tzId+"'";
+                } else if (value.indexOf(']', openIx) < 0) {
+                    msg = "Malformed DateTimeZone id suffix: missing closing ']'";
+                } else {
+                    msg = "Malformed DateTimeZone id suffix: unexpected content after closing ']'";
+                }
                 // [datatype-joda#200]: include Joda's message (may be invalid date/time value)
                 return (ReadableInstant) ctxt.handleWeirdStringValue(handledType(), value,
                         "%s (%s)", msg, e.getMessage());

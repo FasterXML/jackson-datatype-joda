@@ -33,7 +33,6 @@ Project: jackson-datatype-joda
 #199: `LocalDate`/`LocalDateTime`/`LocalTime` deserializers leak raw Joda
   exception for edge-of-`long` timestamps (zone offset overflow, out-of-range year);
   also for `DateTime` (which silently dropped non-UTC zone) and `DateMidnight`
-  (which also ignored configured time zone)
  (fixed by @arfa-21)
 #200: `IntervalDeserializer` leaks raw `ArithmeticException` for overflowing
   period (instead of failing with `InvalidFormatException`); also report
