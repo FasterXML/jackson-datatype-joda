@@ -241,6 +241,21 @@ public class DateMidnightTest extends JodaTestBase
         }
     }
 
+    // Midnight that does not exist in zone (DST gap) must not leak raw Joda exception
+    @Test
+    public void testDateMidnightDeserFailsForMidnightInDSTGap() throws Exception
+    {
+        ObjectMapper mapper = mapperWithModule(TimeZone.getTimeZone("America/Sao_Paulo"));
+        try {
+            DateMidnight result = mapper.readValue("[2016,10,16]", DateMidnight.class);
+            fail("Should not pass, got: "+result);
+        } catch (MismatchedInputException e) {
+            verifyException(e, "Invalid DateMidnight value [2016,10,16]");
+            verifyException(e, "daylight savings time 'gap'");
+            assertInstanceOf(IllegalInstantException.class, e.getCause());
+        }
+    }
+
     @Test
     public void testDateMidnightDeserFailsForPartialArray() throws Exception
     {

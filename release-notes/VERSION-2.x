@@ -21,8 +21,8 @@ Project: jackson-datatype-joda
   `ADJUST_DATES_TO_CONTEXT_TIME_ZONE`); also adjust `DateTime` String with zone
   id suffix to context time zone (not default format zone).
   NOTE: with `ADJUST_DATES_TO_CONTEXT_TIME_ZONE` disabled, timestamps for
-  `LocalDate`/`LocalDateTime`/`LocalTime` are now resolved as UTC (no longer
-  using `ObjectMapper.setTimeZone()` zone)
+  `DateTime`/`LocalDate`/`LocalDateTime`/`LocalTime` are now resolved as UTC
+  (no longer using `ObjectMapper.setTimeZone()` zone)
 #195: Invalid String values for `LocalDate`/`LocalDateTime`/`LocalTime`/`DateTime`
   fail with raw Joda `IllegalArgumentException` (also: `DateMidnight`; and report
   invalid Array values via `DeserializationProblemHandler`)

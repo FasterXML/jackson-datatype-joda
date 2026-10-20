@@ -13,6 +13,7 @@ import com.fasterxml.jackson.core.JsonTokenId;
 import com.fasterxml.jackson.core.StreamReadCapability;
 import com.fasterxml.jackson.core.io.NumberInput;
 import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.exc.MismatchedInputException;
 import com.fasterxml.jackson.datatype.joda.cfg.FormatConfig;
 import com.fasterxml.jackson.datatype.joda.cfg.JacksonJodaDateFormat;
 
@@ -64,6 +65,13 @@ public class DateMidnightDeserializer
                 return new org.joda.time.DateMidnight(year, month, day, tz);
             } catch (IllegalFieldValueException e) {
                 return _handleInvalidArrayValue(ctxt, e);
+            } catch (IllegalArgumentException e) {
+                // [datatype-joda#195]: midnight may not exist in zone (DST gap)
+                MismatchedInputException mie = MismatchedInputException.from(p, handledType(),
+                        String.format("Invalid DateMidnight value [%d,%d,%d]: %s",
+                                year, month, day, e.getMessage()));
+                mie.initCause(e);
+                throw mie;
             }
         }
         switch (p.currentTokenId()) {
