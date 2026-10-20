@@ -13,6 +13,8 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.exc.InvalidFormatException;
+import com.fasterxml.jackson.databind.exc.MismatchedInputException;
 import com.fasterxml.jackson.datatype.joda.JodaTestBase;
 
 @SuppressWarnings("deprecation") // because DateMidnight deprecated by Joda
@@ -210,6 +212,59 @@ public class DateMidnightTest extends JodaTestBase
         DateTimeZone resultTz = resultMidnight.getZone();
         // Is this stable enough for testing?
         assertEquals("America/New_York", resultTz.getID());
+    }
+
+    // Invalid values must be reported as `InvalidFormatException`, not raw Joda exception
+    @Test
+    public void testDateMidnightDeserFailsForInvalidValues() throws Exception
+    {
+        for (String doc : new String[] { quote("2020-13-45"), "[2020,13,1]" }) {
+            try {
+                DateMidnight result = MAPPER.readValue(doc, DateMidnight.class);
+                fail("Should not pass, got: "+result);
+            } catch (InvalidFormatException e) {
+                verifyException(e, "for monthOfYear must be in the range [1,12]");
+            }
+        }
+    }
+
+    // Timestamp resolved using JVM default time zone (regardless of context
+    // time zone), so that serialized value round-trips
+    @Test
+    public void testDateMidnightDeserFromTimestampRoundTrip() throws Exception
+    {
+        final DateMidnight input = new DateMidnight(2009, 4, 2);
+        for (String tzId : new String[] { "UTC", "Pacific/Kiritimati", "Pacific/Pago_Pago" }) {
+            ObjectMapper mapper = mapperWithModule(TimeZone.getTimeZone(tzId));
+            assertEquals(input, mapper.readValue(String.valueOf(input.getMillis()),
+                    DateMidnight.class));
+        }
+    }
+
+    // Midnight that does not exist in zone (DST gap) must not leak raw Joda exception
+    @Test
+    public void testDateMidnightDeserFailsForMidnightInDSTGap() throws Exception
+    {
+        ObjectMapper mapper = mapperWithModule(TimeZone.getTimeZone("America/Sao_Paulo"));
+        try {
+            DateMidnight result = mapper.readValue("[2016,10,16]", DateMidnight.class);
+            fail("Should not pass, got: "+result);
+        } catch (MismatchedInputException e) {
+            verifyException(e, "Invalid DateMidnight value [2016,10,16]");
+            verifyException(e, "daylight savings time 'gap'");
+            assertInstanceOf(IllegalInstantException.class, e.getCause());
+        }
+    }
+
+    @Test
+    public void testDateMidnightDeserFailsForPartialArray() throws Exception
+    {
+        try {
+            DateMidnight result = MAPPER.readValue("[2020,1]", DateMidnight.class);
+            fail("Should not pass, got: "+result);
+        } catch (MismatchedInputException e) {
+            verifyException(e, "expected 3 int values for DateMidnight");
+        }
     }
 
 }

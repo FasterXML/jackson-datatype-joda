@@ -2,8 +2,9 @@ package com.fasterxml.jackson.datatype.joda.deser;
 
 import java.io.IOException;
 
-import org.joda.time.DateTimeZone;
+import org.joda.time.IllegalFieldValueException;
 import org.joda.time.LocalDateTime;
+import org.joda.time.format.DateTimeFormatter;
 
 import com.fasterxml.jackson.core.*;
 import com.fasterxml.jackson.core.io.NumberInput;
@@ -69,53 +70,51 @@ public class LocalDateTimeDeserializer
         //     some textual formats
         if (ctxt.isEnabled(StreamReadCapability.UNTYPED_SCALARS)
                 && _isValidTimestampString(value)) {
-            return _fromTimestamp(ctxt, NumberInput.parseLong(value));
+            return _fromTimestamp(ctxt, NumberInput.parseLong(value), value);
         }
-        return _format.createParser(ctxt).parseLocalDateTime(value);
+        final DateTimeFormatter parser = _format.createParser(ctxt);
+        return _parseWithJoda(ctxt, value, parser::parseLocalDateTime);
     }
 
     protected LocalDateTime _fromArray(final JsonParser p, final DeserializationContext ctxt)
         throws IOException
     {
-        // [yyyy,mm,dd,hh,MM,ss,ms]
-        JsonToken t = p.nextToken();
-        LocalDateTime dt = null;
-        do {
-            if (!t.isNumeric()) { break; }
-            int year = p.getIntValue();
-            t = p.nextToken(); // VALUE_NUMBER_INT
-            if (!t.isNumeric()) { break; }
-            int month = p.getIntValue();
-            t = p.nextToken(); // VALUE_NUMBER_INT
-            if (!t.isNumeric()) { break; }
-            int day = p.getIntValue();
-            t = p.nextToken(); // VALUE_NUMBER_INT
-            if (!t.isNumeric()) { break; }
-            int hour = p.getIntValue();
-            t = p.nextToken(); // VALUE_NUMBER_INT
-            if (!t.isNumeric()) { break; }
-            int minute = p.getIntValue();
-            t = p.nextToken(); // VALUE_NUMBER_INT
-            if (!t.isNumeric()) { break; }
-            int second = p.getIntValue();
-            t = p.nextToken(); // VALUE_NUMBER_INT | END_ARRAY
-            // let's leave milliseconds optional?
-            int millisecond = 0;
-            if (t.isNumeric()) { // VALUE_NUMBER_INT           
-                millisecond = p.getIntValue();
-                t = p.nextToken(); // END_ARRAY?
+        // [yyyy,mm,dd,hh,MM,ss,ms?] (or Strings)
+        final String msg = "expected 6 or 7 int values for LocalDateTime";
+        int year = _nextArrayInt(p, ctxt, msg);
+        int month = _nextArrayInt(p, ctxt, msg);
+        int day = _nextArrayInt(p, ctxt, msg);
+        int hour = _nextArrayInt(p, ctxt, msg);
+        int minute = _nextArrayInt(p, ctxt, msg);
+        int second = _nextArrayInt(p, ctxt, msg);
+        // milliseconds are optional
+        int millisecond = 0;
+        if (p.nextToken() != JsonToken.END_ARRAY) {
+            millisecond = _parseIntPrimitive(p, ctxt);
+            if (p.nextToken() != JsonToken.END_ARRAY) {
+                throw ctxt.wrongTokenException(p, getValueType(ctxt), JsonToken.END_ARRAY,
+                        "after LocalDateTime ints");
             }
-            dt = new LocalDateTime(year, month, day, hour, minute, second, millisecond);                 
-        } while (false); // bogus loop to allow break from within
-        if (t == JsonToken.END_ARRAY) {
-            return dt;
         }
-        throw ctxt.wrongTokenException(p, handledType(), JsonToken.END_ARRAY, "after LocalDateTime ints");
+        try {
+            return new LocalDateTime(year, month, day, hour, minute, second, millisecond);
+        } catch (IllegalFieldValueException e) {
+            return _handleInvalidArrayValue(ctxt, e);
+        }
     }
 
-    protected LocalDateTime _fromTimestamp(DeserializationContext ctxt, long ts) {
-        DateTimeZone tz = _format.isTimezoneExplicit() ? _format.getTimeZone()
-                : DateTimeZone.forTimeZone(ctxt.getTimeZone());
-        return new LocalDateTime(ts, tz);
+    protected LocalDateTime _fromTimestamp(DeserializationContext ctxt, long ts)
+        throws IOException
+    {
+        return _fromTimestamp(ctxt, ts, null);
+    }
+
+    // @since 2.23
+    protected LocalDateTime _fromTimestamp(DeserializationContext ctxt, long ts, String text)
+        throws IOException
+    {
+        // [datatype-joda#199]: zone offset addition for edge-of-long timestamp can
+        //   overflow (or result fall outside year range); do not let raw Joda exception escape
+        return _fromTimestamp(ctxt, ts, text, LocalDateTime::new);
     }
 }

@@ -7,6 +7,7 @@ import org.joda.time.DateTimeZone;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonTokenId;
 import com.fasterxml.jackson.core.StreamReadCapability;
+import com.fasterxml.jackson.core.exc.InputCoercionException;
 import com.fasterxml.jackson.core.io.NumberInput;
 
 import com.fasterxml.jackson.databind.DeserializationContext;
@@ -16,6 +17,9 @@ import com.fasterxml.jackson.databind.DeserializationContext;
  */
 public class DateTimeZoneDeserializer extends JodaDeserializerBase<DateTimeZone>
 {
+    // [datatype-joda#197]
+    private final static String INT_RANGE_MSG = "Offset value out of range of `int`";
+
     private static final long serialVersionUID = 1L;
 
     public DateTimeZoneDeserializer() { super(DateTimeZone.class); }
@@ -27,7 +31,16 @@ public class DateTimeZoneDeserializer extends JodaDeserializerBase<DateTimeZone>
         switch (p.currentTokenId()) {
         case JsonTokenId.ID_NUMBER_INT:
             // for fun let's allow use of offsets...
-            return _fromOffset(ctxt, p.getIntValue());
+            // [datatype-joda#197]: out-of-`int`-range value must be reported, not
+            //   escape as `InputCoercionException` (but in-range `long` is fine)
+            final int offset;
+            try {
+                offset = p.getIntValue();
+            } catch (InputCoercionException e) {
+                return (DateTimeZone) _handleWeirdNumberValue(ctxt, e,
+                        p.getNumberValue(), INT_RANGE_MSG);
+            }
+            return _fromOffset(ctxt, offset);
         case JsonTokenId.ID_STRING:
             return _fromString(p, ctxt, p.getText());
         case JsonTokenId.ID_START_OBJECT:
@@ -55,14 +68,31 @@ public class DateTimeZoneDeserializer extends JodaDeserializerBase<DateTimeZone>
         // 30-Sep-2020: [datatype-joda#117] Should allow use of "Timestamp as String" for
         //     some textual formats
         if (ctxt.isEnabled(StreamReadCapability.UNTYPED_SCALARS)
-                && _isValidTimestampString(value)) {
-            return _fromOffset(ctxt, NumberInput.parseInt(value));
+                && _isIntNumber(value)) {
+            // [datatype-joda#197]: out-of-`int`-range value must be reported, not
+            //   escape as a raw `NumberFormatException`
+            final int offset;
+            try {
+                offset = NumberInput.parseInt(value);
+            } catch (NumberFormatException e) {
+                return (DateTimeZone) _handleWeirdStringValue(ctxt, e, value,
+                        INT_RANGE_MSG);
+            }
+            return _fromOffset(ctxt, offset);
         }
-        return DateTimeZone.forID(value);
+        return _parseWithJoda(ctxt, value, DateTimeZone::forID);
     }
 
     // @since 2.12
-    protected DateTimeZone _fromOffset(DeserializationContext ctxt, int offset) {
-        return DateTimeZone.forOffsetHours(offset);
+    protected DateTimeZone _fromOffset(DeserializationContext ctxt, int offset)
+        throws IOException
+    {
+        // [datatype-joda#195]: do not let raw Joda exception escape
+        try {
+            return DateTimeZone.forOffsetHours(offset);
+        } catch (IllegalArgumentException e) {
+            return (DateTimeZone) _handleWeirdNumberValue(ctxt, e, offset,
+                    "%s", e.getMessage());
+        }
     }
 }

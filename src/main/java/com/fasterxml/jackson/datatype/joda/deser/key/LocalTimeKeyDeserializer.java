@@ -14,6 +14,6 @@ public class LocalTimeKeyDeserializer extends JodaKeyDeserializer {
 
     @Override
     protected LocalTime deserialize(String key, DeserializationContext ctxt) throws IOException {
-        return parser.parseLocalTime(key);
+        return _parseKey(ctxt, LocalTime.class, key, parser::parseLocalTime);
     }
 }

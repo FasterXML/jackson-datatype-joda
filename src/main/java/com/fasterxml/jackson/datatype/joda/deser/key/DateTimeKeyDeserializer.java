@@ -16,10 +16,10 @@ public class DateTimeKeyDeserializer extends JodaKeyDeserializer {
     protected DateTime deserialize(String key, DeserializationContext ctxt) throws IOException {
         if (ctxt.isEnabled(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE)) {
             TimeZone tz = ctxt.getTimeZone();
-            DateTimeZone dtz = (tz == null) ? DateTimeZone.UTC : DateTimeZone.forTimeZone(tz);
-            return new DateTime(key, dtz);
+            final DateTimeZone dtz = (tz == null) ? DateTimeZone.UTC : DateTimeZone.forTimeZone(tz);
+            return _parseKey(ctxt, DateTime.class, key, k -> new DateTime(k, dtz));
         }
-        return DateTime.parse(key);
+        return _parseKey(ctxt, DateTime.class, key, DateTime::parse);
     }
 
 }

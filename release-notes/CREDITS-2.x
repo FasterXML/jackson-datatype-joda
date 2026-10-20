@@ -131,3 +131,19 @@ Joo Hyuk Kim (@JooHyukKim)
 @arfa-21
   * Fixed #190: `PeriodDeserializer` silently truncates out-of-range and invalid values
    (2.23.0)
+  * Fixed #191: `DateTimeDeserializer` accepts malformed zone id suffix
+   (2.23.0)
+  * Fixed #192: `LocalTimeDeserializer` ignores configured time zone for timestamps
+   (2.23.0)
+  * Fixed #193: `LocalDateTimeDeserializer` returns `null` for partial array
+   (2.23.0)
+  * Fixed #197: `DateTimeZoneDeserializer` leaks raw `NumberFormatException` for
+    out-of-`int`-range timestamp String (and `InputCoercionException` for
+    out-of-`int`-range number)
+   (2.23.0)
+  * Fixed #199: `LocalDate`/`LocalDateTime`/`LocalTime` deserializers leak raw Joda
+    exception for edge-of-`long` timestamps (zone offset overflow, out-of-range year)
+   (2.23.0)
+  * Fixed #200: `IntervalDeserializer` leaks raw `ArithmeticException` for overflowing
+    period (instead of failing with `InvalidFormatException`)
+   (2.23.0)

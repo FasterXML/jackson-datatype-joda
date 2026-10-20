@@ -67,7 +67,15 @@ public class DurationDeserializer
                 && _isValidTimestampString(value)) {
             return _fromTimestamp(ctxt, NumberInput.parseLong(value));
         }
-        return _format.parsePeriod(ctxt, value).toStandardDuration();
+        try {
+            return _format.parsePeriod(ctxt, value).toStandardDuration();
+        } catch (IllegalArgumentException | ArithmeticException
+                | UnsupportedOperationException e) {
+            // [datatype-joda#195]: do not let raw Joda exception escape;
+            // `UnsupportedOperationException` for Period with years/months
+            return (Duration) _handleWeirdStringValue(ctxt, e, value,
+                    "Invalid Duration value: %s", e.getMessage());
+        }
     }
 
     // @since 2.12

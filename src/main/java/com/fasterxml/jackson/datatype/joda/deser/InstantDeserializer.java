@@ -3,6 +3,7 @@ package com.fasterxml.jackson.datatype.joda.deser;
 import java.io.IOException;
 
 import org.joda.time.Instant;
+import org.joda.time.format.DateTimeFormatter;
 
 import com.fasterxml.jackson.core.*;
 import com.fasterxml.jackson.core.io.NumberInput;
@@ -71,7 +72,8 @@ public class InstantDeserializer
         }
         // 11-Sep-2018, tatu: `DateTimeDeserializer` allows timezone inclusion in brackets;
         //    should that be checked here too?
-        return Instant.parse(value, _format.createParser(ctxt));
+        final DateTimeFormatter parser = _format.createParser(ctxt);
+        return _parseWithJoda(ctxt, value, v -> Instant.parse(v, parser));
     }
 
     // @since 2.12

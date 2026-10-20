@@ -2,7 +2,9 @@ package com.fasterxml.jackson.datatype.joda.deser;
 
 import java.io.IOException;
 
+import org.joda.time.IllegalFieldValueException;
 import org.joda.time.LocalTime;
+import org.joda.time.format.DateTimeFormatter;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
@@ -37,7 +39,7 @@ public class LocalTimeDeserializer
     {
         switch (p.currentTokenId()) {
         case JsonTokenId.ID_NUMBER_INT:
-            return new LocalTime(p.getLongValue());            
+            return _fromTimestamp(ctxt, p.getLongValue());
         case JsonTokenId.ID_STRING:
             return _fromString(p, ctxt, p.getText());
         case JsonTokenId.ID_START_OBJECT:
@@ -71,30 +73,55 @@ public class LocalTimeDeserializer
         //     some textual formats
         if (ctxt.isEnabled(StreamReadCapability.UNTYPED_SCALARS)
                 && _isValidTimestampString(value)) {
-            return new LocalTime(NumberInput.parseLong(value));
+            return _fromTimestamp(ctxt, NumberInput.parseLong(value), value);
         }
-        return _format.createParser(ctxt).parseLocalTime(value);
+        final DateTimeFormatter parser = _format.createParser(ctxt);
+        return _parseWithJoda(ctxt, value, parser::parseLocalTime);
     }
 
     // @since 2.12
     protected LocalTime _fromArray(final JsonParser p, final DeserializationContext ctxt)
         throws IOException
     {
-        p.nextToken(); // VALUE_NUMBER_INT 
-        int hour = p.getIntValue(); 
-        p.nextToken(); // VALUE_NUMBER_INT
-        int minute = p.getIntValue();
-        p.nextToken(); // VALUE_NUMBER_INT
-        int second = p.getIntValue();
-        p.nextToken(); // VALUE_NUMBER_INT | END_ARRAY
+        // [HH,MM,ss,ms?] (or Strings)
+        final String msg = "expected 3 or 4 int values for LocalTime";
+        int hour = _nextArrayInt(p, ctxt, msg);
+        int minute = _nextArrayInt(p, ctxt, msg);
+        int second = _nextArrayInt(p, ctxt, msg);
+        // milliseconds are optional
         int millis = 0;
-        if (p.currentToken() != JsonToken.END_ARRAY) {
-            millis = p.getIntValue();
-            p.nextToken(); // END_ARRAY?
+        if (p.nextToken() != JsonToken.END_ARRAY) {
+            millis = _parseIntPrimitive(p, ctxt);
+            if (p.nextToken() != JsonToken.END_ARRAY) {
+                throw ctxt.wrongTokenException(p, getValueType(ctxt), JsonToken.END_ARRAY,
+                        "after LocalTime ints");
+            }
         }
-        if (p.currentToken() != JsonToken.END_ARRAY) {
-            throw ctxt.wrongTokenException(p, handledType(), JsonToken.END_ARRAY, "after LocalTime ints");
+        try {
+            return new LocalTime(hour, minute, second, millis);
+        } catch (IllegalFieldValueException e) {
+            return _handleInvalidArrayValue(ctxt, e);
         }
-        return new LocalTime(hour, minute, second, millis);
+    }
+
+    protected LocalTime _fromTimestamp(DeserializationContext ctxt, long ts)
+        throws IOException
+    {
+        return _fromTimestamp(ctxt, ts, null);
+    }
+
+    // @since 2.23
+    protected LocalTime _fromTimestamp(DeserializationContext ctxt, long ts, String text)
+        throws IOException
+    {
+        // [datatype-joda#199]: zone offset addition for edge-of-long timestamp can
+        //   overflow (or result fall outside year range); do not let raw Joda exception escape
+        return _fromTimestamp(ctxt, ts, text, LocalTime::new);
+    }
+
+    // No year in LocalTime: edge-of-long timestamps are valid (if offset does not overflow)
+    @Override
+    protected boolean _verifyTimestampYear() {
+        return false;
     }
 }

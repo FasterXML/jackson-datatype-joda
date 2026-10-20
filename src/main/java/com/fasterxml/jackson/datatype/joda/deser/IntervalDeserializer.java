@@ -69,7 +69,9 @@ public class IntervalDeserializer extends JodaDateDeserializerBase<Interval>
             index = value.indexOf('-', 1);
         }
         if (index < 0) {
-            throw ctxt.weirdStringException(value, handledType(), "no slash or hyphen found to separate start, end");
+            // [datatype-joda#200]: report via handler (like other failures), not throw directly
+            return (Interval) ctxt.handleWeirdStringValue(handledType(), value,
+                    "no slash or hyphen found to separate start, end");
         }
         long start, end;
         String str = value.substring(0, index);
@@ -86,13 +88,22 @@ public class IntervalDeserializer extends JodaDateDeserializerBase<Interval>
                 result = new Interval(start, end);
             }
         } catch (NumberFormatException e) {
-            return (Interval) ctxt.handleWeirdStringValue(handledType(), str,
-"Failed to parse number from '%s' (full source String '%s')",
-                    str, value);
+            // [datatype-joda#200]: report full value (like other failures)
+            return (Interval) _handleWeirdStringValue(ctxt, e, value,
+                    "Failed to parse number from '%s'", str);
+        } catch (IllegalArgumentException e) {
+            // [datatype-joda#195]: do not let raw Joda exception escape
+            // (invalid start/end, or end before start)
+            return (Interval) _handleWeirdStringValue(ctxt, e, value,
+                    "%s", e.getMessage());
+        } catch (ArithmeticException e) {
+            // [datatype-joda#200]: overflow applying period/duration or offset
+            return (Interval) _handleWeirdStringValue(ctxt, e, value,
+                    "value out of range (overflow): %s", e.getMessage());
         }
 
         final DateTimeZone contextTimezone =
-            _format.shouldAdjustToContextTimeZone(ctxt) ? DateTimeZone.forTimeZone(ctxt.getTimeZone()) : null;
+            _format.shouldAdjustToContextTimeZone(ctxt) ? _contextTimeZone(ctxt) : null;
         DateTimeZone tz = _format.isTimezoneExplicit() ? _format.getTimeZone() : contextTimezone;
         if (tz != null) {
             if (!tz.equals(result.getStart().getZone())) {
