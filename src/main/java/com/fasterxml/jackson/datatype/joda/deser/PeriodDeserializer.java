@@ -41,7 +41,7 @@ public class PeriodDeserializer
             try {
                 return new Period(p.getLongValue());
             } catch (ArithmeticException e) {
-                return (ReadablePeriod) ctxt.handleWeirdNumberValue(handledType(), p.getNumberValue(),
+                return (ReadablePeriod) _handleWeirdNumberValue(ctxt, e, p.getNumberValue(),
                         "Invalid Period value: %s", e.getMessage());
             }
         }
@@ -65,7 +65,7 @@ public class PeriodDeserializer
             return _format.parsePeriod(ctxt, value);
         } catch (IllegalArgumentException | ArithmeticException e) {
             // includes `NumberFormatException` for out-of-range components
-            return (ReadablePeriod) ctxt.handleWeirdStringValue(handledType(), value,
+            return (ReadablePeriod) _handleWeirdStringValue(ctxt, e, value,
                     "Invalid Period value: %s", e.getMessage());
         }
     }

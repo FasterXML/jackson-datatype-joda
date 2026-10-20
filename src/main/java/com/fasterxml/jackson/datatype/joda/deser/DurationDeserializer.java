@@ -73,7 +73,7 @@ public class DurationDeserializer
                 | UnsupportedOperationException e) {
             // [datatype-joda#195]: do not let raw Joda exception escape;
             // `UnsupportedOperationException` for Period with years/months
-            return (Duration) ctxt.handleWeirdStringValue(handledType(), value,
+            return (Duration) _handleWeirdStringValue(ctxt, e, value,
                     "Invalid Duration value: %s", e.getMessage());
         }
     }

@@ -58,7 +58,7 @@ public class DateMidnightDeserializer
                 throw ctxt.wrongTokenException(p, handledType(), JsonToken.END_ARRAY,
                         "after DateMidnight ints");
             }
-            DateTimeZone tz = _format.isTimezoneExplicit() ? _format.getTimeZone() : DateTimeZone.forTimeZone(ctxt.getTimeZone());
+            DateTimeZone tz = _format.isTimezoneExplicit() ? _format.getTimeZone() : _contextTimeZone(ctxt);
 
             try {
                 return new org.joda.time.DateMidnight(year, month, day, tz);

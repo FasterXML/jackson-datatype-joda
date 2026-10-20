@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DatabindException;
 import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.deser.DeserializationProblemHandler;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
@@ -143,6 +144,45 @@ public class InvalidStringDeserTest extends JodaTestBase
             fail("Should not pass, got: "+result);
         } catch (InvalidFormatException e) {
             verifyException(e, "Value 25 for hourOfDay must be in the range [0,23]");
+        }
+    }
+
+    // Joda exception retained as cause (for String, timestamp and Array values)
+    @Test
+    public void testJodaExceptionRetainedAsCause() throws Exception
+    {
+        for (String doc : new String[] { q("2019-02-30"), "[2019,2,30]",
+                String.valueOf(Long.MAX_VALUE) }) {
+            try {
+                Object result = MAPPER.readValue(doc, LocalDate.class);
+                fail("Should not pass, got: "+result);
+            } catch (InvalidFormatException e) {
+                assertInstanceOf(IllegalArgumentException.class, e.getCause(), "For: "+doc);
+            }
+        }
+    }
+
+    // ... but not added to exception thrown by problem handler, if explicitly
+    // constructed without cause
+    @Test
+    public void testProblemHandlerExceptionWithNullCause() throws Exception
+    {
+        ObjectMapper mapper = mapperWithModuleBuilder()
+                .addHandler(new DeserializationProblemHandler() {
+                    @Override
+                    public Object handleWeirdStringValue(DeserializationContext ctxt,
+                            Class<?> targetType, String valueToConvert, String failureMsg)
+                        throws java.io.IOException {
+                        throw JsonMappingException.from(ctxt.getParser(), "Handler failure", (Throwable) null);
+                    }
+                })
+                .build();
+        try {
+            Object result = mapper.readValue(q("2019-02-30"), LocalDate.class);
+            fail("Should not pass, got: "+result);
+        } catch (DatabindException e) {
+            verifyException(e, "Handler failure");
+            assertNull(e.getCause());
         }
     }
 

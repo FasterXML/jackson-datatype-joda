@@ -119,7 +119,7 @@ public class DateTimeDeserializer
                         ;
             } catch (IllegalArgumentException | ArithmeticException e) {
                 // 07-Oct-2026: [datatype-joda#191] do not let raw Joda exception escape
-                return (ReadableInstant) ctxt.handleWeirdStringValue(handledType(), fullValue,
+                return (ReadableInstant) _handleWeirdStringValue(ctxt, e, fullValue,
                         "Invalid date/time before DateTimeZone id suffix: %s", e.getMessage());
             }
             // 23-Jul-2017, tatu: As per [datatype-joda#93] only override tz if allowed to
@@ -155,11 +155,16 @@ public class DateTimeDeserializer
                     msg = "Malformed DateTimeZone id suffix: unexpected content after closing ']'";
                 }
                 // [datatype-joda#200]: include Joda's message (may be invalid date/time value)
-                return (ReadableInstant) ctxt.handleWeirdStringValue(handledType(), value,
+                return (ReadableInstant) _handleWeirdStringValue(ctxt, e, value,
                         "%s (%s)", msg, e.getMessage());
             } catch (ArithmeticException e) {
-                // [datatype-joda#200]: overflow, not a malformed suffix
-                return (ReadableInstant) ctxt.handleWeirdStringValue(handledType(), value,
+                // [datatype-joda#200]: overflow, not a malformed suffix (but may
+                //   still need to report unknown zone id)
+                if (tzId != null) {
+                    return (ReadableInstant) _handleWeirdStringValue(ctxt, e, value,
+                            "Unknown DateTimeZone id '%s' (%s)", tzId, e.getMessage());
+                }
+                return (ReadableInstant) _handleWeirdStringValue(ctxt, e, value,
                         "%s", e.getMessage());
             }
         }

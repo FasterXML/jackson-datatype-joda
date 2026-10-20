@@ -7,6 +7,7 @@ import com.fasterxml.jackson.core.*;
 import com.fasterxml.jackson.core.io.NumberInput;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.cfg.CoercionAction;
 import com.fasterxml.jackson.databind.deser.std.StdScalarDeserializer;
 import com.fasterxml.jackson.databind.jsontype.TypeDeserializer;
@@ -117,8 +118,56 @@ abstract class JodaDeserializerBase<T> extends StdScalarDeserializer<T>
         try {
             return parser.apply(value);
         } catch (IllegalArgumentException | ArithmeticException e) {
-            return (T) ctxt.handleWeirdStringValue(handledType(), value,
+            return (T) _handleWeirdStringValue(ctxt, e, value,
                     "%s", e.getMessage());
         }
+    }
+
+    /**
+     * Helper method for reporting invalid String value via
+     * {@link DeserializationContext#handleWeirdStringValue}, retaining given
+     * (Joda) exception as the cause of exception thrown if value is not handled.
+     *
+     * @since 2.23
+     */
+    protected Object _handleWeirdStringValue(DeserializationContext ctxt, Throwable cause,
+            String value, String msg, Object... msgArgs)
+        throws IOException
+    {
+        try {
+            return ctxt.handleWeirdStringValue(handledType(), value, msg, msgArgs);
+        } catch (JsonMappingException e) {
+            throw _withCause(e, cause);
+        }
+    }
+
+    /**
+     * Helper method for reporting invalid Number value via
+     * {@link DeserializationContext#handleWeirdNumberValue}, retaining given
+     * (Joda) exception as the cause of exception thrown if value is not handled.
+     *
+     * @since 2.23
+     */
+    protected Object _handleWeirdNumberValue(DeserializationContext ctxt, Throwable cause,
+            Number value, String msg, Object... msgArgs)
+        throws IOException
+    {
+        try {
+            return ctxt.handleWeirdNumberValue(handledType(), value, msg, msgArgs);
+        } catch (JsonMappingException e) {
+            throw _withCause(e, cause);
+        }
+    }
+
+    private static JsonMappingException _withCause(JsonMappingException e, Throwable cause) {
+        // Only add if no cause yet (problem handler may have thrown its own exception)
+        if (e.getCause() == null) {
+            try {
+                e.initCause(cause);
+            } catch (IllegalStateException ise) {
+                // cause explicitly set to `null` on construction: cannot add, leave as-is
+            }
+        }
+        return e;
     }
 }

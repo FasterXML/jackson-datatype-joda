@@ -37,7 +37,7 @@ public class DateTimeZoneDeserializer extends JodaDeserializerBase<DateTimeZone>
             try {
                 offset = p.getIntValue();
             } catch (InputCoercionException e) {
-                return (DateTimeZone) ctxt.handleWeirdNumberValue(handledType(),
+                return (DateTimeZone) _handleWeirdNumberValue(ctxt, e,
                         p.getNumberValue(), INT_RANGE_MSG);
             }
             return _fromOffset(ctxt, offset);
@@ -75,7 +75,7 @@ public class DateTimeZoneDeserializer extends JodaDeserializerBase<DateTimeZone>
             try {
                 offset = NumberInput.parseInt(value);
             } catch (NumberFormatException e) {
-                return (DateTimeZone) ctxt.handleWeirdStringValue(handledType(), value,
+                return (DateTimeZone) _handleWeirdStringValue(ctxt, e, value,
                         INT_RANGE_MSG);
             }
             return _fromOffset(ctxt, offset);
@@ -91,7 +91,7 @@ public class DateTimeZoneDeserializer extends JodaDeserializerBase<DateTimeZone>
         try {
             return DateTimeZone.forOffsetHours(offset);
         } catch (IllegalArgumentException e) {
-            return (DateTimeZone) ctxt.handleWeirdNumberValue(handledType(), offset,
+            return (DateTimeZone) _handleWeirdNumberValue(ctxt, e, offset,
                     "%s", e.getMessage());
         }
     }

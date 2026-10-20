@@ -140,10 +140,10 @@ public abstract class JodaDateDeserializerBase<T>
             return converter.convert(ts, zone);
         } catch (IllegalArgumentException | ArithmeticException e) {
             if (text != null) {
-                return (T) ctxt.handleWeirdStringValue(handledType(), text,
+                return (T) _handleWeirdStringValue(ctxt, e, text,
                         "%s", e.getMessage());
             }
-            return (T) ctxt.handleWeirdNumberValue(handledType(), ts,
+            return (T) _handleWeirdNumberValue(ctxt, e, ts,
                     "%s", e.getMessage());
         }
     }
@@ -218,18 +218,8 @@ public abstract class JodaDateDeserializerBase<T>
             IllegalFieldValueException e)
         throws IOException
     {
-        try {
-            return (T) ctxt.handleWeirdNumberValue(handledType(), e.getIllegalNumberValue(),
-                    "%s", e.getMessage());
-        } catch (JsonMappingException jme) {
-            // retain Joda exception as cause, if possible (handler may have set its own)
-            if (jme.getCause() == null) {
-                try {
-                    jme.initCause(e);
-                } catch (IllegalStateException ise) { }
-            }
-            throw jme;
-        }
+        return (T) _handleWeirdNumberValue(ctxt, e, e.getIllegalNumberValue(),
+                "%s", e.getMessage());
     }
 
     /**
