@@ -13,6 +13,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.fasterxml.jackson.datatype.joda.JodaTestBase;
 
 @SuppressWarnings("deprecation") // because DateMidnight deprecated by Joda
@@ -210,6 +211,32 @@ public class DateMidnightTest extends JodaTestBase
         DateTimeZone resultTz = resultMidnight.getZone();
         // Is this stable enough for testing?
         assertEquals("America/New_York", resultTz.getID());
+    }
+
+    // Invalid values must be reported as `InvalidFormatException`, not raw Joda exception
+    @Test
+    public void testDateMidnightDeserFailsForInvalidValues() throws Exception
+    {
+        for (String doc : new String[] { quote("2020-13-45"), "[2020,13,1]" }) {
+            try {
+                DateMidnight result = MAPPER.readValue(doc, DateMidnight.class);
+                fail("Should not pass, got: "+result);
+            } catch (InvalidFormatException e) {
+                verifyException(e, "for monthOfYear must be in the range [1,12]");
+            }
+        }
+    }
+
+    // Timestamp must be resolved using configured time zone, not JVM default
+    @Test
+    public void testDateMidnightDeserFromTimestampWithTimeZone() throws Exception
+    {
+        // 2009-04-01T12:00:00Z == 2009-04-02T02:00:00 in Kiritimati (+14:00);
+        // zone chosen so date differs from that of any likely JVM default zone
+        final DateTimeZone tz = DateTimeZone.forID("Pacific/Kiritimati");
+        DateMidnight result = mapperWithModule(tz.toTimeZone())
+                .readValue("1238587200000", DateMidnight.class);
+        assertEquals(new DateMidnight(2009, 4, 2, tz), result);
     }
 
 }

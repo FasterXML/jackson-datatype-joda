@@ -144,3 +144,6 @@ Joo Hyuk Kim (@JooHyukKim)
   * Fixed #199: `LocalDate`/`LocalDateTime`/`LocalTime` deserializers leak raw Joda
     exception for edge-of-`long` timestamps (zone offset overflow, out-of-range year)
    (2.23.0)
+  * Fixed #200: `IntervalDeserializer` leaks raw `ArithmeticException` for overflowing
+    period (instead of failing with `InvalidFormatException`)
+   (2.23.0)

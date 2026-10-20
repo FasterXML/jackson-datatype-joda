@@ -354,6 +354,54 @@ public class DateTimeDeserTest extends JodaTestBase
         assertEquals(input.value, result.value);
     }
 
+    // Value ending with literal bracket of custom pattern is not a zone id suffix
+    @Test
+    public void testBracketPatternValueWithoutZoneIdSuffix() throws Exception
+    {
+        BracketPatternBean result = mapperWithModule().readValue(
+                a2q("{'value':'2017-01-01[10]'}"), BracketPatternBean.class);
+        assertEquals(new DateTime(2017, 1, 1, 10, 0, DateTimeZone.UTC), result.value);
+        // but still fails for invalid value
+        try {
+            mapperWithModule().readValue(a2q("{'value':'2017-01-01[xx]'}"), BracketPatternBean.class);
+            fail("Should not pass");
+        } catch (InvalidFormatException e) {
+            verifyException(e, "Unknown DateTimeZone id 'xx'");
+        }
+    }
+
+    // [datatype-joda#199]: edge-of-long timestamps
+    @Test
+    public void testDeserFromEdgeOfLongTimestamp() throws Exception
+    {
+        // valid in UTC (commonly used as "max value" marker)
+        ObjectMapper mapper = mapperWithModule(TimeZone.getTimeZone("UTC"));
+        DateTime dt = mapper.readValue(String.valueOf(Long.MAX_VALUE), DateTime.class);
+        assertEquals(Long.MAX_VALUE, dt.getMillis());
+        assertEquals(DateTimeZone.UTC, dt.getZone());
+        dt = mapper.readValue(String.valueOf(Long.MIN_VALUE), DateTime.class);
+        assertEquals(Long.MIN_VALUE, dt.getMillis());
+
+        // but zone offset addition may overflow...
+        _verifyEdgeOfLongTimestampFails(mapperWithModule(TimeZone.getTimeZone("Asia/Taipei")),
+                Long.MAX_VALUE, "Adding time zone offset caused overflow");
+        // ... or Joda would silently drop zone
+        _verifyEdgeOfLongTimestampFails(mapperWithModule(TimeZone.getTimeZone("America/Los_Angeles")),
+                Long.MAX_VALUE, "Timestamp out of supported range for time zone 'America/Los_Angeles'");
+    }
+
+    private void _verifyEdgeOfLongTimestampFails(ObjectMapper mapper, long ts, String expMsg)
+        throws Exception
+    {
+        try {
+            DateTime result = mapper.readValue(String.valueOf(ts), DateTime.class);
+            fail("Should not pass, got: "+result);
+        } catch (InvalidFormatException e) {
+            verifyException(e, expMsg);
+            assertEquals(Long.valueOf(ts), e.getValue());
+        }
+    }
+
     /*
     /**********************************************************
     /* Coercion tests

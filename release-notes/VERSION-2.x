@@ -19,15 +19,21 @@ Project: jackson-datatype-joda
  (fixed by @arfa-21)
 #194: Fix timestamp time zone resolution (explicit zone equal to JVM default;
   `ADJUST_DATES_TO_CONTEXT_TIME_ZONE`); also adjust `DateTime` String with zone
-  id suffix to context time zone (not default format zone)
+  id suffix to context time zone (not default format zone).
+  NOTE: with `ADJUST_DATES_TO_CONTEXT_TIME_ZONE` disabled, timestamps for
+  `LocalDate`/`LocalDateTime`/`LocalTime` are now resolved as UTC (no longer
+  using `ObjectMapper.setTimeZone()` zone)
 #195: Invalid String values for `LocalDate`/`LocalDateTime`/`LocalTime`/`DateTime`
-  fail with raw Joda `IllegalArgumentException`
+  fail with raw Joda `IllegalArgumentException` (also: `DateMidnight`; and report
+  invalid Array values via `DeserializationProblemHandler`)
 #197: `DateTimeZoneDeserializer` leaks raw `NumberFormatException` for
   out-of-`int`-range timestamp String (and `InputCoercionException` for
   out-of-`int`-range number)
  (fixed by @arfa-21)
 #199: `LocalDate`/`LocalDateTime`/`LocalTime` deserializers leak raw Joda
-  exception for edge-of-`long` timestamps (zone offset overflow, out-of-range year)
+  exception for edge-of-`long` timestamps (zone offset overflow, out-of-range year);
+  also for `DateTime` (which silently dropped non-UTC zone) and `DateMidnight`
+  (which also ignored configured time zone)
  (fixed by @arfa-21)
 #200: `IntervalDeserializer` leaks raw `ArithmeticException` for overflowing
   period (instead of failing with `InvalidFormatException`); also report

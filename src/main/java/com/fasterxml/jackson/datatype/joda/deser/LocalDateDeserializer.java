@@ -92,7 +92,7 @@ public class LocalDateDeserializer
         try {
             return new LocalDate(year, month, day);
         } catch (IllegalFieldValueException e) {
-            throw _invalidArrayValue(ctxt, e);
+            return _handleInvalidArrayValue(ctxt, e);
         }
     }
 

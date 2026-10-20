@@ -56,7 +56,7 @@ public class DateTimeDeserializer
     {
         switch (p.currentTokenId()) {
         case JsonTokenId.ID_NUMBER_INT:
-            return _fromTimestamp(ctxt, p.getLongValue());
+            return _fromTimestamp(ctxt, p.getLongValue(), null);
         case JsonTokenId.ID_STRING:
             return _fromString(p, ctxt, p.getText());
         case JsonTokenId.ID_START_OBJECT:
@@ -92,9 +92,14 @@ public class DateTimeDeserializer
             try {
                 tz = DateTimeZone.forID(tzId);
             } catch (IllegalArgumentException e) {
-                // [datatype-joda#200]: report via handler (like other failures)
-                return (ReadableInstant) ctxt.handleWeirdStringValue(handledType(), fullValue,
-                        "Unknown DateTimeZone id '%s'", tzId);
+                // Not a zone id: may be literal brackets at end of custom pattern
+                try {
+                    return _format.createParser(ctxt).parseDateTime(fullValue);
+                } catch (IllegalArgumentException | ArithmeticException e2) {
+                    // [datatype-joda#200]: report via handler (like other failures)
+                    return (ReadableInstant) ctxt.handleWeirdStringValue(handledType(), fullValue,
+                            "Unknown DateTimeZone id '%s'", tzId);
+                }
             }
             value = value.substring(0, ix);
 
@@ -132,7 +137,7 @@ public class DateTimeDeserializer
         //     some textual formats
         if (ctxt.isEnabled(StreamReadCapability.UNTYPED_SCALARS)
                 && _isValidTimestampString(value)) {
-            return _fromTimestamp(ctxt, NumberInput.parseLong(value));
+            return _fromTimestamp(ctxt, NumberInput.parseLong(value), value);
         }
 
         // Not sure if it should use timezone or not...
@@ -160,7 +165,34 @@ public class DateTimeDeserializer
         return _parseWithJoda(ctxt, value, parser::parseDateTime);
     }
 
-    protected DateTime _fromTimestamp(DeserializationContext ctxt, long ts) {
-        return new DateTime(ts, _timestampZone(ctxt));
+    protected DateTime _fromTimestamp(DeserializationContext ctxt, long ts)
+        throws IOException
+    {
+        return (DateTime) _fromTimestamp(ctxt, ts, null);
+    }
+
+    // @since 2.23
+    protected ReadableInstant _fromTimestamp(DeserializationContext ctxt, long ts, String text)
+        throws IOException
+    {
+        // [datatype-joda#199]: zone offset addition for edge-of-long timestamp can
+        //   overflow; do not let raw Joda exception escape
+        return _fromTimestamp(ctxt, ts, text, (t, zone) -> {
+            DateTime dt = new DateTime(t, zone);
+            // Joda silently drops non-UTC zone for instants at the very edge of
+            // supported range: must not return value with wrong zone
+            if (!zone.equals(dt.getZone())) {
+                throw new IllegalArgumentException(String.format(
+                        "Timestamp out of supported range for time zone '%s'", zone.getID()));
+            }
+            return dt;
+        });
+    }
+
+    // Edge-of-long timestamps are valid in UTC (unlike local date/time ones),
+    // and verified by checking resulting zone instead
+    @Override
+    protected boolean _verifyTimestampYear() {
+        return false;
     }
 }

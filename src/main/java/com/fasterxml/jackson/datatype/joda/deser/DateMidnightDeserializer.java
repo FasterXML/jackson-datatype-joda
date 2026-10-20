@@ -3,7 +3,9 @@ package com.fasterxml.jackson.datatype.joda.deser;
 import java.io.IOException;
 
 import org.joda.time.DateTimeZone;
+import org.joda.time.IllegalFieldValueException;
 import org.joda.time.LocalDate;
+import org.joda.time.format.DateTimeFormatter;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
@@ -60,11 +62,15 @@ public class DateMidnightDeserializer
             }
             DateTimeZone tz = _format.isTimezoneExplicit() ? _format.getTimeZone() : DateTimeZone.forTimeZone(ctxt.getTimeZone());
 
-            return new org.joda.time.DateMidnight(year, month, day, tz);
+            try {
+                return new org.joda.time.DateMidnight(year, month, day, tz);
+            } catch (IllegalFieldValueException e) {
+                return _handleInvalidArrayValue(ctxt, e);
+            }
         }
         switch (p.currentTokenId()) {
         case JsonTokenId.ID_NUMBER_INT:
-            return new org.joda.time.DateMidnight(p.getLongValue());
+            return _fromTimestamp(ctxt, p.getLongValue(), null);
         case JsonTokenId.ID_STRING:
             return _fromString(p, ctxt, p.getText());
         default:
@@ -86,16 +92,29 @@ public class DateMidnightDeserializer
         //     some textual formats
         if (ctxt.isEnabled(StreamReadCapability.UNTYPED_SCALARS)
                 && _isValidTimestampString(value)) {
-            return _fromTimestamp(ctxt, NumberInput.parseLong(value));
+            return _fromTimestamp(ctxt, NumberInput.parseLong(value), value);
         }
-        LocalDate local = _format.createParser(ctxt).parseLocalDate(value);
-        if (local == null) {
-            return null;
-        }
-        return local.toDateMidnight();
+        // [datatype-joda#195]: do not let raw Joda exception escape
+        final DateTimeFormatter parser = _format.createParser(ctxt);
+        return _parseWithJoda(ctxt, value, v -> {
+            LocalDate local = parser.parseLocalDate(v);
+            return (local == null) ? null : local.toDateMidnight();
+        });
     }
-    
-    protected org.joda.time.DateMidnight _fromTimestamp(DeserializationContext ctxt, long ts) {
-        return new org.joda.time.DateMidnight(ts);
+
+    protected org.joda.time.DateMidnight _fromTimestamp(DeserializationContext ctxt, long ts)
+        throws IOException
+    {
+        return _fromTimestamp(ctxt, ts, null);
+    }
+
+    // @since 2.23
+    protected org.joda.time.DateMidnight _fromTimestamp(DeserializationContext ctxt, long ts,
+            String text)
+        throws IOException
+    {
+        // [datatype-joda#192], [datatype-joda#199]: use configured time zone (not JVM
+        //   default), and do not let raw Joda exception escape
+        return _fromTimestamp(ctxt, ts, text, org.joda.time.DateMidnight::new);
     }
 }

@@ -10,9 +10,11 @@ import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.deser.DeserializationProblemHandler;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.fasterxml.jackson.databind.exc.MismatchedInputException;
 import com.fasterxml.jackson.datatype.joda.JodaTestBase;
@@ -223,6 +225,23 @@ public class LocalDateDeserTest extends JodaTestBase
         } catch (MismatchedInputException e) {
             verifyException(e, "Cannot coerce `null` to `int` for element #2 of `org.joda.time.LocalDate` Array value");
         }
+    }
+
+    // Should allow `DeserializationProblemHandler` to provide replacement value
+    @Test
+    public void testLocalDateDeserInvalidArrayValueWithProblemHandler() throws IOException
+    {
+        final LocalDate fallback = new LocalDate(1970, 1, 1);
+        ObjectMapper mapper = mapperWithModuleBuilder()
+                .addHandler(new DeserializationProblemHandler() {
+                    @Override
+                    public Object handleWeirdNumberValue(DeserializationContext ctxt,
+                            Class<?> targetType, Number valueToConvert, String failureMsg) {
+                        return fallback;
+                    }
+                })
+                .build();
+        assertEquals(fallback, mapper.readValue("[2001,13,1]", LocalDate.class));
     }
 
     @Test
