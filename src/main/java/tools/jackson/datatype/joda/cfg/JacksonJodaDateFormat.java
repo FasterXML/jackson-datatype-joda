@@ -3,6 +3,7 @@ package tools.jackson.datatype.joda.cfg;
 import java.util.Locale;
 import java.util.TimeZone;
 
+import org.joda.time.DateTimeUtils;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
@@ -49,7 +50,7 @@ public class JacksonJodaDateFormat extends JacksonJodaFormatBase
     {
         super();
         _formatter = defaultFormatter;
-        _formatterWithOffsetParsed = _formatter.withOffsetParsed();
+        _formatterWithOffsetParsed = _withOffsetParsed(_formatter);
         DateTimeZone tz = defaultFormatter.getZone();
         _jdkTimezone = (tz == null) ? null : tz.toTimeZone();
         _explicitTimezone = false;
@@ -62,7 +63,7 @@ public class JacksonJodaDateFormat extends JacksonJodaFormatBase
     {
         super(base, useTimestamp);
         _formatter = base._formatter;
-        _formatterWithOffsetParsed = _formatter.withOffsetParsed();
+        _formatterWithOffsetParsed = _withOffsetParsed(_formatter);
         _jdkTimezone = base._jdkTimezone;
         _explicitTimezone = base._explicitTimezone;
         _adjustToContextTZOverride = base._adjustToContextTZOverride;
@@ -74,7 +75,7 @@ public class JacksonJodaDateFormat extends JacksonJodaFormatBase
     {
         super(base);
         _formatter = formatter;
-        _formatterWithOffsetParsed = _formatter.withOffsetParsed();
+        _formatterWithOffsetParsed = _withOffsetParsed(_formatter);
         _jdkTimezone = base._jdkTimezone;
         _explicitTimezone = base._explicitTimezone;
         _adjustToContextTZOverride = base._adjustToContextTZOverride;
@@ -85,7 +86,7 @@ public class JacksonJodaDateFormat extends JacksonJodaFormatBase
     {
         super(base, jdkTimezone);
         _formatter = base._formatter.withZone(DateTimeZone.forTimeZone(jdkTimezone));
-        _formatterWithOffsetParsed = _formatter.withOffsetParsed();
+        _formatterWithOffsetParsed = _withOffsetParsed(_formatter);
         _jdkTimezone = jdkTimezone;
         _explicitTimezone = true;
         _adjustToContextTZOverride = base._adjustToContextTZOverride;
@@ -96,7 +97,7 @@ public class JacksonJodaDateFormat extends JacksonJodaFormatBase
     {
         super(base, locale);
         _formatter = base._formatter.withLocale(locale);
-        _formatterWithOffsetParsed = _formatter.withOffsetParsed();
+        _formatterWithOffsetParsed = _withOffsetParsed(_formatter);
         _jdkTimezone = base._jdkTimezone;
         _explicitTimezone = base._explicitTimezone;
         _adjustToContextTZOverride = base._adjustToContextTZOverride;
@@ -111,7 +112,7 @@ public class JacksonJodaDateFormat extends JacksonJodaFormatBase
     {
         super(base);
         _formatter = base._formatter;
-        _formatterWithOffsetParsed = _formatter.withOffsetParsed();
+        _formatterWithOffsetParsed = _withOffsetParsed(_formatter);
         _jdkTimezone = base._jdkTimezone;
         _explicitTimezone = base._explicitTimezone;
         _adjustToContextTZOverride = adjustToContextTZOverride;
@@ -303,6 +304,12 @@ public class JacksonJodaDateFormat extends JacksonJodaFormatBase
                 }
             } else {
                 formatter = _formatterWithOffsetParsed;
+                // 20-Oct-2026: values without offset must still be resolved
+                //   using context time zone (not JVM default one)
+                TimeZone tz = ctxt.getTimeZone();
+                if (tz != null && !tz.equals(_jdkTimezone)) {
+                    formatter = _withZoneViaChronology(formatter, DateTimeZone.forTimeZone(tz));
+                }
             }
         }
         if (!_explicitLocale) {
@@ -344,6 +351,30 @@ public class JacksonJodaDateFormat extends JacksonJodaFormatBase
     /**********************************************************
      */
     
+    /**
+     * Helper method for creating a parser that retains the offset parsed from
+     * the value but still resolves values without offset using the time zone
+     * of the given formatter (and not the JVM default one):
+     * {@link DateTimeFormatter#withOffsetParsed} clears the zone override so
+     * it has to be passed via the chronology instead.
+     *
+     * @since 3.3
+     */
+    private static DateTimeFormatter _withOffsetParsed(DateTimeFormatter formatter) {
+        final DateTimeZone tz = formatter.getZone();
+        formatter = formatter.withOffsetParsed();
+        if (tz != null) {
+            formatter = _withZoneViaChronology(formatter, tz);
+        }
+        return formatter;
+    }
+
+    private static DateTimeFormatter _withZoneViaChronology(DateTimeFormatter formatter,
+            DateTimeZone tz) {
+        return formatter.withChronology(DateTimeUtils.getChronology(formatter.getChronology())
+                .withZone(tz));
+    }
+
     protected static boolean _isStyle(String formatStr) {
         if (formatStr.length() != 2) {
             return false;

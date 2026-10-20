@@ -4,6 +4,9 @@ import java.util.TimeZone;
 
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
+import org.joda.time.chrono.ISOChronology;
+import org.joda.time.format.DateTimeFormatter;
+import org.joda.time.format.ISODateTimeFormat;
 
 import tools.jackson.core.JacksonException;
 
@@ -12,16 +15,23 @@ import tools.jackson.databind.cfg.DateTimeFeature;
 
 public class DateTimeKeyDeserializer extends JodaKeyDeserializer
 {
+    // Same parser as used by `DateTime.parse(String)`
+    private static final DateTimeFormatter PARSER = ISODateTimeFormat.dateTimeParser()
+            .withOffsetParsed();
+
     @Override
     protected DateTime deserialize(String key, DeserializationContext ctxt)
             throws JacksonException
     {
+        TimeZone tz = ctxt.getTimeZone();
+        final DateTimeZone dtz = (tz == null) ? DateTimeZone.UTC : DateTimeZone.forTimeZone(tz);
         if (ctxt.isEnabled(DateTimeFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE)) {
-            TimeZone tz = ctxt.getTimeZone();
-            final DateTimeZone dtz = (tz == null) ? DateTimeZone.UTC : DateTimeZone.forTimeZone(tz);
             return _parseKey(ctxt, DateTime.class, key, k -> new DateTime(k, dtz));
         }
-        return _parseKey(ctxt, DateTime.class, key, DateTime::parse);
+        // 20-Oct-2026: key without offset must be resolved using context
+        //   time zone (not JVM default one); offset is retained if included
+        final DateTimeFormatter parser = PARSER.withChronology(ISOChronology.getInstance(dtz));
+        return _parseKey(ctxt, DateTime.class, key, parser::parseDateTime);
     }
 
 }

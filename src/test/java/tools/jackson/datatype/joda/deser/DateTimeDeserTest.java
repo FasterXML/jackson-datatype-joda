@@ -481,4 +481,26 @@ public class DateTimeDeserTest extends JodaTestBase
         assertEquals(1238558582001L, w.time.getMillis());
         assertEquals(DateTimeZone.UTC, w.time.getZone());
     }
+
+    // Value without offset must be resolved using context time zone (and not
+    // JVM default one) even if not adjusting values that include offset
+    @Test
+    public void testDateTimeDeserWithoutOffsetWithoutAdjust() throws IOException
+    {
+        for (String zoneId : new String[] { "Asia/Kolkata", "America/Los_Angeles" }) {
+            final DateTimeZone tz = DateTimeZone.forID(zoneId);
+            ObjectMapper mapper = jodaMapperBuilder(tz.toTimeZone())
+                    .disable(DateTimeFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE)
+                    .build();
+            assertEquals(new DateTime(2020, 1, 1, 0, 0, 0, tz),
+                    mapper.readValue(quote("2020-01-01T00:00:00"), DateTime.class));
+            // but offset, if included, is retained
+            assertEquals(new DateTime(2020, 1, 1, 0, 0, 0, DateTimeZone.forOffsetHours(3)),
+                    mapper.readValue(quote("2020-01-01T00:00:00+03:00"), DateTime.class));
+            // and same with custom pattern
+            Issue93Bean bean = mapper.readValue("{\"jodaDateTime\":\"2020-01-01 00:00:00\"}",
+                    Issue93Bean.class);
+            assertEquals(new DateTime(2020, 1, 1, 0, 0, 0, tz), bean.getJodaDateTime());
+        }
+    }
 }
