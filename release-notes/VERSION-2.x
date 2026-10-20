@@ -18,7 +18,8 @@ Project: jackson-datatype-joda
 #193: `LocalDateTimeDeserializer` returns `null` for partial array (instead of failing)
  (fixed by @arfa-21)
 #194: Fix timestamp time zone resolution (explicit zone equal to JVM default;
-  `ADJUST_DATES_TO_CONTEXT_TIME_ZONE`)
+  `ADJUST_DATES_TO_CONTEXT_TIME_ZONE`); also adjust `DateTime` String with zone
+  id suffix to context time zone (not default format zone)
 #195: Invalid String values for `LocalDate`/`LocalDateTime`/`LocalTime`/`DateTime`
   fail with raw Joda `IllegalArgumentException`
 #197: `DateTimeZoneDeserializer` leaks raw `NumberFormatException` for

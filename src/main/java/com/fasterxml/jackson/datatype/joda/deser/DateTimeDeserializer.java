@@ -122,7 +122,9 @@ public class DateTimeDeserializer
             }
             // 23-Jul-2017, tatu: As per [datatype-joda#93] only override tz if allowed to
             if (_format.shouldAdjustToContextTimeZone(ctxt)) {
-                result = result.withZone(_format.getTimeZone());
+                // [datatype-joda#194]: use context time zone unless explicitly configured
+                result = result.withZone(_format.isTimezoneExplicit()
+                        ? _format.getTimeZone() : _contextTimeZone(ctxt));
             }
             return result;
         }

@@ -174,6 +174,22 @@ public class DateTimeDeserTest extends JodaTestBase
         assertEquals(new DateTime(2016, 12, 31, 17, 1, 1, DateTimeZone.UTC), result);
     }
 
+    // [datatype-joda#194]: zone id suffix value must be adjusted to context
+    // time zone (not default zone of format), same as offset value
+    @Test
+    public void test_enable_ADJUST_DATES_TO_CONTEXT_TIME_ZONE_nonUTC() throws Exception
+    {
+        final DateTimeZone taipei = DateTimeZone.forID("Asia/Taipei");
+        ObjectMapper mapper = jodaMapper();
+        mapper.enable(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE);
+        mapper.setTimeZone(taipei.toTimeZone());
+        final DateTime exp = new DateTime(2020, 1, 1, 7, 0, 0, taipei);
+        assertEquals(exp, mapper.readValue(quote("2020-01-01T00:00:00.000+01:00"),
+                DateTime.class));
+        assertEquals(exp, mapper.readValue(quote("2020-01-01T00:00:00.000+01:00[Europe/Paris]"),
+                DateTime.class));
+    }
+
     @Test
     public void test_disable_ADJUST_DATES_TO_CONTEXT_TIME_ZONE() throws Exception
     {
