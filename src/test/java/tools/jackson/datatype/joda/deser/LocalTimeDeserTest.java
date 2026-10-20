@@ -168,38 +168,28 @@ public class LocalTimeDeserTest extends JodaTestBase
         }
     }
 
-    // Edge-of-long timestamp for which offset addition does not overflow, but
-    // local instant falls outside of supported year range (Joda would silently
-    // accept, possibly wrapping around): must be reported
+    // Edge-of-long timestamp for which offset addition does not overflow: valid
+    // for LocalTime (no year component; Joda computes time of day correctly)
     @Test
-    public void testLocalTimeDeserFailsForOutOfRangeTimestamp() throws IOException
+    public void testLocalTimeDeserFromEdgeOfLongTimestamp() throws IOException
     {
-        _verifyOutOfRangeTimestamp(mapperWithModule(), Long.MAX_VALUE);
-        _verifyOutOfRangeTimestamp(mapperWithModule(), Long.MIN_VALUE);
-        _verifyOutOfRangeTimestamp(mapperWithModule(TimeZone.getTimeZone("Asia/Taipei")),
-                Long.MIN_VALUE);
-        _verifyOutOfRangeTimestamp(mapperWithModule(TimeZone.getTimeZone("America/Los_Angeles")),
-                Long.MAX_VALUE);
+        _verifyEdgeOfLongTimestamp(mapperWithModule(), Long.MAX_VALUE,
+                new LocalTime(7, 12, 55, 807));
+        _verifyEdgeOfLongTimestamp(mapperWithModule(), Long.MIN_VALUE,
+                new LocalTime(16, 47, 4, 192));
+        _verifyEdgeOfLongTimestamp(mapperWithModule(TimeZone.getTimeZone("Asia/Taipei")),
+                Long.MIN_VALUE, new LocalTime(0, 53, 4, 192));
+        _verifyEdgeOfLongTimestamp(mapperWithModule(TimeZone.getTimeZone("America/Los_Angeles")),
+                Long.MAX_VALUE, new LocalTime(0, 12, 55, 807));
     }
 
-    private void _verifyOutOfRangeTimestamp(ObjectMapper mapper, long ts) throws IOException
+    private void _verifyEdgeOfLongTimestamp(ObjectMapper mapper, long ts, LocalTime exp)
+        throws IOException
     {
-        try {
-            LocalTime result = mapper.readValue(String.valueOf(ts), LocalTime.class);
-            fail("Should not pass, got: "+result.getClass().getName());
-        } catch (InvalidFormatException e) {
-            verifyException(e, "for year must be in the range");
-            assertEquals(Long.valueOf(ts), e.getValue());
-        }
-        // and same for "timestamp as String" from textual formats (like XML, CSV):
-        // reported with original String value
-        final String text = String.valueOf(ts);
-        try (JsonParser p = new UntypedScalarsParser(mapper.createParser(quote(text)))) {
-            LocalTime result = mapper.readValue(p, LocalTime.class);
-            fail("Should not pass, got: "+result.getClass().getName());
-        } catch (InvalidFormatException e) {
-            verifyException(e, "for year must be in the range");
-            assertEquals(text, e.getValue());
+        assertEquals(exp, mapper.readValue(String.valueOf(ts), LocalTime.class));
+        // and same for "timestamp as String" from textual formats (like XML, CSV)
+        try (JsonParser p = new UntypedScalarsParser(mapper.createParser(quote(String.valueOf(ts))))) {
+            assertEquals(exp, mapper.readValue(p, LocalTime.class));
         }
     }
 

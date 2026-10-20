@@ -57,6 +57,11 @@ public class DateTimeDeserTest extends JodaTestBase
         public DateTime value;
     }
 
+    static class BracketOffsetPatternBean {
+        @JsonFormat(pattern = "yyyy-MM-dd'['ZZ']'", timezone = "UTC")
+        public DateTime value;
+    }
+
     static class BracketInMiddlePatternBean {
         @JsonFormat(pattern = "yyyy'['MM']'dd", timezone = "UTC")
         public DateTime value;
@@ -171,6 +176,22 @@ public class DateTimeDeserTest extends JodaTestBase
         DateTime result = mapper.readValue("{\"jodaDateTime\":\"2017-01-01 01:01:01[Asia/Shanghai]\"}",
                 Issue93Bean.class).getJodaDateTime();
         assertEquals(new DateTime(2016, 12, 31, 17, 1, 1, DateTimeZone.UTC), result);
+    }
+
+    // [datatype-joda#194]: zone id suffix value must be adjusted to context
+    // time zone (not default zone of format), same as offset value
+    @Test
+    public void test_enable_ADJUST_DATES_TO_CONTEXT_TIME_ZONE_nonUTC() throws Exception
+    {
+        final DateTimeZone taipei = DateTimeZone.forID("Asia/Taipei");
+        ObjectMapper mapper = jodaMapperBuilder(taipei.toTimeZone())
+            .enable(DateTimeFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE)
+            .build();
+        final DateTime exp = new DateTime(2020, 1, 1, 7, 0, 0, taipei);
+        assertEquals(exp, mapper.readValue(quote("2020-01-01T00:00:00.000+01:00"),
+                DateTime.class));
+        assertEquals(exp, mapper.readValue(quote("2020-01-01T00:00:00.000+01:00[Europe/Paris]"),
+                DateTime.class));
     }
 
     @Test
@@ -333,6 +354,80 @@ public class DateTimeDeserTest extends JodaTestBase
         assertEquals(a2q("{'value':'2017[01]01'}"), json);
         BracketInMiddlePatternBean result = mapper.readValue(json, BracketInMiddlePatternBean.class);
         assertEquals(input.value, result.value);
+    }
+
+    // Value ending with literal bracket of custom pattern is not a zone id suffix
+    @Test
+    public void testBracketPatternValueWithZoneIdLikeContent() throws Exception
+    {
+        // "+01:00" is valid zone id, but here part of custom pattern
+        BracketOffsetPatternBean result = mapperWithModule().readValue(
+                a2q("{'value':'2017-01-01[+01:00]'}"), BracketOffsetPatternBean.class);
+        assertEquals(new DateTime(2016, 12, 31, 23, 0, DateTimeZone.UTC).getMillis(),
+                result.value.getMillis());
+        // but invalid value still reported as failure of value before suffix
+        try {
+            mapperWithModule().readValue(a2q("{'value':'2017-13-01[+01:00]'}"),
+                    BracketOffsetPatternBean.class);
+            fail("Should not pass");
+        } catch (InvalidFormatException e) {
+            verifyException(e, "Invalid date/time before DateTimeZone id suffix");
+        }
+    }
+
+    @Test
+    public void testBracketPatternValueWithoutZoneIdSuffix() throws Exception
+    {
+        BracketPatternBean result = mapperWithModule().readValue(
+                a2q("{'value':'2017-01-01[10]'}"), BracketPatternBean.class);
+        assertEquals(new DateTime(2017, 1, 1, 10, 0, DateTimeZone.UTC), result.value);
+        // but still fails for invalid value
+        try {
+            mapperWithModule().readValue(a2q("{'value':'2017-01-01[xx]'}"), BracketPatternBean.class);
+            fail("Should not pass");
+        } catch (InvalidFormatException e) {
+            verifyException(e, "Unknown DateTimeZone id 'xx'");
+        }
+        // including actual cause, if date/time itself is invalid
+        try {
+            mapperWithModule().readValue(a2q("{'value':'2017-13-01[10]'}"), BracketPatternBean.class);
+            fail("Should not pass");
+        } catch (InvalidFormatException e) {
+            verifyException(e, "Unknown DateTimeZone id '10'");
+            verifyException(e, "Value 13 for monthOfYear must be in the range [1,12]");
+        }
+    }
+
+    // [datatype-joda#199]: edge-of-long timestamps
+    @Test
+    public void testDeserFromEdgeOfLongTimestamp() throws Exception
+    {
+        // valid in UTC (commonly used as "max value" marker)
+        ObjectMapper mapper = mapperWithModule(TimeZone.getTimeZone("UTC"));
+        DateTime dt = mapper.readValue(String.valueOf(Long.MAX_VALUE), DateTime.class);
+        assertEquals(Long.MAX_VALUE, dt.getMillis());
+        assertEquals(DateTimeZone.UTC, dt.getZone());
+        dt = mapper.readValue(String.valueOf(Long.MIN_VALUE), DateTime.class);
+        assertEquals(Long.MIN_VALUE, dt.getMillis());
+
+        // but zone offset addition may overflow...
+        _verifyEdgeOfLongTimestampFails(mapperWithModule(TimeZone.getTimeZone("Asia/Taipei")),
+                Long.MAX_VALUE, "Adding time zone offset caused overflow");
+        // ... or Joda would silently drop zone
+        _verifyEdgeOfLongTimestampFails(mapperWithModule(TimeZone.getTimeZone("America/Los_Angeles")),
+                Long.MAX_VALUE, "Timestamp out of supported range for time zone 'America/Los_Angeles'");
+    }
+
+    private void _verifyEdgeOfLongTimestampFails(ObjectMapper mapper, long ts, String expMsg)
+        throws Exception
+    {
+        try {
+            DateTime result = mapper.readValue(String.valueOf(ts), DateTime.class);
+            fail("Should not pass, got: "+result);
+        } catch (InvalidFormatException e) {
+            verifyException(e, expMsg);
+            assertEquals(Long.valueOf(ts), e.getValue());
+        }
     }
 
     /*

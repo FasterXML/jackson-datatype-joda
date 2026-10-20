@@ -86,16 +86,16 @@ public class IntervalDeserializer extends JodaDateDeserializerBase<Interval>
             }
         } catch (NumberFormatException e) {
             // [datatype-joda#200]: report full value (like other failures)
-            return (Interval) ctxt.handleWeirdStringValue(handledType(), value,
+            return (Interval) _handleWeirdStringValue(ctxt, e, value,
                     "Failed to parse number from '%s'", str);
         } catch (IllegalArgumentException e) {
             // [datatype-joda#195]: do not let raw Joda exception escape
             // (invalid start/end, or end before start)
-            return (Interval) ctxt.handleWeirdStringValue(handledType(), value,
+            return (Interval) _handleWeirdStringValue(ctxt, e, value,
                     "%s", e.getMessage());
         } catch (ArithmeticException e) {
             // [datatype-joda#200]: overflow applying period/duration or offset
-            return (Interval) ctxt.handleWeirdStringValue(handledType(), value,
+            return (Interval) _handleWeirdStringValue(ctxt, e, value,
                     "value out of range (overflow): %s", e.getMessage());
         }
 

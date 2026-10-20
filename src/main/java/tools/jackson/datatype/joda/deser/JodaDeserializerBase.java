@@ -6,6 +6,7 @@ import java.util.function.Function;
 import tools.jackson.core.*;
 import tools.jackson.core.io.NumberInput;
 
+import tools.jackson.databind.DatabindException;
 import tools.jackson.databind.DeserializationContext;
 import tools.jackson.databind.JavaType;
 import tools.jackson.databind.cfg.CoercionAction;
@@ -118,7 +119,7 @@ abstract class JodaDeserializerBase<T> extends StdScalarDeserializer<T>
         try {
             return parser.apply(value);
         } catch (IllegalArgumentException | ArithmeticException e) {
-            return (T) ctxt.handleWeirdStringValue(handledType(), value,
+            return (T) _handleWeirdStringValue(ctxt, e, value,
                     "%s", e.getMessage());
         }
     }
@@ -139,5 +140,53 @@ abstract class JodaDeserializerBase<T> extends StdScalarDeserializer<T>
         // 18-Jan-2021, tatu: Start by simply reusing functionality of more
         //   general handling, for now
         return _wrapIOFailure(ctxt, e);
+    }
+
+    /**
+     * Helper method for reporting invalid String value via
+     * {@link DeserializationContext#handleWeirdStringValue}, retaining given
+     * (Joda) exception as the cause of exception thrown if value is not handled.
+     *
+     * @since 3.3
+     */
+    protected Object _handleWeirdStringValue(DeserializationContext ctxt, Throwable cause,
+            String value, String msg, Object... msgArgs)
+        throws JacksonException
+    {
+        try {
+            return ctxt.handleWeirdStringValue(handledType(), value, msg, msgArgs);
+        } catch (DatabindException e) {
+            throw _withCause(e, cause);
+        }
+    }
+
+    /**
+     * Helper method for reporting invalid Number value via
+     * {@link DeserializationContext#handleWeirdNumberValue}, retaining given
+     * (Joda) exception as the cause of exception thrown if value is not handled.
+     *
+     * @since 3.3
+     */
+    protected Object _handleWeirdNumberValue(DeserializationContext ctxt, Throwable cause,
+            Number value, String msg, Object... msgArgs)
+        throws JacksonException
+    {
+        try {
+            return ctxt.handleWeirdNumberValue(handledType(), value, msg, msgArgs);
+        } catch (DatabindException e) {
+            throw _withCause(e, cause);
+        }
+    }
+
+    private static DatabindException _withCause(DatabindException e, Throwable cause) {
+        // Only add if no cause yet (problem handler may have thrown its own exception)
+        if (e.getCause() == null) {
+            try {
+                e.initCause(cause);
+            } catch (IllegalStateException ise) {
+                // cause explicitly set to `null` on construction: cannot add, leave as-is
+            }
+        }
+        return e;
     }
 }

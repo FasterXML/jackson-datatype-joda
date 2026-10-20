@@ -97,7 +97,7 @@ public class LocalTimeDeserializer
         try {
             return new LocalTime(hour, minute, second, millis);
         } catch (IllegalFieldValueException e) {
-            throw _invalidArrayValue(ctxt, e);
+            return _handleInvalidArrayValue(ctxt, e);
         }
     }
 
@@ -110,5 +110,11 @@ public class LocalTimeDeserializer
         // [datatype-joda#199]: zone offset addition for edge-of-long timestamp can
         //   overflow (or result fall outside year range); do not let raw Joda exception escape
         return _fromTimestamp(ctxt, ts, text, LocalTime::new);
+    }
+
+    // No year in LocalTime: edge-of-long timestamps are valid (if offset does not overflow)
+    @Override
+    protected boolean _verifyTimestampYear() {
+        return false;
     }
 }

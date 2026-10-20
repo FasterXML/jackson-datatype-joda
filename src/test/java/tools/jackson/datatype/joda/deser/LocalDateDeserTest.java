@@ -3,6 +3,7 @@ package tools.jackson.datatype.joda.deser;
 import java.io.IOException;
 import java.util.TimeZone;
 
+import org.joda.time.IllegalFieldValueException;
 import org.joda.time.LocalDate;
 import org.joda.time.chrono.ISOChronology;
 
@@ -10,8 +11,10 @@ import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import tools.jackson.core.JsonParser;
+import tools.jackson.databind.DeserializationContext;
 import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.cfg.DateTimeFeature;
+import tools.jackson.databind.deser.DeserializationProblemHandler;
 import tools.jackson.databind.exc.InvalidFormatException;
 import tools.jackson.databind.exc.MismatchedInputException;
 import tools.jackson.datatype.joda.JodaTestBase;
@@ -201,6 +204,7 @@ public class LocalDateDeserTest extends JodaTestBase
             fail("Should not pass, got: "+result);
         } catch (InvalidFormatException e) {
             verifyException(e, "Value 30 for dayOfMonth must be in the range [1,28]");
+            assertInstanceOf(IllegalFieldValueException.class, e.getCause());
         }
         try {
             LocalDate result = mapper.readValue("[2001,null,30]", LocalDate.class);
@@ -208,6 +212,23 @@ public class LocalDateDeserTest extends JodaTestBase
         } catch (MismatchedInputException e) {
             verifyException(e, "Cannot coerce `null` to `int` for element #2 of `org.joda.time.LocalDate` Array value");
         }
+    }
+
+    // Should allow `DeserializationProblemHandler` to provide replacement value
+    @Test
+    public void testLocalDateDeserInvalidArrayValueWithProblemHandler() throws IOException
+    {
+        final LocalDate fallback = new LocalDate(1970, 1, 1);
+        ObjectMapper mapper = mapperWithModuleBuilder()
+                .addHandler(new DeserializationProblemHandler() {
+                    @Override
+                    public Object handleWeirdNumberValue(DeserializationContext ctxt,
+                            Class<?> targetType, Number valueToConvert, String failureMsg) {
+                        return fallback;
+                    }
+                })
+                .build();
+        assertEquals(fallback, mapper.readValue("[2001,13,1]", LocalDate.class));
     }
 
     @Test

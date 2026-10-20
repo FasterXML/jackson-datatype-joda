@@ -120,20 +120,33 @@ public abstract class JodaDateDeserializerBase<T>
             // but only for edge-of-long values (others are well within range)
             if (ts <= -SAFE_TIMESTAMP_RANGE || ts >= SAFE_TIMESTAMP_RANGE) {
                 // NOTE: zone offset addition may also overflow (ArithmeticException)
-                final DateTimeField yearField = ISOChronology.getInstanceUTC().year();
-                final int year = yearField.get(zone.convertUTCToLocal(ts));
-                FieldUtils.verifyValueBounds(DateTimeFieldType.year(), year,
-                        yearField.getMinimumValue(), yearField.getMaximumValue());
+                final long local = zone.convertUTCToLocal(ts);
+                if (_verifyTimestampYear()) {
+                    final DateTimeField yearField = ISOChronology.getInstanceUTC().year();
+                    FieldUtils.verifyValueBounds(DateTimeFieldType.year(), yearField.get(local),
+                            yearField.getMinimumValue(), yearField.getMaximumValue());
+                }
             }
             return converter.convert(ts, zone);
         } catch (IllegalArgumentException | ArithmeticException e) {
             if (text != null) {
-                return (T) ctxt.handleWeirdStringValue(handledType(), text,
+                return (T) _handleWeirdStringValue(ctxt, e, text,
                         "%s", e.getMessage());
             }
-            return (T) ctxt.handleWeirdNumberValue(handledType(), ts,
+            return (T) _handleWeirdNumberValue(ctxt, e, ts,
                     "%s", e.getMessage());
         }
+    }
+
+    /**
+     * Whether local instant of edge-of-{@code long} timestamps needs to be
+     * verified to be within supported year range: needed for types that have
+     * year component (Joda may silently produce invalid value otherwise).
+     *
+     * @since 3.3
+     */
+    protected boolean _verifyTimestampYear() {
+        return true;
     }
 
     /**
@@ -182,17 +195,18 @@ public abstract class JodaDateDeserializerBase<T>
 
     /**
      * Helper method for reporting a JSON Array value with out-of-range
-     * component(s) (like month 13) as {@link DatabindException}.
+     * component(s) (like month 13) via {@link tools.jackson.databind.deser.DeserializationProblemHandler}s,
+     * failing with {@link DatabindException} if none handles it.
      *
      * @since 3.3
      */
-    protected DatabindException _invalidArrayValue(DeserializationContext ctxt,
+    @SuppressWarnings("unchecked")
+    protected T _handleInvalidArrayValue(DeserializationContext ctxt,
             IllegalFieldValueException e)
+        throws JacksonException
     {
-        DatabindException dbe = ctxt.weirdNumberException(e.getIllegalNumberValue(),
-                handledType(), e.getMessage());
-        dbe.initCause(e);
-        return dbe;
+        return (T) _handleWeirdNumberValue(ctxt, e, e.getIllegalNumberValue(),
+                "%s", e.getMessage());
     }
 
     /**

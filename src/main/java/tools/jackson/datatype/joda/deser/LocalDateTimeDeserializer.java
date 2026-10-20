@@ -95,7 +95,7 @@ public class LocalDateTimeDeserializer
         try {
             return new LocalDateTime(year, month, day, hour, minute, second, millisecond);
         } catch (IllegalFieldValueException e) {
-            throw _invalidArrayValue(ctxt, e);
+            return _handleInvalidArrayValue(ctxt, e);
         }
     }
 
