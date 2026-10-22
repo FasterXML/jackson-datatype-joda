@@ -36,3 +36,7 @@ Jooyoung Pyoung (@anthologia)
  * Fixed #200: `IntervalDeserializer` leaks raw `ArithmeticException` for overflowing
    period (instead of failing with `InvalidFormatException`)
   [3.3.0]
+ * Fixed #202: Date/time values without offset resolved using JVM default time zone
+   (instead of context time zone) by `IntervalDeserializer`, `DateTime`/`Instant`
+   deserializers and `DateTimeKeyDeserializer`
+  [3.3.0]
