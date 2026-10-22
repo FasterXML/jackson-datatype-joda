@@ -5,12 +5,15 @@ import java.util.TimeZone;
 
 import org.junit.jupiter.api.Test;
 
+import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.Interval;
 import org.joda.time.chrono.ISOChronology;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
+import tools.jackson.databind.DatabindException;
 import tools.jackson.databind.DeserializationContext;
 import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.cfg.DateTimeFeature;
@@ -24,6 +27,11 @@ public class IntervalDeserTest extends JodaTestBase
 {
     @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.WRAPPER_ARRAY, property = "@class")
     private static interface ObjectConfiguration {
+    }
+
+    static class FormattedInterval {
+        @JsonFormat(timezone = "Asia/Tokyo")
+        public Interval interval;
     }
 
     /*
@@ -115,6 +123,105 @@ public class IntervalDeserTest extends JodaTestBase
                 mapper.readValue(quote("1970-01-01T06:00:01.000+06:00/1970-01-01T06:00:02.000+06:00"), Interval.class);
 
         assertEquals(expectedInterval, actualInterval);
+    }
+
+    // Values without offset must be resolved using context time zone (and
+    // not JVM default one), same as for `DateTime`
+    @Test
+    public void testIntervalDeserWithoutOffsetUsesContextTimeZone() throws IOException
+    {
+        for (String zoneId : new String[] { "Asia/Kolkata", "America/Los_Angeles" }) {
+            final DateTimeZone tz = DateTimeZone.forID(zoneId);
+            final Interval exp = new Interval(new DateTime(2020, 1, 1, 0, 0, 0, tz),
+                    new DateTime(2020, 1, 2, 0, 0, 0, tz));
+            for (boolean adjust : new boolean[] { true, false }) {
+                final ObjectMapper mapper = jodaMapperBuilder(tz.toTimeZone())
+                        .configure(DateTimeFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE, adjust)
+                        .build();
+                for (String value : new String[] {
+                        "2020-01-01T00:00:00/2020-01-02T00:00:00",
+                        "2020-01-01/2020-01-02",
+                        "2020-01-01T00:00:00/P1D",
+                        "P1D/2020-01-02T00:00:00",
+                }) {
+                    assertEquals(exp, mapper.readValue(quote(value), Interval.class),
+                            "value '"+value+"', adjust: "+adjust);
+                }
+            }
+        }
+    }
+
+    @Test
+    public void testIntervalDeserWithoutOffsetUsesFormatTimeZone() throws IOException
+    {
+        final DateTimeZone tokyo = DateTimeZone.forID("Asia/Tokyo");
+        final Interval exp = new Interval(new DateTime(2020, 1, 1, 0, 0, 0, tokyo),
+                new DateTime(2020, 1, 2, 0, 0, 0, tokyo));
+        final ObjectMapper mapper = mapperWithModule(TimeZone.getTimeZone("America/Los_Angeles"));
+        FormattedInterval result = mapper.readValue(
+                "{\"interval\":\"2020-01-01T00:00:00/2020-01-02T00:00:00\"}",
+                FormattedInterval.class);
+        assertEquals(exp, result.interval);
+    }
+
+    // "start-end" (epoch millis) form has no zone information: without
+    // adjustment, result uses context time zone (same as ISO form)
+    @Test
+    public void testIntervalDeserFromMillisWithoutAdjust() throws IOException
+    {
+        final ObjectMapper mapper = jodaMapperBuilder(TimeZone.getTimeZone("America/Los_Angeles"))
+                .disable(DateTimeFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE)
+                .build();
+        Interval interval = mapper.readValue(quote("1396439982-1396440001"), Interval.class);
+        assertEquals(1396439982, interval.getStartMillis());
+        assertEquals(1396440001, interval.getEndMillis());
+        assertEquals(ISOChronology.getInstance(DateTimeZone.forID("America/Los_Angeles")),
+                interval.getChronology());
+        // and same zone as for ISO form
+        assertEquals(interval.getChronology(),
+                mapper.readValue(quote("2020-01-01/2020-01-02"), Interval.class).getChronology());
+    }
+
+    // Our ISO parsing re-implements `Interval.parseWithOffset()` (which can not use
+    // other than JVM default zone): verify same results (or failures) with that zone
+    @Test
+    public void testIntervalDeserSameAsJodaParseWithOffset() throws IOException
+    {
+        final ObjectMapper mapper = jodaMapperBuilder(DateTimeZone.getDefault().toTimeZone())
+                .disable(DateTimeFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE)
+                .build();
+        for (String value : new String[] {
+                "2020-01-01T00:00:00/2020-01-02T00:00:00",
+                "2020-01-01/2020-01-02",
+                "2020-01-01T00:00:00+03:00/2020-01-02T00:00:00-05:00",
+                "2020-01-01T00:00:00Z/P1D",
+                "2020-01-01T00:00:00/PT36H",
+                "P1D/2020-01-02T00:00:00",
+                "P1M2DT3H/2020-01-02T00:00:00+03:00",
+                "2020-01-01T00:00:00/p1d",
+                "p1d/2020-01-02T00:00:00",
+                // failures
+                "2020-01-01/",
+                "/2020-01-02",
+                "P1D/P1D",
+                "2020-01-02/2020-01-01",
+                "2020-01-01/not-a-date",
+                "P1D/",
+        }) {
+            Interval exp = null;
+            try {
+                exp = Interval.parseWithOffset(value);
+            } catch (IllegalArgumentException e) { }
+            if (exp == null) {
+                try {
+                    mapper.readValue(quote(value), Interval.class);
+                    fail("Should not pass for '"+value+"' (Joda fails)");
+                } catch (DatabindException e) { }
+            } else {
+                assertEquals(exp, mapper.readValue(quote(value), Interval.class),
+                        "value '"+value+"'");
+            }
+        }
     }
 
     @Test

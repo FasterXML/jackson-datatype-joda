@@ -481,4 +481,71 @@ public class DateTimeDeserTest extends JodaTestBase
         assertEquals(1238558582001L, w.time.getMillis());
         assertEquals(DateTimeZone.UTC, w.time.getZone());
     }
+
+    // Value without offset must be resolved using context time zone (and not
+    // JVM default one) even if not adjusting values that include offset
+    @Test
+    public void testDateTimeDeserWithoutOffsetWithoutAdjust() throws IOException
+    {
+        for (String zoneId : new String[] { "Asia/Kolkata", "America/Los_Angeles" }) {
+            final DateTimeZone tz = DateTimeZone.forID(zoneId);
+            ObjectMapper mapper = jodaMapperBuilder(tz.toTimeZone())
+                    .disable(DateTimeFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE)
+                    .build();
+            assertEquals(new DateTime(2020, 1, 1, 0, 0, 0, tz),
+                    mapper.readValue(quote("2020-01-01T00:00:00"), DateTime.class));
+            // but offset, if included, is retained
+            assertEquals(new DateTime(2020, 1, 1, 0, 0, 0, DateTimeZone.forOffsetHours(3)),
+                    mapper.readValue(quote("2020-01-01T00:00:00+03:00"), DateTime.class));
+            // and same with custom pattern
+            Issue93Bean bean = mapper.readValue("{\"jodaDateTime\":\"2020-01-01 00:00:00\"}",
+                    Issue93Bean.class);
+            assertEquals(new DateTime(2020, 1, 1, 0, 0, 0, tz), bean.getJodaDateTime());
+        }
+    }
+
+    static class ExplicitZoneBean {
+        @JsonFormat(timezone = "Asia/Tokyo")
+        public DateTime value;
+    }
+
+    // Explicit zone of format wins over context time zone
+    @Test
+    public void testDateTimeDeserWithoutOffsetExplicitZoneWithoutAdjust() throws IOException
+    {
+        ObjectMapper mapper = jodaMapperBuilder(TimeZone.getTimeZone("America/Los_Angeles"))
+                .disable(DateTimeFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE)
+                .build();
+        ExplicitZoneBean bean = mapper.readValue("{\"value\":\"2020-01-01T00:00:00\"}",
+                ExplicitZoneBean.class);
+        assertEquals(new DateTime(2020, 1, 1, 0, 0, 0, DateTimeZone.forID("Asia/Tokyo")),
+                bean.value);
+    }
+
+    // Zone id suffix is used for value without offset, regardless of context zone
+    @Test
+    public void testDateTimeDeserWithZoneIdSuffixWithoutAdjust() throws IOException
+    {
+        ObjectMapper mapper = jodaMapperBuilder(TimeZone.getTimeZone("America/Los_Angeles"))
+                .disable(DateTimeFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE)
+                .build();
+        Issue93Bean bean = mapper.readValue(
+                "{\"jodaDateTime\":\"2017-01-01 01:01:01[Asia/Shanghai]\"}", Issue93Bean.class);
+        assertEquals(new DateTime(2017, 1, 1, 1, 1, 1, DateTimeZone.forID("Asia/Shanghai")),
+                bean.getJodaDateTime());
+    }
+
+    // Context time zone same as JVM default one: no override needed, same result
+    @Test
+    public void testDateTimeDeserWithoutOffsetDefaultZoneWithoutAdjust() throws IOException
+    {
+        final DateTimeZone tz = DateTimeZone.getDefault();
+        ObjectMapper mapper = jodaMapperBuilder(tz.toTimeZone())
+                .disable(DateTimeFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE)
+                .build();
+        assertEquals(new DateTime(2020, 1, 1, 0, 0, 0, tz),
+                mapper.readValue(quote("2020-01-01T00:00:00"), DateTime.class));
+        assertEquals(new DateTime(2020, 1, 1, 0, 0, 0, DateTimeZone.forOffsetHours(3)),
+                mapper.readValue(quote("2020-01-01T00:00:00+03:00"), DateTime.class));
+    }
 }

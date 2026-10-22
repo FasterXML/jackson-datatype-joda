@@ -1,7 +1,15 @@
 package tools.jackson.datatype.joda.deser;
 
+import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.Interval;
+import org.joda.time.Period;
+import org.joda.time.PeriodType;
+import org.joda.time.chrono.ISOChronology;
+import org.joda.time.format.DateTimeFormatter;
+import org.joda.time.format.ISODateTimeFormat;
+import org.joda.time.format.ISOPeriodFormat;
+import org.joda.time.format.PeriodFormatter;
 
 import tools.jackson.core.JacksonException;
 import tools.jackson.core.JsonParser;
@@ -13,6 +21,12 @@ import tools.jackson.datatype.joda.cfg.JacksonJodaDateFormat;
 
 public class IntervalDeserializer extends JodaDateDeserializerBase<Interval>
 {
+    // Same parsers as used by `Interval.parseWithOffset()`
+    private static final DateTimeFormatter ISO_DATETIME_PARSER = ISODateTimeFormat.dateTimeParser()
+            .withOffsetParsed();
+    private static final PeriodFormatter ISO_PERIOD_PARSER = ISOPeriodFormat.standard()
+            .withParseType(PeriodType.standard());
+
     public IntervalDeserializer() {
         // NOTE: not currently used, but must pass something
         this(FormatConfig.DEFAULT_DATETIME_PARSER);
@@ -77,12 +91,14 @@ public class IntervalDeserializer extends JodaDateDeserializerBase<Interval>
         try {
             // !!! TODO: configurable formats...
             if (hasSlash) {
-                result = Interval.parseWithOffset(value);
+                result = _fromISOString(ctxt, value, index);
             } else {
                 start = Long.parseLong(str);
                 str = value.substring(index + 1);
                 end = Long.parseLong(str);
-                result = new Interval(start, end);
+                // 20-Oct-2026: instants are zone-independent, but use same zone as for
+                //   ISO form (not JVM default one) for consistent chronology of result
+                result = new Interval(start, end, _intervalZone(ctxt));
             }
         } catch (NumberFormatException e) {
             // [datatype-joda#200]: report full value (like other failures)
@@ -108,5 +124,59 @@ public class IntervalDeserializer extends JodaDateDeserializerBase<Interval>
             }
         }
         return result;
+    }
+
+    /**
+     * Helper method for parsing ISO-8601 interval notation ({@code start/end},
+     * {@code start/period} or {@code period/end}), same as
+     * {@link Interval#parseWithOffset} except that date/time values without
+     * offset are resolved using the configured time zone (explicit format time
+     * zone if any, context time zone otherwise) and not the JVM default one.
+     *
+     * @since 3.3
+     */
+    protected Interval _fromISOString(DeserializationContext ctxt, String value, int separator)
+    {
+        final String leftStr = value.substring(0, separator);
+        final String rightStr = value.substring(separator + 1);
+        // `withOffsetParsed()` clears zone override so zone has to be passed via chronology
+        final DateTimeFormatter parser = ISO_DATETIME_PARSER
+                .withChronology(ISOChronology.getInstance(_intervalZone(ctxt)));
+        DateTime start = null;
+        Period period = null;
+
+        if (_isPeriod(leftStr)) {
+            period = ISO_PERIOD_PARSER.parsePeriod(leftStr);
+        } else {
+            start = parser.parseDateTime(leftStr);
+        }
+        if (_isPeriod(rightStr)) {
+            if (period != null) {
+                throw new IllegalArgumentException("Interval composed of two durations: " + value);
+            }
+            return new Interval(start, ISO_PERIOD_PARSER.parsePeriod(rightStr));
+        }
+        final DateTime end = parser.parseDateTime(rightStr);
+        if (period != null) {
+            return new Interval(period, end);
+        }
+        return new Interval(start, end);
+    }
+
+    /**
+     * Time zone used for values without offset and for chronology of results
+     * of both String forms: explicit format time zone if any, context time zone
+     * otherwise (regardless of whether adjustment to context zone is enabled).
+     */
+    private DateTimeZone _intervalZone(DeserializationContext ctxt) {
+        return _format.isTimezoneExplicit() ? _format.getTimeZone() : _contextTimeZone(ctxt);
+    }
+
+    private static boolean _isPeriod(String str) {
+        if (str.isEmpty()) {
+            return false;
+        }
+        final char c = str.charAt(0);
+        return (c == 'P') || (c == 'p');
     }
 }

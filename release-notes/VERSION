@@ -38,6 +38,14 @@ Major version: 3 (for earlier, see VERSION-2.x)
   value and Map key deserializers, and report `Interval` String value without
   separator via `DeserializationProblemHandler`
  (fixed by @arfa-21)
+#202: Date/time values without offset resolved using JVM default time zone
+  (instead of context time zone) by `IntervalDeserializer` (ISO slash form,
+  epoch-millis form), `DateTime`/`Instant` deserializers (with
+  `ADJUST_DATES_TO_CONTEXT_TIME_ZONE` disabled) and `DateTimeKeyDeserializer`.
+  NOTE: with `ADJUST_DATES_TO_CONTEXT_TIME_ZONE` disabled, values without
+  offset are now resolved using context time zone (UTC by default) instead of
+  JVM default time zone
+ (fixed by @arfa-21)
 
 3.2.4 (18-Oct-2026)
 
