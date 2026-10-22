@@ -297,19 +297,18 @@ public class JacksonJodaDateFormat extends JacksonJodaFormatBase
     {
         DateTimeFormatter formatter = _formatter;
         if (!_explicitTimezone) {
-            if (shouldAdjustToContextTimeZone(ctxt)) {
-                TimeZone tz = ctxt.getTimeZone();
-                if (tz != null && !tz.equals(_jdkTimezone)) {
-                    formatter = formatter.withZone(DateTimeZone.forTimeZone(tz));
-                }
-            } else {
+            final boolean adjust = shouldAdjustToContextTimeZone(ctxt);
+            if (!adjust) {
                 formatter = _formatterWithOffsetParsed;
-                // 20-Oct-2026: values without offset must still be resolved
-                //   using context time zone (not JVM default one)
-                TimeZone tz = ctxt.getTimeZone();
-                if (tz != null && !tz.equals(_jdkTimezone)) {
-                    formatter = _withZoneViaChronology(formatter, DateTimeZone.forTimeZone(tz));
-                }
+            }
+            final TimeZone tz = ctxt.getTimeZone();
+            if (tz != null && !tz.equals(_jdkTimezone)) {
+                final DateTimeZone dtz = DateTimeZone.forTimeZone(tz);
+                // 20-Oct-2026: when not adjusting, values without offset must still be
+                //   resolved using context time zone (not JVM default one); offset-parsing
+                //   formatter ignores zone override so pass it via chronology
+                formatter = adjust ? formatter.withZone(dtz)
+                        : _withZoneViaChronology(formatter, dtz);
             }
         }
         if (!_explicitLocale) {

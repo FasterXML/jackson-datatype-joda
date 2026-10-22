@@ -5,6 +5,8 @@ import java.util.*;
 
 import org.junit.jupiter.api.Test;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.Instant;
@@ -114,5 +116,35 @@ public class InstantDeserTest extends JodaTestBase
             assertEquals(new DateTime(2020, 1, 1, 0, 0, 0, tz).toInstant(),
                     mapper.readValue(quote("2020-01-01T00:00:00"), Instant.class));
         }
+    }
+
+    static class ExplicitZoneBean {
+        @JsonFormat(timezone = "Asia/Tokyo")
+        public Instant value;
+    }
+
+    // Explicit zone of format wins over context time zone
+    @Test
+    public void testDeserInstantWithoutOffsetExplicitZoneWithoutAdjust() throws IOException
+    {
+        ObjectMapper mapper = jodaMapperBuilder(TimeZone.getTimeZone("America/Los_Angeles"))
+                .disable(DateTimeFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE)
+                .build();
+        ExplicitZoneBean bean = mapper.readValue("{\"value\":\"2020-01-01T00:00:00\"}",
+                ExplicitZoneBean.class);
+        assertEquals(new DateTime(2020, 1, 1, 0, 0, 0, DateTimeZone.forID("Asia/Tokyo")).toInstant(),
+                bean.value);
+    }
+
+    // Context time zone same as JVM default one: no override needed, same result
+    @Test
+    public void testDeserInstantWithoutOffsetDefaultZoneWithoutAdjust() throws IOException
+    {
+        final DateTimeZone tz = DateTimeZone.getDefault();
+        ObjectMapper mapper = jodaMapperBuilder(tz.toTimeZone())
+                .disable(DateTimeFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE)
+                .build();
+        assertEquals(new DateTime(2020, 1, 1, 0, 0, 0, tz).toInstant(),
+                mapper.readValue(quote("2020-01-01T00:00:00"), Instant.class));
     }
 }

@@ -96,8 +96,9 @@ public class IntervalDeserializer extends JodaDateDeserializerBase<Interval>
                 start = Long.parseLong(str);
                 str = value.substring(index + 1);
                 end = Long.parseLong(str);
-                // 20-Oct-2026: resolve like timestamps (not using JVM default zone)
-                result = new Interval(start, end, _timestampZone(ctxt));
+                // 20-Oct-2026: instants are zone-independent, but use same zone as for
+                //   ISO form (not JVM default one) for consistent chronology of result
+                result = new Interval(start, end, _intervalZone(ctxt));
             }
         } catch (NumberFormatException e) {
             // [datatype-joda#200]: report full value (like other failures)
@@ -139,10 +140,8 @@ public class IntervalDeserializer extends JodaDateDeserializerBase<Interval>
         final String leftStr = value.substring(0, separator);
         final String rightStr = value.substring(separator + 1);
         // `withOffsetParsed()` clears zone override so zone has to be passed via chronology
-        final DateTimeZone tz = _format.isTimezoneExplicit() ? _format.getTimeZone()
-                : _contextTimeZone(ctxt);
         final DateTimeFormatter parser = ISO_DATETIME_PARSER
-                .withChronology(ISOChronology.getInstance(tz));
+                .withChronology(ISOChronology.getInstance(_intervalZone(ctxt)));
         DateTime start = null;
         Period period = null;
 
@@ -162,6 +161,15 @@ public class IntervalDeserializer extends JodaDateDeserializerBase<Interval>
             return new Interval(period, end);
         }
         return new Interval(start, end);
+    }
+
+    /**
+     * Time zone used for values without offset and for chronology of results
+     * of both String forms: explicit format time zone if any, context time zone
+     * otherwise (regardless of whether adjustment to context zone is enabled).
+     */
+    private DateTimeZone _intervalZone(DeserializationContext ctxt) {
+        return _format.isTimezoneExplicit() ? _format.getTimeZone() : _contextTimeZone(ctxt);
     }
 
     private static boolean _isPeriod(String str) {
