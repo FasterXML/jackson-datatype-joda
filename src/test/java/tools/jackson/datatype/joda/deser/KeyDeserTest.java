@@ -14,6 +14,7 @@ import org.joda.time.LocalTime;
 import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.cfg.DateTimeFeature;
+import tools.jackson.databind.exc.InvalidFormatException;
 import tools.jackson.datatype.joda.JodaTestBase;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -74,6 +75,29 @@ public class KeyDeserTest extends JodaTestBase
 
         assertNotNull(map);
         assertTrue(map.containsKey(LocalDate.parse("2014-05-23")));
+    }
+
+    // Keys with year outside of supported range must be reported: Joda would
+    // silently wrap around to the other end of the range
+    @Test
+    public void testLocalDateKeysFailForOutOfRangeYear() throws IOException {
+        _verifyOutOfRangeYearKey("-292275055-01-01", new TypeReference<Map<LocalDate, String>>() { });
+        _verifyOutOfRangeYearKey("292278994-12-31", new TypeReference<Map<LocalDate, String>>() { });
+        _verifyOutOfRangeYearKey("-292275055-01-01T00:00",
+                new TypeReference<Map<LocalDateTime, String>>() { });
+        _verifyOutOfRangeYearKey("292278994-12-31T00:00",
+                new TypeReference<Map<LocalDateTime, String>>() { });
+    }
+
+    private void _verifyOutOfRangeYearKey(String key, TypeReference<?> type) {
+        final String json = "{" + quote(key) + ":0}";
+        try {
+            Object result = MAPPER.readValue(json, type);
+            fail("Should not pass, got: "+result.getClass().getName());
+        } catch (InvalidFormatException e) {
+            verifyException(e, "for year must be in the range");
+            assertEquals(key, e.getValue());
+        }
     }
 
     @Test

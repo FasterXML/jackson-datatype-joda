@@ -69,7 +69,12 @@ public class LocalDateTimeDeserializer
             return _fromTimestamp(ctxt, NumberInput.parseLong(value), value);
         }
         final DateTimeFormatter parser = _format.createParser(ctxt);
-        return _parseWithJoda(ctxt, value, parser::parseLocalDateTime);
+        // Joda does not verify year range: out-of-range year may wrap around
+        return _parseWithJoda(ctxt, value, v -> {
+            final LocalDateTime dt = parser.parseLocalDateTime(v);
+            _verifyYear(dt.getYear());
+            return dt;
+        });
     }
 
     protected LocalDateTime _fromArray(final JsonParser p, final DeserializationContext ctxt)
@@ -93,6 +98,7 @@ public class LocalDateTimeDeserializer
             }
         }
         try {
+            _verifyYear(year);
             return new LocalDateTime(year, month, day, hour, minute, second, millisecond);
         } catch (IllegalFieldValueException e) {
             return _handleInvalidArrayValue(ctxt, e);
