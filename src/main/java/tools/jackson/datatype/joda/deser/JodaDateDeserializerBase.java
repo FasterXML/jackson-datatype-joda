@@ -122,9 +122,7 @@ public abstract class JodaDateDeserializerBase<T>
                 // NOTE: zone offset addition may also overflow (ArithmeticException)
                 final long local = zone.convertUTCToLocal(ts);
                 if (_verifyTimestampYear()) {
-                    final DateTimeField yearField = ISOChronology.getInstanceUTC().year();
-                    FieldUtils.verifyValueBounds(DateTimeFieldType.year(), yearField.get(local),
-                            yearField.getMinimumValue(), yearField.getMaximumValue());
+                    _verifyYear(ISOChronology.getInstanceUTC().year().get(local));
                 }
             }
             return converter.convert(ts, zone);
@@ -147,6 +145,22 @@ public abstract class JodaDateDeserializerBase<T>
      */
     protected boolean _verifyTimestampYear() {
         return true;
+    }
+
+    /**
+     * Helper method for verifying that given year is within supported year
+     * range: Joda does not verify it when parsing String values or constructing
+     * local date (time) values, and may silently produce a different value
+     * (wrapping around to the other end of the range) for years outside.
+     *
+     * @throws IllegalFieldValueException if year is outside of supported range
+     *
+     * @since 3.3
+     */
+    protected static void _verifyYear(int year) {
+        final DateTimeField yearField = ISOChronology.getInstanceUTC().year();
+        FieldUtils.verifyValueBounds(DateTimeFieldType.year(), year,
+                yearField.getMinimumValue(), yearField.getMaximumValue());
     }
 
     /**
