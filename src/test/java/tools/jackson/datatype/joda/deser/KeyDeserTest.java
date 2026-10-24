@@ -14,6 +14,7 @@ import org.joda.time.LocalTime;
 import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.cfg.DateTimeFeature;
+import tools.jackson.databind.exc.InvalidFormatException;
 import tools.jackson.datatype.joda.JodaTestBase;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -62,6 +63,24 @@ public class KeyDeserTest extends JodaTestBase
                 final DateTime key = map.keySet().iterator().next();
                 assertEquals(exp.getMillis(), key.getMillis(), "adjust: "+adjust);
                 assertEquals(tz, key.getZone(), "adjust: "+adjust);
+            }
+        }
+    }
+
+    // Overflowing key must not wrap around to the other end of the timeline
+    @Test
+    public void testDateTimeKeyDeserializeFailsForOverflowingYear() throws IOException {
+        final String json = "{" + quote("292278994-12-31T00:00:00Z") + ":0}";
+        for (boolean adjust : new boolean[] { true, false }) {
+            final ObjectMapper mapper = mapperWithModuleBuilder()
+                    .configure(DateTimeFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE, adjust)
+                    .build();
+            try {
+                Map<DateTime,?> result = mapper.readValue(json,
+                        new TypeReference<Map<DateTime, String>>() { });
+                fail("Should not pass, got: "+result);
+            } catch (InvalidFormatException e) {
+                verifyException(e, "instant out of supported range (overflow)");
             }
         }
     }

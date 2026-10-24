@@ -3,10 +3,15 @@ package tools.jackson.datatype.joda.cfg;
 import java.util.Locale;
 import java.util.TimeZone;
 
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeField;
+import org.joda.time.DateTimeFieldType;
 import org.joda.time.DateTimeUtils;
 import org.joda.time.DateTimeZone;
+import org.joda.time.chrono.ISOChronology;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
+import org.joda.time.format.DateTimeParserBucket;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
@@ -21,6 +26,13 @@ import tools.jackson.databind.cfg.DateTimeFeature;
 public class JacksonJodaDateFormat extends JacksonJodaFormatBase
 {
     private final static String JODA_STYLE_CHARS = "SMLF-";
+
+    /**
+     * Instants strictly within {@code (-2^62, 2^62)} (about +/- 146 million
+     * years) cannot be result of {@code long} overflow; ones outside need
+     * to be verified.
+     */
+    private final static long SAFE_INSTANT_RANGE = 1L << 62;
 
     protected final DateTimeFormatter _formatter;
 
@@ -321,6 +333,35 @@ public class JacksonJodaDateFormat extends JacksonJodaFormatBase
     }
 
     /**
+     * Helper method for parsing given text as {@link DateTime} using given parser,
+     * verifying that the instant did not overflow: Joda accepts years one past
+     * the supported range (like {@code 292278994}) but does not check
+     * calculation of the instant, which silently wraps around to the other end
+     * of the timeline for values past {@code Long.MAX_VALUE} (or before
+     * {@code Long.MIN_VALUE}).
+     *
+     * @throws IllegalArgumentException if text is not valid for parser
+     * @throws ArithmeticException if the value is out of supported range
+     *
+     * @since 3.3
+     */
+    public static DateTime parseDateTime(DateTimeFormatter parser, String text)
+    {
+        final DateTime result = parser.parseDateTime(text);
+        final long millis = result.getMillis();
+        if (millis <= -SAFE_INSTANT_RANGE || millis >= SAFE_INSTANT_RANGE) {
+            // Overflow flips the sign of instant (relative to that of the year)
+            final YearCapture bucket = new YearCapture(parser);
+            parser.getParser().parseInto(bucket, text, 0);
+            if ((bucket.year != null) && ((bucket.year < 0) != (millis < 0))) {
+                throw new ArithmeticException(String.format(
+                        "Cannot parse \"%s\": instant out of supported range (overflow)", text));
+            }
+        }
+        return result;
+    }
+
+    /**
      * @since 2.8
      */
     public boolean shouldAdjustToContextTimeZone(DeserializationContext ctxt) {
@@ -372,6 +413,34 @@ public class JacksonJodaDateFormat extends JacksonJodaFormatBase
             DateTimeZone tz) {
         return formatter.withChronology(DateTimeUtils.getChronology(formatter.getChronology())
                 .withZone(tz));
+    }
+
+    /**
+     * Bucket used for finding out the year (or weekyear) parsed from the value,
+     * to detect overflow of the instant calculated from it.
+     */
+    private static final class YearCapture extends DateTimeParserBucket
+    {
+        Integer year;
+
+        YearCapture(DateTimeFormatter parser) {
+            super(0L, ISOChronology.getInstanceUTC(), parser.getLocale(),
+                    parser.getPivotYear(), parser.getDefaultYear());
+        }
+
+        @Override
+        public void saveField(DateTimeFieldType fieldType, int value) {
+            if (fieldType == DateTimeFieldType.year()
+                    || fieldType == DateTimeFieldType.weekyear()) {
+                year = value;
+            }
+            super.saveField(fieldType, value);
+        }
+
+        @Override
+        public void saveField(DateTimeField field, int value) {
+            saveField(field.getType(), value);
+        }
     }
 
     protected static boolean _isStyle(String formatStr) {
