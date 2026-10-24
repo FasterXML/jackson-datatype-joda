@@ -148,7 +148,7 @@ public class IntervalDeserializer extends JodaDateDeserializerBase<Interval>
         if (_isPeriod(leftStr)) {
             period = ISO_PERIOD_PARSER.parsePeriod(leftStr);
         } else {
-            start = parser.parseDateTime(leftStr);
+            start = JacksonJodaDateFormat.parseDateTime(parser, leftStr);
         }
         if (_isPeriod(rightStr)) {
             if (period != null) {
@@ -156,7 +156,7 @@ public class IntervalDeserializer extends JodaDateDeserializerBase<Interval>
             }
             return new Interval(start, ISO_PERIOD_PARSER.parsePeriod(rightStr));
         }
-        final DateTime end = parser.parseDateTime(rightStr);
+        final DateTime end = JacksonJodaDateFormat.parseDateTime(parser, rightStr);
         if (period != null) {
             return new Interval(period, end);
         }

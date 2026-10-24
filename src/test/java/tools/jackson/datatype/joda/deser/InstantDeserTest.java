@@ -15,6 +15,7 @@ import org.joda.time.ReadableInstant;
 import tools.jackson.core.JsonParser;
 import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.cfg.DateTimeFeature;
+import tools.jackson.databind.exc.InvalidFormatException;
 import tools.jackson.datatype.joda.JodaTestBase;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -146,5 +147,27 @@ public class InstantDeserTest extends JodaTestBase
                 .build();
         assertEquals(new DateTime(2020, 1, 1, 0, 0, 0, tz).toInstant(),
                 mapper.readValue(quote("2020-01-01T00:00:00"), Instant.class));
+    }
+
+    // Joda accepts years one past supported range, but instant calculation
+    // silently wraps around to the other end of the timeline on overflow
+    @Test
+    public void testDeserFailsForOverflowingYear() throws IOException
+    {
+        final ObjectMapper mapper = mapperWithModule();
+        for (String value : new String[] {
+                "292278994-12-31T00:00:00Z",
+                "-292275055-01-01T00:00:00Z",
+        }) {
+            try {
+                Instant result = mapper.readValue(quote(value), Instant.class);
+                fail("Should not pass, got: "+result);
+            } catch (InvalidFormatException e) {
+                verifyException(e, "instant out of supported range (overflow)");
+                assertEquals(value, e.getValue());
+            }
+        }
+        assertEquals(new Instant(Long.MAX_VALUE),
+                mapper.readValue(quote("292278994-08-17T07:12:55.807Z"), Instant.class));
     }
 }

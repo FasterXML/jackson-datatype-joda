@@ -110,15 +110,13 @@ public class DateTimeDeserializer
 
             DateTime result;
             try {
-                result = _format.createParser(ctxt)
-                        .withZone(tz)
-                        .parseDateTime(value)
-                        ;
+                result = JacksonJodaDateFormat.parseDateTime(
+                        _format.createParser(ctxt).withZone(tz), value);
             } catch (IllegalArgumentException | ArithmeticException e) {
                 // Bracketed value may instead be literal part of custom pattern
                 // (like offset in "yyyy-MM-dd'['ZZ']'"), so try full value first
                 try {
-                    return _format.createParser(ctxt).parseDateTime(fullValue);
+                    return JacksonJodaDateFormat.parseDateTime(_format.createParser(ctxt), fullValue);
                 } catch (IllegalArgumentException | ArithmeticException e2) {
                     // not valid that way either: report original failure
                 }
@@ -148,7 +146,7 @@ public class DateTimeDeserializer
             // 07-Oct-2026: [datatype-joda#191] Not a valid zone id suffix, but may still
             //   be valid for a custom pattern with literal '['
             try {
-                return _format.createParser(ctxt).parseDateTime(value);
+                return JacksonJodaDateFormat.parseDateTime(_format.createParser(ctxt), value);
             } catch (IllegalArgumentException e) {
                 final String msg;
                 if (tzId != null) {
@@ -173,7 +171,7 @@ public class DateTimeDeserializer
             }
         }
         final DateTimeFormatter parser = _format.createParser(ctxt);
-        return _parseWithJoda(ctxt, value, parser::parseDateTime);
+        return _parseWithJoda(ctxt, value, v -> JacksonJodaDateFormat.parseDateTime(parser, v));
     }
 
     protected DateTime _fromTimestamp(DeserializationContext ctxt, long ts) {

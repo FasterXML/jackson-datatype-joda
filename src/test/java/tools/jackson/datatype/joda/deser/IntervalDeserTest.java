@@ -248,6 +248,25 @@ public class IntervalDeserTest extends JodaTestBase
         }
     }
 
+    // Overflowing start or end must not wrap around to the other end of the timeline
+    @Test
+    public void testIntervalDeserFailsForOverflowingYear() throws IOException
+    {
+        final ObjectMapper mapper = mapperWithModule();
+        for (String value : new String[] {
+                "292278994-12-31T00:00:00Z/2020-01-01T00:00:00Z",
+                "2020-01-01T00:00:00Z/-292275055-01-01T00:00:00Z",
+        }) {
+            try {
+                Interval result = mapper.readValue(quote(value), Interval.class);
+                fail("Should not pass, got: "+result);
+            } catch (InvalidFormatException e) {
+                verifyException(e, "value out of range (overflow)");
+                assertEquals(value, e.getValue());
+            }
+        }
+    }
+
     // Smaller overflows are reported by Joda as out-of-range field values
     // (and not as `ArithmeticException`), but must fail the same way
     @Test
