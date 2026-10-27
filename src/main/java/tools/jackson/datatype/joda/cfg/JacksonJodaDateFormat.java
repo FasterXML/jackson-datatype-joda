@@ -3,10 +3,16 @@ package tools.jackson.datatype.joda.cfg;
 import java.util.Locale;
 import java.util.TimeZone;
 
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeField;
+import org.joda.time.DateTimeFieldType;
 import org.joda.time.DateTimeUtils;
 import org.joda.time.DateTimeZone;
+import org.joda.time.chrono.ISOChronology;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
+import org.joda.time.format.ISODateTimeFormat;
+import org.joda.time.format.DateTimeParserBucket;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
@@ -22,9 +28,14 @@ public class JacksonJodaDateFormat extends JacksonJodaFormatBase
 {
     private final static String JODA_STYLE_CHARS = "SMLF-";
 
-    protected final DateTimeFormatter _formatter;
+    /**
+     * Instants strictly within {@code (-2^62, 2^62)} (about +/- 146 million
+     * years) cannot be result of {@code long} overflow; ones outside need
+     * to be verified.
+     */
+    private final static long SAFE_INSTANT_RANGE = 1L << 62;
 
-    protected final DateTimeFormatter _formatterWithOffsetParsed;
+    protected final DateTimeFormatter _formatter;
 
     protected final TimeZone _jdkTimezone;
 
@@ -50,7 +61,6 @@ public class JacksonJodaDateFormat extends JacksonJodaFormatBase
     {
         super();
         _formatter = defaultFormatter;
-        _formatterWithOffsetParsed = _withOffsetParsed(_formatter);
         DateTimeZone tz = defaultFormatter.getZone();
         _jdkTimezone = (tz == null) ? null : tz.toTimeZone();
         _explicitTimezone = false;
@@ -63,7 +73,6 @@ public class JacksonJodaDateFormat extends JacksonJodaFormatBase
     {
         super(base, useTimestamp);
         _formatter = base._formatter;
-        _formatterWithOffsetParsed = _withOffsetParsed(_formatter);
         _jdkTimezone = base._jdkTimezone;
         _explicitTimezone = base._explicitTimezone;
         _adjustToContextTZOverride = base._adjustToContextTZOverride;
@@ -75,7 +84,6 @@ public class JacksonJodaDateFormat extends JacksonJodaFormatBase
     {
         super(base);
         _formatter = formatter;
-        _formatterWithOffsetParsed = _withOffsetParsed(_formatter);
         _jdkTimezone = base._jdkTimezone;
         _explicitTimezone = base._explicitTimezone;
         _adjustToContextTZOverride = base._adjustToContextTZOverride;
@@ -86,7 +94,6 @@ public class JacksonJodaDateFormat extends JacksonJodaFormatBase
     {
         super(base, jdkTimezone);
         _formatter = base._formatter.withZone(DateTimeZone.forTimeZone(jdkTimezone));
-        _formatterWithOffsetParsed = _withOffsetParsed(_formatter);
         _jdkTimezone = jdkTimezone;
         _explicitTimezone = true;
         _adjustToContextTZOverride = base._adjustToContextTZOverride;
@@ -97,7 +104,6 @@ public class JacksonJodaDateFormat extends JacksonJodaFormatBase
     {
         super(base, locale);
         _formatter = base._formatter.withLocale(locale);
-        _formatterWithOffsetParsed = _withOffsetParsed(_formatter);
         _jdkTimezone = base._jdkTimezone;
         _explicitTimezone = base._explicitTimezone;
         _adjustToContextTZOverride = base._adjustToContextTZOverride;
@@ -112,7 +118,6 @@ public class JacksonJodaDateFormat extends JacksonJodaFormatBase
     {
         super(base);
         _formatter = base._formatter;
-        _formatterWithOffsetParsed = _withOffsetParsed(_formatter);
         _jdkTimezone = base._jdkTimezone;
         _explicitTimezone = base._explicitTimezone;
         _adjustToContextTZOverride = adjustToContextTZOverride;
@@ -299,7 +304,7 @@ public class JacksonJodaDateFormat extends JacksonJodaFormatBase
         if (!_explicitTimezone) {
             final boolean adjust = shouldAdjustToContextTimeZone(ctxt);
             if (!adjust) {
-                formatter = _formatterWithOffsetParsed;
+                formatter = _withOffsetParsed(formatter);
             }
             final TimeZone tz = ctxt.getTimeZone();
             if (tz != null && !tz.equals(_jdkTimezone)) {
@@ -308,7 +313,7 @@ public class JacksonJodaDateFormat extends JacksonJodaFormatBase
                 //   resolved using context time zone (not JVM default one); offset-parsing
                 //   formatter ignores zone override so pass it via chronology
                 formatter = adjust ? formatter.withZone(dtz)
-                        : _withZoneViaChronology(formatter, dtz);
+                        : withZoneViaChronology(formatter, dtz);
             }
         }
         if (!_explicitLocale) {
@@ -318,6 +323,35 @@ public class JacksonJodaDateFormat extends JacksonJodaFormatBase
             }
         }
         return formatter;
+    }
+
+    /**
+     * Helper method for parsing given text as {@link DateTime} using given parser,
+     * verifying that the instant did not overflow: Joda accepts years one past
+     * the supported range (like {@code 292278994}) but does not check
+     * calculation of the instant, which silently wraps around to the other end
+     * of the timeline for values past {@code Long.MAX_VALUE} (or before
+     * {@code Long.MIN_VALUE}).
+     *
+     * @throws IllegalArgumentException if text is not valid for parser
+     * @throws ArithmeticException if the value is out of supported range
+     *
+     * @since 3.3
+     */
+    public static DateTime parseDateTime(DateTimeFormatter parser, String text)
+    {
+        final DateTime result = parser.parseDateTime(text);
+        final long millis = result.getMillis();
+        if (millis <= -SAFE_INSTANT_RANGE || millis >= SAFE_INSTANT_RANGE) {
+            // Overflow flips the sign of instant (relative to that of the year)
+            final YearCapture bucket = new YearCapture(parser);
+            parser.getParser().parseInto(bucket, text, 0);
+            if ((bucket.year != null) && ((bucket.year < 0) != (millis < 0))) {
+                throw new ArithmeticException(String.format(
+                        "Cannot parse \"%s\": instant out of supported range (overflow)", text));
+            }
+        }
+        return result;
     }
 
     /**
@@ -363,15 +397,61 @@ public class JacksonJodaDateFormat extends JacksonJodaFormatBase
         final DateTimeZone tz = formatter.getZone();
         formatter = formatter.withOffsetParsed();
         if (tz != null) {
-            formatter = _withZoneViaChronology(formatter, tz);
+            formatter = withZoneViaChronology(formatter, tz);
         }
         return formatter;
     }
 
-    private static DateTimeFormatter _withZoneViaChronology(DateTimeFormatter formatter,
+    /**
+     * Same parser as used by {@code DateTime.parse(String)}: retains offset
+     * parsed from value; use {@link #withZoneViaChronology} to specify zone for
+     * values without offset.
+     *
+     * @since 3.3
+     */
+    public static final DateTimeFormatter ISO_DATETIME_OFFSET_PARSER = ISODateTimeFormat
+            .dateTimeParser().withOffsetParsed();
+
+    /**
+     * Helper method for specifying zone of a formatter that parses offset:
+     * {@link DateTimeFormatter#withZone} would be ignored (and
+     * {@code withOffsetParsed()} clears it) so zone has to be passed via
+     * the chronology instead.
+     *
+     * @since 3.3
+     */
+    public static DateTimeFormatter withZoneViaChronology(DateTimeFormatter formatter,
             DateTimeZone tz) {
         return formatter.withChronology(DateTimeUtils.getChronology(formatter.getChronology())
                 .withZone(tz));
+    }
+
+    /**
+     * Bucket used for finding out the year (or weekyear) parsed from the value,
+     * to detect overflow of the instant calculated from it.
+     */
+    private static final class YearCapture extends DateTimeParserBucket
+    {
+        Integer year;
+
+        YearCapture(DateTimeFormatter parser) {
+            super(0L, ISOChronology.getInstanceUTC(), parser.getLocale(),
+                    parser.getPivotYear(), parser.getDefaultYear());
+        }
+
+        @Override
+        public void saveField(DateTimeFieldType fieldType, int value) {
+            if (fieldType == DateTimeFieldType.year()
+                    || fieldType == DateTimeFieldType.weekyear()) {
+                year = value;
+            }
+            super.saveField(fieldType, value);
+        }
+
+        @Override
+        public void saveField(DateTimeField field, int value) {
+            saveField(field.getType(), value);
+        }
     }
 
     protected static boolean _isStyle(String formatStr) {

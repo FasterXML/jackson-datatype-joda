@@ -44,8 +44,10 @@ Major version: 3 (for earlier, see VERSION-2.x)
   `ADJUST_DATES_TO_CONTEXT_TIME_ZONE` disabled) and `DateTimeKeyDeserializer`.
   NOTE: with `ADJUST_DATES_TO_CONTEXT_TIME_ZONE` disabled, values without
   offset are now resolved using context time zone (UTC by default) instead of
-  JVM default time zone
+  JVM default time zone (also affects chronology of `Interval` epoch-millis form)
  (fixed by @arfa-21)
+- `DateTime`/`Instant`/`Interval` text values that overflow instant range now
+  fail with `InvalidFormatException` (instead of silently wrapping)
 
 3.2.4 (18-Oct-2026)
 
