@@ -5,9 +5,7 @@ import org.joda.time.DateTimeZone;
 import org.joda.time.Interval;
 import org.joda.time.Period;
 import org.joda.time.PeriodType;
-import org.joda.time.chrono.ISOChronology;
 import org.joda.time.format.DateTimeFormatter;
-import org.joda.time.format.ISODateTimeFormat;
 import org.joda.time.format.ISOPeriodFormat;
 import org.joda.time.format.PeriodFormatter;
 
@@ -22,8 +20,6 @@ import tools.jackson.datatype.joda.cfg.JacksonJodaDateFormat;
 public class IntervalDeserializer extends JodaDateDeserializerBase<Interval>
 {
     // Same parsers as used by `Interval.parseWithOffset()`
-    private static final DateTimeFormatter ISO_DATETIME_PARSER = ISODateTimeFormat.dateTimeParser()
-            .withOffsetParsed();
     private static final PeriodFormatter ISO_PERIOD_PARSER = ISOPeriodFormat.standard()
             .withParseType(PeriodType.standard());
 
@@ -139,16 +135,15 @@ public class IntervalDeserializer extends JodaDateDeserializerBase<Interval>
     {
         final String leftStr = value.substring(0, separator);
         final String rightStr = value.substring(separator + 1);
-        // `withOffsetParsed()` clears zone override so zone has to be passed via chronology
-        final DateTimeFormatter parser = ISO_DATETIME_PARSER
-                .withChronology(ISOChronology.getInstance(_intervalZone(ctxt)));
+        final DateTimeFormatter parser = JacksonJodaDateFormat.withZoneViaChronology(
+                JacksonJodaDateFormat.ISO_DATETIME_OFFSET_PARSER, _intervalZone(ctxt));
         DateTime start = null;
         Period period = null;
 
         if (_isPeriod(leftStr)) {
             period = ISO_PERIOD_PARSER.parsePeriod(leftStr);
         } else {
-            start = parser.parseDateTime(leftStr);
+            start = JacksonJodaDateFormat.parseDateTime(parser, leftStr);
         }
         if (_isPeriod(rightStr)) {
             if (period != null) {
@@ -156,7 +151,7 @@ public class IntervalDeserializer extends JodaDateDeserializerBase<Interval>
             }
             return new Interval(start, ISO_PERIOD_PARSER.parsePeriod(rightStr));
         }
-        final DateTime end = parser.parseDateTime(rightStr);
+        final DateTime end = JacksonJodaDateFormat.parseDateTime(parser, rightStr);
         if (period != null) {
             return new Interval(period, end);
         }

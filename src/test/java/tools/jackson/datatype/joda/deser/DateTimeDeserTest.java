@@ -418,6 +418,38 @@ public class DateTimeDeserTest extends JodaTestBase
                 Long.MAX_VALUE, "Timestamp out of supported range for time zone 'America/Los_Angeles'");
     }
 
+    // Joda accepts years one past supported range, but instant calculation
+    // silently wraps around to the other end of the timeline on overflow
+    @Test
+    public void testDeserFailsForOverflowingYear() throws Exception
+    {
+        final ObjectMapper mapper = mapperWithModule(TimeZone.getTimeZone("UTC"));
+        for (String value : new String[] {
+                "292278994-12-31T00:00:00Z",
+                "292278994-08-17T07:12:55.808Z",
+                "-292275055-01-01T00:00:00Z",
+                "-292275055-05-16T16:47:04.191Z",
+                "292278994-365",
+                "-292275055-W01-1",
+                "292278994-12-31T00:00:00Z[UTC]",
+        }) {
+            try {
+                DateTime result = mapper.readValue(quote(value), DateTime.class);
+                fail("Should not pass, got: "+result);
+            } catch (InvalidFormatException e) {
+                verifyException(e, "instant out of supported range (overflow)");
+                assertEquals(value, e.getValue());
+            }
+        }
+        // but edge-of-long values are still fine
+        assertEquals(Long.MAX_VALUE, mapper.readValue(quote("292278994-08-17T07:12:55.807Z"),
+                DateTime.class).getMillis());
+        assertEquals(Long.MIN_VALUE, mapper.readValue(quote("-292275055-05-16T16:47:04.192Z"),
+                DateTime.class).getMillis());
+        final DateTime max = new DateTime(Long.MAX_VALUE, DateTimeZone.UTC);
+        assertEquals(max, mapper.readValue(mapper.writeValueAsString(max), DateTime.class));
+    }
+
     private void _verifyEdgeOfLongTimestampFails(ObjectMapper mapper, long ts, String expMsg)
         throws Exception
     {
