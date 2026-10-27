@@ -11,6 +11,7 @@ import org.joda.time.DateTimeZone;
 import org.joda.time.chrono.ISOChronology;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
+import org.joda.time.format.ISODateTimeFormat;
 import org.joda.time.format.DateTimeParserBucket;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -312,7 +313,7 @@ public class JacksonJodaDateFormat extends JacksonJodaFormatBase
                 //   resolved using context time zone (not JVM default one); offset-parsing
                 //   formatter ignores zone override so pass it via chronology
                 formatter = adjust ? formatter.withZone(dtz)
-                        : _withZoneViaChronology(formatter, dtz);
+                        : withZoneViaChronology(formatter, dtz);
             }
         }
         if (!_explicitLocale) {
@@ -396,12 +397,30 @@ public class JacksonJodaDateFormat extends JacksonJodaFormatBase
         final DateTimeZone tz = formatter.getZone();
         formatter = formatter.withOffsetParsed();
         if (tz != null) {
-            formatter = _withZoneViaChronology(formatter, tz);
+            formatter = withZoneViaChronology(formatter, tz);
         }
         return formatter;
     }
 
-    private static DateTimeFormatter _withZoneViaChronology(DateTimeFormatter formatter,
+    /**
+     * Same parser as used by {@code DateTime.parse(String)}: retains offset
+     * parsed from value; use {@link #withZoneViaChronology} to specify zone for
+     * values without offset.
+     *
+     * @since 3.3
+     */
+    public static final DateTimeFormatter ISO_DATETIME_OFFSET_PARSER = ISODateTimeFormat
+            .dateTimeParser().withOffsetParsed();
+
+    /**
+     * Helper method for specifying zone of a formatter that parses offset:
+     * {@link DateTimeFormatter#withZone} would be ignored (and
+     * {@code withOffsetParsed()} clears it) so zone has to be passed via
+     * the chronology instead.
+     *
+     * @since 3.3
+     */
+    public static DateTimeFormatter withZoneViaChronology(DateTimeFormatter formatter,
             DateTimeZone tz) {
         return formatter.withChronology(DateTimeUtils.getChronology(formatter.getChronology())
                 .withZone(tz));

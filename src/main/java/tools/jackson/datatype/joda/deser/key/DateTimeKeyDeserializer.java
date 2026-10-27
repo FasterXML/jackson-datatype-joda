@@ -4,9 +4,7 @@ import java.util.TimeZone;
 
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.joda.time.chrono.ISOChronology;
 import org.joda.time.format.DateTimeFormatter;
-import org.joda.time.format.ISODateTimeFormat;
 
 import tools.jackson.core.JacksonException;
 
@@ -16,9 +14,7 @@ import tools.jackson.datatype.joda.cfg.JacksonJodaDateFormat;
 
 public class DateTimeKeyDeserializer extends JodaKeyDeserializer
 {
-    // Same parser as used by `DateTime.parse(String)`
-    private static final DateTimeFormatter PARSER = ISODateTimeFormat.dateTimeParser()
-            .withOffsetParsed();
+    private static final DateTimeFormatter PARSER = JacksonJodaDateFormat.ISO_DATETIME_OFFSET_PARSER;
 
     @Override
     protected DateTime deserialize(String key, DeserializationContext ctxt)
@@ -35,7 +31,7 @@ public class DateTimeKeyDeserializer extends JodaKeyDeserializer
         }
         // 20-Oct-2026: key without offset must be resolved using context
         //   time zone (not JVM default one); offset is retained if included
-        final DateTimeFormatter parser = PARSER.withChronology(ISOChronology.getInstance(dtz));
+        final DateTimeFormatter parser = JacksonJodaDateFormat.withZoneViaChronology(PARSER, dtz);
         return _parseKey(ctxt, DateTime.class, key,
                 k -> JacksonJodaDateFormat.parseDateTime(parser, k));
     }
