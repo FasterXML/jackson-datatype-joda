@@ -36,8 +36,6 @@ public class JacksonJodaDateFormat extends JacksonJodaFormatBase
 
     protected final DateTimeFormatter _formatter;
 
-    protected final DateTimeFormatter _formatterWithOffsetParsed;
-
     protected final TimeZone _jdkTimezone;
 
     protected transient DateTimeZone _jodaTimezone;
@@ -62,7 +60,6 @@ public class JacksonJodaDateFormat extends JacksonJodaFormatBase
     {
         super();
         _formatter = defaultFormatter;
-        _formatterWithOffsetParsed = _withOffsetParsed(_formatter);
         DateTimeZone tz = defaultFormatter.getZone();
         _jdkTimezone = (tz == null) ? null : tz.toTimeZone();
         _explicitTimezone = false;
@@ -75,7 +72,6 @@ public class JacksonJodaDateFormat extends JacksonJodaFormatBase
     {
         super(base, useTimestamp);
         _formatter = base._formatter;
-        _formatterWithOffsetParsed = _withOffsetParsed(_formatter);
         _jdkTimezone = base._jdkTimezone;
         _explicitTimezone = base._explicitTimezone;
         _adjustToContextTZOverride = base._adjustToContextTZOverride;
@@ -87,7 +83,6 @@ public class JacksonJodaDateFormat extends JacksonJodaFormatBase
     {
         super(base);
         _formatter = formatter;
-        _formatterWithOffsetParsed = _withOffsetParsed(_formatter);
         _jdkTimezone = base._jdkTimezone;
         _explicitTimezone = base._explicitTimezone;
         _adjustToContextTZOverride = base._adjustToContextTZOverride;
@@ -98,7 +93,6 @@ public class JacksonJodaDateFormat extends JacksonJodaFormatBase
     {
         super(base, jdkTimezone);
         _formatter = base._formatter.withZone(DateTimeZone.forTimeZone(jdkTimezone));
-        _formatterWithOffsetParsed = _withOffsetParsed(_formatter);
         _jdkTimezone = jdkTimezone;
         _explicitTimezone = true;
         _adjustToContextTZOverride = base._adjustToContextTZOverride;
@@ -109,7 +103,6 @@ public class JacksonJodaDateFormat extends JacksonJodaFormatBase
     {
         super(base, locale);
         _formatter = base._formatter.withLocale(locale);
-        _formatterWithOffsetParsed = _withOffsetParsed(_formatter);
         _jdkTimezone = base._jdkTimezone;
         _explicitTimezone = base._explicitTimezone;
         _adjustToContextTZOverride = base._adjustToContextTZOverride;
@@ -124,7 +117,6 @@ public class JacksonJodaDateFormat extends JacksonJodaFormatBase
     {
         super(base);
         _formatter = base._formatter;
-        _formatterWithOffsetParsed = _withOffsetParsed(_formatter);
         _jdkTimezone = base._jdkTimezone;
         _explicitTimezone = base._explicitTimezone;
         _adjustToContextTZOverride = adjustToContextTZOverride;
@@ -311,7 +303,7 @@ public class JacksonJodaDateFormat extends JacksonJodaFormatBase
         if (!_explicitTimezone) {
             final boolean adjust = shouldAdjustToContextTimeZone(ctxt);
             if (!adjust) {
-                formatter = _formatterWithOffsetParsed;
+                formatter = _withOffsetParsed(formatter);
             }
             final TimeZone tz = ctxt.getTimeZone();
             if (tz != null && !tz.equals(_jdkTimezone)) {
