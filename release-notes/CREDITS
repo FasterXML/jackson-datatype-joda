@@ -40,3 +40,6 @@ Jooyoung Pyoung (@anthologia)
    (instead of context time zone) by `IntervalDeserializer`, `DateTime`/`Instant`
    deserializers and `DateTimeKeyDeserializer`
   [3.3.0]
+ * Fixed #204: `LocalDate`/`LocalDateTime` String, Array and Map key values with
+   out-of-range year fail with raw Joda exception
+  [3.3.0]
