@@ -359,4 +359,19 @@ public class LocalDateTimeDeserTest extends JodaTestBase
         assertEquals(new LocalDateTime(2009, 4, 1, 12, 3, 2, 1),
                 mapper.readValue("1238558582001", LocalDateTime.class));
     }
+
+    @Test
+    public void testLocalDateTimeDeserFailsForFarOutOfRangeYear() throws IOException
+    {
+        final ObjectMapper mapper = mapperWithModule();
+        for (String value : new String[] { "600000000-01-01T00:00:00", "999999999-01-01T12:00:00",
+                "-999999999-01-01T00:00:00", "-600000000-06-15T00:00:00" }) {
+            try {
+                LocalDateTime result = mapper.readValue(quote(value), LocalDateTime.class);
+                fail("Should not pass, got: "+result);
+            } catch (InvalidFormatException e) {
+                assertEquals(value, e.getValue());
+            }
+        }
+    }
 }

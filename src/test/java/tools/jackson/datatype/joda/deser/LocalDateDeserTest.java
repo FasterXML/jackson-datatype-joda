@@ -186,6 +186,22 @@ public class LocalDateDeserTest extends JodaTestBase
                 mapper.readValue("[292278993,12,31]", LocalDate.class));
     }
 
+    // Years far outside the range could wrap around multiple times
+    @Test
+    public void testLocalDateDeserFailsForFarOutOfRangeYear() throws IOException
+    {
+        final ObjectMapper mapper = mapperWithModule();
+        for (String value : new String[] { "600000000-01-01", "999999999-01-01",
+                "-999999999-01-01", "-600000000-06-15" }) {
+            try {
+                LocalDate result = mapper.readValue(quote(value), LocalDate.class);
+                fail("Should not pass, got: "+result);
+            } catch (InvalidFormatException e) {
+                assertEquals(value, e.getValue());
+            }
+        }
+    }
+
     @Test
     public void testLocalDateDeserWithTypeInfo() throws IOException
     {

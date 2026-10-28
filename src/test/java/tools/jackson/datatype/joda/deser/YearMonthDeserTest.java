@@ -47,6 +47,21 @@ public class YearMonthDeserTest extends JodaTestBase
     }
 
     @Test
+    public void testDeserYearMonthFailsForOutOfRangeYear() throws Exception
+    {
+        for (String value : new String[] { "292278994-01", "-292275055-12",
+                "600000000-01", "999999999-06", "-999999999-06" }) {
+            try {
+                YearMonth result = READER.readValue(quote(value));
+                fail("Should not pass, got: "+result);
+            } catch (InvalidFormatException e) {
+                assertEquals(value, e.getValue());
+            }
+        }
+        assertEquals(new YearMonth(292278993, 12), READER.readValue(quote("292278993-12")));
+    }
+
+    @Test
     public void testDeserYearMonthFailsForUnexpectedType() throws IOException
     {
         try {
