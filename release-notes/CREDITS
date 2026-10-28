@@ -40,6 +40,9 @@ Jooyoung Pyoung (@anthologia)
    (instead of context time zone) by `IntervalDeserializer`, `DateTime`/`Instant`
    deserializers and `DateTimeKeyDeserializer`
   [3.3.0]
+ * Fixed #203: `DateTime`/`Instant`/`Interval` text values that overflow instant range
+   silently wrap around instead of failing
+  [3.3.0]
  * Fixed #204: `LocalDate`/`LocalDateTime` String, Array and Map key values with
    out-of-range year silently wrap around instead of failing
   [3.3.0]
