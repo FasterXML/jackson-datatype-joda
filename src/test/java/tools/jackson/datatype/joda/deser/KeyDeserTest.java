@@ -107,6 +107,16 @@ public class KeyDeserTest extends JodaTestBase
                 new TypeReference<Map<LocalDateTime, String>>() { });
     }
 
+    // ... including years far outside the range (could wrap around multiple times)
+    @Test
+    public void testLocalDateKeysFailForFarOutOfRangeYear() throws IOException {
+        for (String year : new String[] { "600000000", "999999999", "-600000000", "-999999999" }) {
+            _verifyOutOfRangeYearKey(year + "-06-15", new TypeReference<Map<LocalDate, String>>() { });
+            _verifyOutOfRangeYearKey(year + "-06-15T12:00",
+                    new TypeReference<Map<LocalDateTime, String>>() { });
+        }
+    }
+
     private void _verifyOutOfRangeYearKey(String key, TypeReference<?> type) {
         final String json = "{" + quote(key) + ":0}";
         try {
