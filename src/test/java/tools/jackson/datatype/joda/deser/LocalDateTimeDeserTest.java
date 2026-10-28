@@ -147,6 +147,36 @@ public class LocalDateTimeDeserTest extends JodaTestBase
                 Long.MAX_VALUE);
     }
 
+    // String and Array values with year outside of supported range must be
+    // reported: Joda would silently wrap around to the other end of the range
+    // (or produce value that cannot be printed)
+    @Test
+    public void testLocalDateTimeDeserFailsForOutOfRangeYear() throws Exception
+    {
+        final ObjectMapper mapper = mapperWithModule();
+        for (String value : new String[] { "-292275055-01-01T00:00:00",
+                "292278994-12-31T00:00:00", "292278994-01-01T00:00:00" }) {
+            try {
+                LocalDateTime result = mapper.readValue(quote(value), LocalDateTime.class);
+                fail("Should not pass, got year: "+result.getYear());
+            } catch (InvalidFormatException e) {
+                verifyException(e, "for year must be in the range");
+                assertEquals(value, e.getValue());
+            }
+        }
+        try {
+            LocalDateTime result = mapper.readValue("[292278994,1,1,0,0,0]", LocalDateTime.class);
+            fail("Should not pass, got year: "+result.getYear());
+        } catch (InvalidFormatException e) {
+            verifyException(e, "Value 292278994 for year must be in the range");
+        }
+        // but values at the ends of the range are fine
+        assertEquals(new LocalDateTime(292278993, 12, 31, 23, 59, 59, 999),
+                mapper.readValue(quote("292278993-12-31T23:59:59.999"), LocalDateTime.class));
+        assertEquals(new LocalDateTime(-292275054, 1, 1, 0, 0, 0, 0),
+                mapper.readValue("[-292275054,1,1,0,0,0]", LocalDateTime.class));
+    }
+
     private void _verifyOutOfRangeTimestamp(ObjectMapper mapper, long ts) throws IOException
     {
         try {
@@ -328,5 +358,20 @@ public class LocalDateTimeDeserTest extends JodaTestBase
                 .build();
         assertEquals(new LocalDateTime(2009, 4, 1, 12, 3, 2, 1),
                 mapper.readValue("1238558582001", LocalDateTime.class));
+    }
+
+    @Test
+    public void testLocalDateTimeDeserFailsForFarOutOfRangeYear() throws Exception
+    {
+        final ObjectMapper mapper = mapperWithModule();
+        for (String value : new String[] { "600000000-01-01T00:00:00", "999999999-01-01T12:00:00",
+                "-999999999-01-01T00:00:00", "-600000000-06-15T00:00:00" }) {
+            try {
+                LocalDateTime result = mapper.readValue(quote(value), LocalDateTime.class);
+                fail("Should not pass, got: "+result);
+            } catch (InvalidFormatException e) {
+                assertEquals(value, e.getValue());
+            }
+        }
     }
 }

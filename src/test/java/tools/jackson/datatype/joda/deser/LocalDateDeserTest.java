@@ -152,6 +152,56 @@ public class LocalDateDeserTest extends JodaTestBase
         }
     }
 
+    // String and Array values with year outside of supported range must be
+    // reported: Joda would silently wrap around to the other end of the range
+    @Test
+    public void testLocalDateDeserFailsForOutOfRangeYear() throws Exception
+    {
+        final ObjectMapper mapper = mapperWithModule();
+        // these used to be read as 292278994-01-01 and -292275055-12-31
+        for (String value : new String[] { "-292275055-01-01", "292278994-12-31",
+                "292278994-01-01" }) {
+            try {
+                LocalDate result = mapper.readValue(quote(value), LocalDate.class);
+                fail("Should not pass, got: "+result);
+            } catch (InvalidFormatException e) {
+                verifyException(e, "for year must be in the range");
+                assertEquals(value, e.getValue());
+            }
+        }
+        // ... and similarly for Array: used to be read as -292275055-05-16
+        try {
+            LocalDate result = mapper.readValue("[-292275055,1,1]", LocalDate.class);
+            fail("Should not pass, got: "+result);
+        } catch (InvalidFormatException e) {
+            verifyException(e, "Value -292275055 for year must be in the range");
+            assertInstanceOf(IllegalFieldValueException.class, e.getCause());
+        }
+        // but values at the ends of the range are fine
+        assertEquals(new LocalDate(292278993, 12, 31),
+                mapper.readValue(quote("292278993-12-31"), LocalDate.class));
+        assertEquals(new LocalDate(-292275054, 1, 1),
+                mapper.readValue(quote("-292275054-01-01"), LocalDate.class));
+        assertEquals(new LocalDate(292278993, 12, 31),
+                mapper.readValue("[292278993,12,31]", LocalDate.class));
+    }
+
+    // Years far outside the range could wrap around multiple times
+    @Test
+    public void testLocalDateDeserFailsForFarOutOfRangeYear() throws Exception
+    {
+        final ObjectMapper mapper = mapperWithModule();
+        for (String value : new String[] { "600000000-01-01", "999999999-01-01",
+                "-999999999-01-01", "-600000000-06-15" }) {
+            try {
+                LocalDate result = mapper.readValue(quote(value), LocalDate.class);
+                fail("Should not pass, got: "+result);
+            } catch (InvalidFormatException e) {
+                assertEquals(value, e.getValue());
+            }
+        }
+    }
+
     @Test
     public void testLocalDateDeserWithTypeInfo() throws IOException
     {

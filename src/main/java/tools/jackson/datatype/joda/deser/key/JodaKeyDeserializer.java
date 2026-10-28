@@ -3,6 +3,11 @@ package tools.jackson.datatype.joda.deser.key;
 import java.io.IOException;
 import java.util.function.Function;
 
+import org.joda.time.DateTimeField;
+import org.joda.time.DateTimeFieldType;
+import org.joda.time.chrono.ISOChronology;
+import org.joda.time.field.FieldUtils;
+
 import tools.jackson.core.JacksonException;
 import tools.jackson.core.exc.JacksonIOException;
 import tools.jackson.databind.DeserializationContext;
@@ -47,6 +52,22 @@ abstract class JodaKeyDeserializer extends KeyDeserializer
         } catch (IllegalArgumentException | ArithmeticException e) {
             return (K) ctxt.handleWeirdKey(keyType, key, "%s", e.getMessage());
         }
+    }
+
+    /**
+     * Helper method for verifying that given year is within supported year
+     * range: Joda does not verify it when parsing, and may silently produce
+     * a different value (wrapping around to the other end of the range)
+     * for years outside.
+     *
+     * @throws org.joda.time.IllegalFieldValueException if year is outside of supported range
+     *
+     * @since 3.3
+     */
+    protected static void _verifyYear(int year) {
+        final DateTimeField yearField = ISOChronology.getInstanceUTC().year();
+        FieldUtils.verifyValueBounds(DateTimeFieldType.year(), year,
+                yearField.getMinimumValue(), yearField.getMaximumValue());
     }
 
     protected JacksonException _wrapJodaFailure(IOException e) {
