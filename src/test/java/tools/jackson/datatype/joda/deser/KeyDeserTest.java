@@ -98,7 +98,7 @@ public class KeyDeserTest extends JodaTestBase
     // Keys with year outside of supported range must be reported: Joda would
     // silently wrap around to the other end of the range
     @Test
-    public void testLocalDateKeysFailForOutOfRangeYear() throws IOException {
+    public void testLocalDateKeysFailForOutOfRangeYear() throws Exception {
         _verifyOutOfRangeYearKey("-292275055-01-01", new TypeReference<Map<LocalDate, String>>() { });
         _verifyOutOfRangeYearKey("292278994-12-31", new TypeReference<Map<LocalDate, String>>() { });
         _verifyOutOfRangeYearKey("-292275055-01-01T00:00",
@@ -107,9 +107,24 @@ public class KeyDeserTest extends JodaTestBase
                 new TypeReference<Map<LocalDateTime, String>>() { });
     }
 
+    // ... but keys at the ends of the supported range are fine
+    @Test
+    public void testLocalDateKeysAtYearRangeEnds() throws Exception {
+        Map<LocalDate, String> dates = MAPPER.readValue(
+                "{" + quote("292278993-12-31") + ":0," + quote("-292275054-01-01") + ":1}",
+                new TypeReference<Map<LocalDate, String>>() { });
+        assertTrue(dates.containsKey(new LocalDate(292278993, 12, 31)));
+        assertTrue(dates.containsKey(new LocalDate(-292275054, 1, 1)));
+        Map<LocalDateTime, String> dts = MAPPER.readValue(
+                "{" + quote("292278993-12-31T00:00") + ":0," + quote("-292275054-01-01T00:00") + ":1}",
+                new TypeReference<Map<LocalDateTime, String>>() { });
+        assertTrue(dts.containsKey(new LocalDateTime(292278993, 12, 31, 0, 0)));
+        assertTrue(dts.containsKey(new LocalDateTime(-292275054, 1, 1, 0, 0)));
+    }
+
     // ... including years far outside the range (could wrap around multiple times)
     @Test
-    public void testLocalDateKeysFailForFarOutOfRangeYear() throws IOException {
+    public void testLocalDateKeysFailForFarOutOfRangeYear() throws Exception {
         for (String year : new String[] { "600000000", "999999999", "-600000000", "-999999999" }) {
             _verifyOutOfRangeYearKey(year + "-06-15", new TypeReference<Map<LocalDate, String>>() { });
             _verifyOutOfRangeYearKey(year + "-06-15T12:00",

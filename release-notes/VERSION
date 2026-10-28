@@ -46,12 +46,13 @@ Major version: 3 (for earlier, see VERSION-2.x)
   offset are now resolved using context time zone (UTC by default) instead of
   JVM default time zone (also affects chronology of `Interval` epoch-millis form)
  (fixed by @arfa-21)
-#204: `LocalDate`/`LocalDateTime` String, Array and Map key values with
-  out-of-range year fail with raw Joda exception (instead of
-  `InvalidFormatException`)
+#203: `DateTime`/`Instant`/`Interval` text values that overflow instant range
+  silently wrap around (instead of failing with `InvalidFormatException`)
  (fixed by @arfa-21)
-- `DateTime`/`Instant`/`Interval` text values that overflow instant range now
-  fail with `InvalidFormatException` (instead of silently wrapping)
+#204: `LocalDate`/`LocalDateTime` String, Array and Map key values with
+  out-of-range year silently wrap around to the other end of the range
+  (instead of failing with `InvalidFormatException`)
+ (fixed by @arfa-21)
 
 3.2.4 (18-Oct-2026)
 

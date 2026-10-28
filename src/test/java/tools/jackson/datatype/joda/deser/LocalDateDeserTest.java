@@ -155,7 +155,7 @@ public class LocalDateDeserTest extends JodaTestBase
     // String and Array values with year outside of supported range must be
     // reported: Joda would silently wrap around to the other end of the range
     @Test
-    public void testLocalDateDeserFailsForOutOfRangeYear() throws IOException
+    public void testLocalDateDeserFailsForOutOfRangeYear() throws Exception
     {
         final ObjectMapper mapper = mapperWithModule();
         // these used to be read as 292278994-01-01 and -292275055-12-31
@@ -188,7 +188,7 @@ public class LocalDateDeserTest extends JodaTestBase
 
     // Years far outside the range could wrap around multiple times
     @Test
-    public void testLocalDateDeserFailsForFarOutOfRangeYear() throws IOException
+    public void testLocalDateDeserFailsForFarOutOfRangeYear() throws Exception
     {
         final ObjectMapper mapper = mapperWithModule();
         for (String value : new String[] { "600000000-01-01", "999999999-01-01",

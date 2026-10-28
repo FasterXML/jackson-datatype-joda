@@ -151,7 +151,7 @@ public class LocalDateTimeDeserTest extends JodaTestBase
     // reported: Joda would silently wrap around to the other end of the range
     // (or produce value that cannot be printed)
     @Test
-    public void testLocalDateTimeDeserFailsForOutOfRangeYear() throws IOException
+    public void testLocalDateTimeDeserFailsForOutOfRangeYear() throws Exception
     {
         final ObjectMapper mapper = mapperWithModule();
         for (String value : new String[] { "-292275055-01-01T00:00:00",
@@ -361,7 +361,7 @@ public class LocalDateTimeDeserTest extends JodaTestBase
     }
 
     @Test
-    public void testLocalDateTimeDeserFailsForFarOutOfRangeYear() throws IOException
+    public void testLocalDateTimeDeserFailsForFarOutOfRangeYear() throws Exception
     {
         final ObjectMapper mapper = mapperWithModule();
         for (String value : new String[] { "600000000-01-01T00:00:00", "999999999-01-01T12:00:00",
