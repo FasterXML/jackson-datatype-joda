@@ -65,7 +65,7 @@ public class JodaSerializationTest extends JodaTestBase
         // We can also configure beans to not include empty values. In this case,
         // JodaDateSerializerBase#isEmpty is called to check if the value is empty.
         ObjectMapper mapper = jodaMapper();
-        mapper.setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
+        mapper.setDefaultPropertyInclusion(JsonInclude.Include.NON_EMPTY);
         assertEquals("{\"contents\":[2001,5,25]}", mapper.writeValueAsString(new Container<LocalDate>(date)));
 
         // also verify pruning by NON_EMPTY
