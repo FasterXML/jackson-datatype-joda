@@ -5,7 +5,7 @@ Major version: 3 (for earlier, see VERSION-2.x)
 === Releases ===
 ------------------------------------------------------------------------
 
-3.3.0 (not yet released)
+3.3.0 (07-Nov-2026)
 
 #191: `DateTimeDeserializer` accepts malformed zone id suffix (trailing text
   after `]`, or missing `]`)
