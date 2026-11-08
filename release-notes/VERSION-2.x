@@ -4,7 +4,7 @@ Project: jackson-datatype-joda
 === Releases ===
 ------------------------------------------------------------------------
 
-2.23.0 (not yet released)
+2.23.0 (07-Nov-2026)
 
 #190: `PeriodDeserializer` silently truncates out-of-range and invalid values
   (instead of failing)
